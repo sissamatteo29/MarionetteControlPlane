@@ -1,6 +1,7 @@
 package org.marionette.controlplane.domain.entities;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.marionette.controlplane.domain.values.BehaviourId;
 import org.marionette.controlplane.domain.values.ClassName;
@@ -24,12 +25,16 @@ public class ServiceConfig {
         requireNonNull(className, "The class name cannot be null");
         requireNonNull(classConfig, "The class configuration cannot be null");
 
-        classesWithVariants.put(className, classConfig);
+        classesWithVariants.put(className, ClassConfig.copyOf(classConfig));
     }
 
     public void addAll(Map<ClassName, ClassConfig> classConfigs) {
         requireNonNull(classConfigs, "Trying to add a null map to the service configuration");
-        classesWithVariants.putAll(classConfigs);
+        
+        for(Entry<ClassName, ClassConfig> entry : classConfigs.entrySet()) {
+            classesWithVariants.put(entry.getKey(), ClassConfig.copyOf(entry.getValue()));  // Defensive copy
+        }
+
     }
 
     public void removeClassConfiguration(ClassName className) {

@@ -52,11 +52,11 @@ public class MethodConfig {
 
     }
 
-    public static MethodConfig copy(MethodConfig source) {
+    public static MethodConfig copyOf(MethodConfig other) {
 
-        requireNonNull(source, "Source cannot be null when copying a MethodConfig object");
+        requireNonNull(other, "Other cannot be null when copying a MethodConfig object");
 
-        return new MethodConfig(source.getDefaultBehaviourId(), source.getCurrentBehaviourId(), source.getAvailableBehaviourIds());
+        return new MethodConfig(other.getDefaultBehaviourId(), other.getCurrentBehaviourId(), other.getAvailableBehaviourIds());
     }
 
 
