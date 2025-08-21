@@ -13,12 +13,14 @@ import java.util.HashMap;
 
 public class ServiceConfig {
 
-    private final String serviceName;
     private final Map<ClassName, ClassConfig> classesWithVariants = new HashMap<>();
 
-    public ServiceConfig(String serviceName) {
-        requireNonNull(serviceName, "The service name cannot be null");
-        this.serviceName = serviceName;
+
+    public static ServiceConfig copyOf(ServiceConfig other) {
+        requireNonNull(other, "The ServiceConfig other reference cannot be null when trying to copy the content");
+        ServiceConfig copy = new ServiceConfig();
+        copy.addAll(other.classesWithVariants);
+        return copy;
     }
 
     public void addClassConfiguration(ClassName className, ClassConfig classConfig) {
@@ -60,12 +62,8 @@ public class ServiceConfig {
     private void ensureMapContainsKey(ClassName className) {
         if (!classesWithVariants.containsKey(className)) {
             throw new IllegalArgumentException(
-                    "The class " + className + " does not exist in the configuration of the service " + serviceName);
+                    "The class " + className + " does not exist in the configuration of the service");
         }
-    }
-
-    public String toString() {
-        return serviceName;
     }
 
 }
