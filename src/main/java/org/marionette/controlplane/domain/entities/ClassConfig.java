@@ -7,7 +7,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.HashMap;
 
 import org.marionette.controlplane.domain.values.BehaviourId;
-import org.marionette.controlplane.domain.values.ClassName;
 import org.marionette.controlplane.domain.values.MethodName;
 
 /**
@@ -16,12 +15,7 @@ import org.marionette.controlplane.domain.values.MethodName;
  */
 public class ClassConfig {
 
-    private final ClassName className;
     private final Map<MethodName, MethodConfig> methodsConfig = new HashMap<>();  // Aggregate relationship between class config and method config
-    
-    public ClassConfig(ClassName className) {
-        this.className = requireNonNull(className, "Trying to build a ClassConfig object with null className");
-    }
 
     public void addMethodConfig(MethodName methodName, MethodConfig methodConfig) {
         requireNonNull(methodConfig, "Trying to add a null MethodConfig object inside a ClassConfig");
@@ -44,14 +38,10 @@ public class ClassConfig {
         requireNonNull(newBehaviour, "The newBehaviour cannot be null");
 
         if(!methodsConfig.containsKey(method)) {
-            throw new IllegalArgumentException("The method with name " + method.getMethodName() + " does not exist in the current class configuration for the class " + className.getClassName());
+            throw new IllegalArgumentException("The method with name " + method.getMethodName() + " does not exist in the current class configuration");
         }
 
-        methodsConfig.get(method).setCurrentBehaviourId(newBehaviour);
-    }
-
-    public ClassName getClassName() {
-        return className;
+        methodsConfig.get(method).setCurrentBehaviourId(newBehaviour); // LoD
     }
 
     
