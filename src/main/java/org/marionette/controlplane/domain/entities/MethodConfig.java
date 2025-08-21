@@ -52,6 +52,13 @@ public class MethodConfig {
 
     }
 
+    public static MethodConfig copy(MethodConfig source) {
+
+        requireNonNull(source, "Source cannot be null when copying a MethodConfig object");
+
+        return new MethodConfig(source.getDefaultBehaviourId(), source.getCurrentBehaviourId(), source.getAvailableBehaviourIds());
+    }
+
 
     public void setCurrentBehaviourId(BehaviourId currentBehaviourId) {
         if(!availableBehaviourIds.contains(currentBehaviourId)) {
