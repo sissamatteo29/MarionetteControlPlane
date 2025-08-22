@@ -71,6 +71,13 @@ public class BehaviourIdSet {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "BehaviourIdSet [behaviours=" + behaviours + "]";
+    }
+
+    
+
 
     
 }

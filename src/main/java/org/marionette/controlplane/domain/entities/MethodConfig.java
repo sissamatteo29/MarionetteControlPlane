@@ -13,9 +13,8 @@ import org.marionette.controlplane.domain.values.BehaviourIdSet;
 public class MethodConfig {
 
     private final BehaviourId defaultBehaviourId;
+    private final BehaviourId currentBehaviourId;
     private final BehaviourIdSet availableBehaviourIds;
-    
-    private BehaviourId currentBehaviourId;
     
     
     private MethodConfig(BehaviourId defaultBehaviourId, BehaviourId currentBehaviourId,
@@ -60,11 +59,15 @@ public class MethodConfig {
     }
 
 
-    public void setCurrentBehaviourId(BehaviourId currentBehaviourId) {
-        if(!availableBehaviourIds.contains(currentBehaviourId)) {
-            throw new IllegalArgumentException("Impossible to find the behaviourid " + currentBehaviourId + " among the available ones, which are " + availableBehaviourIds);
+    public MethodConfig changeCurrentBehaviourId(BehaviourId newBehaviourId) {
+
+        requireNonNull(newBehaviourId, "The newBehaviourId field cannot be null");
+
+        if(!availableBehaviourIds.contains(newBehaviourId)) {
+            throw new IllegalArgumentException("Impossible to find the behaviour id " + newBehaviourId + " among the available ones, which are " + availableBehaviourIds);
         }
-        this.currentBehaviourId = currentBehaviourId;
+
+        return new MethodConfig(defaultBehaviourId, newBehaviourId, availableBehaviourIds);
     }
 
     public BehaviourId getDefaultBehaviourId() {

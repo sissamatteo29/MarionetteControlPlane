@@ -1,4 +1,4 @@
-package org.marionette.controlplane.domain.entities;
+package org.marionette.controlplane.domain.helpers;
 
 import java.util.Objects;
 

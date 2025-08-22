@@ -1,7 +1,7 @@
 package org.marionette.controlplane.domain.values;
 
 
-import org.marionette.controlplane.domain.entities.StringValidator;
+import org.marionette.controlplane.domain.helpers.StringValidator;
 
 public class MethodName {
 
