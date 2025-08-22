@@ -5,7 +5,6 @@ import java.util.List;
 public class GenericClassConfigDTO {
     
     public String path;
-    public String resolvedPath;
     public List<BehaviourConfigDTO> behaviours;
 
 }
