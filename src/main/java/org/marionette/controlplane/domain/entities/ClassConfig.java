@@ -29,8 +29,7 @@ public class ClassConfig {
         requireNonNull(methodConfig, "Trying to add a null MethodConfig object inside a ClassConfig");
         requireNonNull(methodName, "Trying to add a method configuration with a null name to the ClassConfig object");
         
-        ClassConfig copy = new ClassConfig();
-        copy.methodsConfig.putAll(methodsConfig);
+        ClassConfig copy = initialiseCopy();
         copy.methodsConfig.put(methodName, methodConfig);
         return copy;
     }
@@ -38,16 +37,14 @@ public class ClassConfig {
     public ClassConfig addAll(Map<MethodName, MethodConfig> configurations) {
         requireNonNull(configurations, "Trying to add configurations to a ClassConfig object with a null map");
         
-        ClassConfig copy = new ClassConfig();
-        copy.methodsConfig.putAll(methodsConfig);
+        ClassConfig copy = initialiseCopy();
         copy.methodsConfig.putAll(configurations);
         return copy;
     }
 
     public ClassConfig removeMethodConfig(MethodName methodName) {
         requireNonNull(methodName, "Trying to remove a MethodConfig object inside a ClassConfig with a null MethodName reference");
-        ClassConfig copy = new ClassConfig();
-        copy.methodsConfig.putAll(methodsConfig);
+        ClassConfig copy = initialiseCopy();
         copy.methodsConfig.remove(methodName);
         return copy;
     }
@@ -55,15 +52,20 @@ public class ClassConfig {
     public ClassConfig modifyCurrentBehaviour(MethodName method, BehaviourId newBehaviour) {
         requireNonNull(method, "The method name cannot be null");
         requireNonNull(newBehaviour, "The newBehaviour cannot be null");
-
         if(!methodsConfig.containsKey(method)) {
             throw new IllegalArgumentException("The method with name " + method.getMethodName() + " does not exist in the current class configuration");
         }
 
-        ClassConfig copy = new ClassConfig();
-        copy.methodsConfig.putAll(methodsConfig);
+        ClassConfig copy = initialiseCopy();
         MethodConfig newMethodConfig = copy.methodsConfig.get(method).changeCurrentBehaviourId(newBehaviour);
         copy.methodsConfig.put(method, newMethodConfig);
+        return copy;
+    }
+
+
+    private ClassConfig initialiseCopy() {
+        ClassConfig copy = new ClassConfig();
+        copy.methodsConfig.putAll(methodsConfig);
         return copy;
     }
 

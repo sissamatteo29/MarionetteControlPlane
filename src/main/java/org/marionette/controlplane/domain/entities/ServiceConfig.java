@@ -1,7 +1,6 @@
 package org.marionette.controlplane.domain.entities;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.marionette.controlplane.domain.values.BehaviourId;
 import org.marionette.controlplane.domain.values.ClassName;
@@ -23,31 +22,36 @@ public class ServiceConfig {
         return copy;
     }
 
-    public void addClassConfiguration(ClassName className, ClassConfig classConfig) {
+    public ServiceConfig addClassConfiguration(ClassName className, ClassConfig classConfig) {
         requireNonNull(className, "The class name cannot be null");
         requireNonNull(classConfig, "The class configuration cannot be null");
 
-        classesWithVariants.put(className, ClassConfig.copyOf(classConfig));
+        ServiceConfig copy = initialiseCopy();
+        copy.classesWithVariants.put(className, classConfig);
+        return copy;
+
     }
 
-    public void addAll(Map<ClassName, ClassConfig> classConfigs) {
+    public ServiceConfig addAll(Map<ClassName, ClassConfig> classConfigs) {
         requireNonNull(classConfigs, "Trying to add a null map to the service configuration");
         
-        for(Entry<ClassName, ClassConfig> entry : classConfigs.entrySet()) {
-            classesWithVariants.put(entry.getKey(), ClassConfig.copyOf(entry.getValue()));  // Defensive copy
-        }
+        ServiceConfig copy = initialiseCopy();
+        copy.classesWithVariants.putAll(classConfigs);
+        return copy;
 
     }
 
-    public void removeClassConfiguration(ClassName className) {
+    public ServiceConfig removeClassConfiguration(ClassName className) {
         requireNonNull(className, "The class name cannot be null");
 
         ensureMapContainsKey(className);
 
-        classesWithVariants.remove(className);
+        ServiceConfig copy = initialiseCopy();
+        copy.classesWithVariants.remove(className);
+        return copy;
     }
 
-    public void modifyCurrentBehaviourForMethod(ClassName className, MethodName methodName,
+    public ServiceConfig modifyCurrentBehaviourForMethod(ClassName className, MethodName methodName,
             BehaviourId newBehaviourId) {
         requireNonNull(className, "The class name cannot be null");
         requireNonNull(methodName, "The method name cannot be null");
@@ -55,7 +59,10 @@ public class ServiceConfig {
 
         ensureMapContainsKey(className);
 
-        classesWithVariants.get(className).modifyCurrentBehaviour(methodName, newBehaviourId); // LoD
+        ServiceConfig copy = initialiseCopy();
+        ClassConfig modifiedClassConfig = copy.classesWithVariants.get(className).modifyCurrentBehaviour(methodName, newBehaviourId);
+        copy.classesWithVariants.put(className, modifiedClassConfig);
+        return copy;
 
     }
 
@@ -64,6 +71,12 @@ public class ServiceConfig {
             throw new IllegalArgumentException(
                     "The class " + className + " does not exist in the configuration of the service");
         }
+    }
+
+    private ServiceConfig initialiseCopy() {
+        ServiceConfig copy = new ServiceConfig();
+        copy.classesWithVariants.putAll(classesWithVariants);
+        return copy;
     }
 
 }
