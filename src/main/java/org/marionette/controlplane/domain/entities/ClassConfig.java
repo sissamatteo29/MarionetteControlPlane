@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.HashMap;
 
 import org.marionette.controlplane.domain.values.BehaviourId;
+import org.marionette.controlplane.domain.values.ClassName;
 import org.marionette.controlplane.domain.values.MethodName;
 
 /**
@@ -15,17 +16,30 @@ import org.marionette.controlplane.domain.values.MethodName;
  */
 public class ClassConfig {
 
-    private final Map<MethodName, MethodConfig> methodsConfig = new HashMap<>();  // Aggregate relationship between class config and method config
+    private final ClassName className;
+    private final Map<MethodName, MethodConfig> methodsConfig;
 
+    public ClassConfig(ClassName className) {
+        this.className = className;
+        methodsConfig = new HashMap<>();
+    }
+
+    public ClassConfig(ClassName className, Map<MethodName, MethodConfig> methodsConfig) {
+        this.className = className;
+
+        // Defensive copy, content unmodifiable
+        this.methodsConfig = new HashMap<>(methodsConfig);
+    }
+    
     public static ClassConfig copyOf(ClassConfig other) {
         requireNonNull(other, "Trying to copy a ClassConfig object which is null");
 
-        ClassConfig copy = new ClassConfig();
-        copy.methodsConfig.putAll(other.methodsConfig);
+        ClassConfig copy = new ClassConfig(other.getClassName());
+        copy.methodsConfig.putAll(other.getMethodsConfigurations());
         return copy;
     }
 
-    public ClassConfig addMethodConfig(MethodName methodName, MethodConfig methodConfig) {
+    public ClassConfig withAddedMethodConfig(MethodName methodName, MethodConfig methodConfig) {
         requireNonNull(methodConfig, "Trying to add a null MethodConfig object inside a ClassConfig");
         requireNonNull(methodName, "Trying to add a method configuration with a null name to the ClassConfig object");
         
@@ -34,7 +48,7 @@ public class ClassConfig {
         return copy;
     }
 
-    public ClassConfig addAll(Map<MethodName, MethodConfig> configurations) {
+    public ClassConfig withAddedAll(Map<MethodName, MethodConfig> configurations) {
         requireNonNull(configurations, "Trying to add configurations to a ClassConfig object with a null map");
         
         ClassConfig copy = initialiseCopy();
@@ -42,14 +56,14 @@ public class ClassConfig {
         return copy;
     }
 
-    public ClassConfig removeMethodConfig(MethodName methodName) {
+    public ClassConfig withRemovedMethodConfig(MethodName methodName) {
         requireNonNull(methodName, "Trying to remove a MethodConfig object inside a ClassConfig with a null MethodName reference");
         ClassConfig copy = initialiseCopy();
         copy.methodsConfig.remove(methodName);
         return copy;
     }
 
-    public ClassConfig modifyCurrentBehaviour(MethodName method, BehaviourId newBehaviour) {
+    public ClassConfig withNewBehaviourForMethod(MethodName method, BehaviourId newBehaviour) {
         requireNonNull(method, "The method name cannot be null");
         requireNonNull(newBehaviour, "The newBehaviour cannot be null");
         if(!methodsConfig.containsKey(method)) {
@@ -57,17 +71,26 @@ public class ClassConfig {
         }
 
         ClassConfig copy = initialiseCopy();
-        MethodConfig newMethodConfig = copy.methodsConfig.get(method).changeCurrentBehaviourId(newBehaviour);
+        MethodConfig newMethodConfig = copy.methodsConfig.get(method).withCurrentBehaviourId(newBehaviour);
         copy.methodsConfig.put(method, newMethodConfig);
         return copy;
     }
 
+    public ClassName getClassName() {
+        return className;
+    }
+
+    public Map<MethodName, MethodConfig> getMethodsConfigurations() {
+        return Map.copyOf(methodsConfig);       // Immutable view of the map, content of the map immutable by design
+    }
 
     private ClassConfig initialiseCopy() {
-        ClassConfig copy = new ClassConfig();
-        copy.methodsConfig.putAll(methodsConfig);
+        ClassConfig copy = new ClassConfig(getClassName());
+        copy.methodsConfig.putAll(getMethodsConfigurations());
         return copy;
     }
+
+
 
     
 }

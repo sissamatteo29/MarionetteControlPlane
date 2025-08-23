@@ -18,7 +18,7 @@ public class ConfigRegistry {
         requireNonNull(serviceName, "Trying to a service config in the ConfigRegistry with a null service name");
         requireNonNull(serviceConfig, "The service configuration cannot be a null value");
         
-        globalServiceConfigs.put(serviceName, serviceConfig); // Defensive copy
+        globalServiceConfigs.put(serviceName, serviceConfig); 
     }
 
     public void addAll(Map<ServiceName, ServiceConfig> configurations) {
@@ -48,7 +48,7 @@ public class ConfigRegistry {
             throw new IllegalArgumentException("The service " + serviceName + " does not exist in the ConfigRegistry");
         }
         
-        ServiceConfig modifiedServiceConfig = globalServiceConfigs.get(serviceName).modifyCurrentBehaviourForMethod(className, methodName, newBehaviourId);
+        ServiceConfig modifiedServiceConfig = globalServiceConfigs.get(serviceName).withNewBehaviourForMethod(className, methodName, newBehaviourId);
         globalServiceConfigs.put(serviceName, modifiedServiceConfig);
     }
 

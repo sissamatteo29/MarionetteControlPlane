@@ -6,19 +6,22 @@ import java.util.Collection;
 
 import org.marionette.controlplane.domain.values.BehaviourId;
 import org.marionette.controlplane.domain.values.BehaviourIdSet;
+import org.marionette.controlplane.domain.values.MethodName;
 
 /***
  * Entity
  */
 public class MethodConfig {
 
+    private final MethodName methodName;
     private final BehaviourId defaultBehaviourId;
     private final BehaviourId currentBehaviourId;
     private final BehaviourIdSet availableBehaviourIds;
     
     
-    private MethodConfig(BehaviourId defaultBehaviourId, BehaviourId currentBehaviourId,
+    private MethodConfig(MethodName methodName, BehaviourId defaultBehaviourId, BehaviourId currentBehaviourId,
             BehaviourIdSet availableBehaviourIds) {
+        this.methodName = requireNonNull(methodName, "The method name cannot be null");
         this.defaultBehaviourId = requireNonNull(defaultBehaviourId,
                 "The default behaviour id for the MethodConfig object is a null value");
         this.currentBehaviourId = requireNonNull(currentBehaviourId,
@@ -40,14 +43,15 @@ public class MethodConfig {
         }
     }
 
-    public static MethodConfig of(String defaultBehaviourId, String currentBehaviourId,
+    public static MethodConfig of(String methodName, String defaultBehaviourId, String currentBehaviourId,
             Collection<String> availableBehaviourIds) {
 
+        MethodName methodN = new MethodName(methodName);
         BehaviourId defaultBehaviour = new BehaviourId(defaultBehaviourId);
         BehaviourId currentBehaviour = new BehaviourId(currentBehaviourId);
         BehaviourIdSet availableBehaviours = BehaviourIdSet.fromStringCollection(availableBehaviourIds);
 
-        return new MethodConfig(defaultBehaviour, currentBehaviour, availableBehaviours);
+        return new MethodConfig(methodN, defaultBehaviour, currentBehaviour, availableBehaviours);
 
     }
 
@@ -55,11 +59,11 @@ public class MethodConfig {
 
         requireNonNull(other, "Other cannot be null when copying a MethodConfig object");
 
-        return new MethodConfig(other.getDefaultBehaviourId(), other.getCurrentBehaviourId(), other.getAvailableBehaviourIds());
+        return new MethodConfig(other.getMethodName(), other.getDefaultBehaviourId(), other.getCurrentBehaviourId(), other.getAvailableBehaviourIds());
     }
 
 
-    public MethodConfig changeCurrentBehaviourId(BehaviourId newBehaviourId) {
+    public MethodConfig withCurrentBehaviourId(BehaviourId newBehaviourId) {
 
         requireNonNull(newBehaviourId, "The newBehaviourId field cannot be null");
 
@@ -67,7 +71,11 @@ public class MethodConfig {
             throw new IllegalArgumentException("Impossible to find the behaviour id " + newBehaviourId + " among the available ones, which are " + availableBehaviourIds);
         }
 
-        return new MethodConfig(defaultBehaviourId, newBehaviourId, availableBehaviourIds);
+        return new MethodConfig(getMethodName(), getDefaultBehaviourId(), newBehaviourId, getAvailableBehaviourIds());
+    }
+
+    public MethodName getMethodName() {
+        return methodName;
     }
 
     public BehaviourId getDefaultBehaviourId() {
@@ -86,9 +94,10 @@ public class MethodConfig {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((methodName == null) ? 0 : methodName.hashCode());
         result = prime * result + ((defaultBehaviourId == null) ? 0 : defaultBehaviourId.hashCode());
-        result = prime * result + ((availableBehaviourIds == null) ? 0 : availableBehaviourIds.hashCode());
         result = prime * result + ((currentBehaviourId == null) ? 0 : currentBehaviourId.hashCode());
+        result = prime * result + ((availableBehaviourIds == null) ? 0 : availableBehaviourIds.hashCode());
         return result;
     }
 
@@ -101,23 +110,30 @@ public class MethodConfig {
         if (getClass() != obj.getClass())
             return false;
         MethodConfig other = (MethodConfig) obj;
+        if (methodName == null) {
+            if (other.methodName != null)
+                return false;
+        } else if (!methodName.equals(other.methodName))
+            return false;
         if (defaultBehaviourId == null) {
             if (other.defaultBehaviourId != null)
                 return false;
         } else if (!defaultBehaviourId.equals(other.defaultBehaviourId))
-            return false;
-        if (availableBehaviourIds == null) {
-            if (other.availableBehaviourIds != null)
-                return false;
-        } else if (!availableBehaviourIds.equals(other.availableBehaviourIds))
             return false;
         if (currentBehaviourId == null) {
             if (other.currentBehaviourId != null)
                 return false;
         } else if (!currentBehaviourId.equals(other.currentBehaviourId))
             return false;
+        if (availableBehaviourIds == null) {
+            if (other.availableBehaviourIds != null)
+                return false;
+        } else if (!availableBehaviourIds.equals(other.availableBehaviourIds))
+            return false;
         return true;
     }
+
+
 
    
 
