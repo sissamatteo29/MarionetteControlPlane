@@ -1,7 +1,6 @@
 package org.marionette.controlplane.domain.entities;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import static java.util.Objects.requireNonNull;
 
@@ -22,33 +21,38 @@ public class ClassConfig {
         requireNonNull(other, "Trying to copy a ClassConfig object which is null");
 
         ClassConfig copy = new ClassConfig();
-        for(Entry<MethodName, MethodConfig> entry : other.methodsConfig.entrySet()) {
-            copy.addMethodConfig(entry.getKey(), MethodConfig.copyOf(entry.getValue()));   // Defensive copy
-        }
-
+        copy.methodsConfig.putAll(other.methodsConfig);
         return copy;
     }
 
-    public void addMethodConfig(MethodName methodName, MethodConfig methodConfig) {
+    public ClassConfig addMethodConfig(MethodName methodName, MethodConfig methodConfig) {
         requireNonNull(methodConfig, "Trying to add a null MethodConfig object inside a ClassConfig");
         requireNonNull(methodName, "Trying to add a method configuration with a null name to the ClassConfig object");
-        methodsConfig.put(methodName, MethodConfig.copyOf(methodConfig));  // Defensive copy
+        
+        ClassConfig copy = new ClassConfig();
+        copy.methodsConfig.putAll(methodsConfig);
+        copy.methodsConfig.put(methodName, methodConfig);
+        return copy;
     }
 
-    public void addAll(Map<MethodName, MethodConfig> configurations) {
+    public ClassConfig addAll(Map<MethodName, MethodConfig> configurations) {
         requireNonNull(configurations, "Trying to add configurations to a ClassConfig object with a null map");
         
-        for(Entry<MethodName, MethodConfig> entry : configurations.entrySet()) {
-            methodsConfig.put(entry.getKey(), MethodConfig.copyOf(entry.getValue()));   // Defensive copy
-        }
+        ClassConfig copy = new ClassConfig();
+        copy.methodsConfig.putAll(methodsConfig);
+        copy.methodsConfig.putAll(configurations);
+        return copy;
     }
 
-    public void removeMethodConfig(MethodName methodName) {
+    public ClassConfig removeMethodConfig(MethodName methodName) {
         requireNonNull(methodName, "Trying to remove a MethodConfig object inside a ClassConfig with a null MethodName reference");
-        methodsConfig.remove(methodName);
+        ClassConfig copy = new ClassConfig();
+        copy.methodsConfig.putAll(methodsConfig);
+        copy.methodsConfig.remove(methodName);
+        return copy;
     }
 
-    public void modifyCurrentBehaviour(MethodName method, BehaviourId newBehaviour) {
+    public ClassConfig modifyCurrentBehaviour(MethodName method, BehaviourId newBehaviour) {
         requireNonNull(method, "The method name cannot be null");
         requireNonNull(newBehaviour, "The newBehaviour cannot be null");
 
@@ -56,7 +60,11 @@ public class ClassConfig {
             throw new IllegalArgumentException("The method with name " + method.getMethodName() + " does not exist in the current class configuration");
         }
 
-        methodsConfig.get(method).setCurrentBehaviourId(newBehaviour); // LoD
+        ClassConfig copy = new ClassConfig();
+        copy.methodsConfig.putAll(methodsConfig);
+        MethodConfig newMethodConfig = copy.methodsConfig.get(method).changeCurrentBehaviourId(newBehaviour);
+        copy.methodsConfig.put(method, newMethodConfig);
+        return copy;
     }
 
     
