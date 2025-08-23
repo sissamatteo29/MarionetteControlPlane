@@ -3,6 +3,7 @@ package org.marionette.controlplane.usecases.addserviceconfig;
 import java.util.Objects;
 
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
+import org.marionette.controlplane.usecases.addserviceconfig.request.AddServiceConfigRequest;
 import org.marionette.controlplane.usecases.ports.in.AddServiceConfigPort;
 
 public class AddServiceConfigUseCase implements AddServiceConfigPort {

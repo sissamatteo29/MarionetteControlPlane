@@ -9,6 +9,7 @@ import org.marionette.controlplane.domain.values.ServiceName;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Collections;
 import java.util.HashMap;
 
 public class ServiceConfig {
@@ -84,7 +85,7 @@ public class ServiceConfig {
     }
 
     public Map<ClassName, ClassConfig> getClassConfigurations() {
-        return Map.copyOf(classConfigs);
+        return Collections.unmodifiableMap(classConfigs);
     }
 
 
