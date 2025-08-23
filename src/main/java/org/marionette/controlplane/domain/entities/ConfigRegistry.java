@@ -2,7 +2,6 @@ package org.marionette.controlplane.domain.entities;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.marionette.controlplane.domain.values.BehaviourId;
 import org.marionette.controlplane.domain.values.ClassName;
@@ -19,15 +18,13 @@ public class ConfigRegistry {
         requireNonNull(serviceName, "Trying to a service config in the ConfigRegistry with a null service name");
         requireNonNull(serviceConfig, "The service configuration cannot be a null value");
         
-        globalServiceConfigs.put(serviceName, ServiceConfig.copyOf(serviceConfig)); // Defensive copy
+        globalServiceConfigs.put(serviceName, serviceConfig); // Defensive copy
     }
 
     public void addAll(Map<ServiceName, ServiceConfig> configurations) {
         requireNonNull(configurations, "Trying to add configurations to the ConfigRegistry object with a null map");
 
-        for (Entry<ServiceName, ServiceConfig> entry : configurations.entrySet()) {
-            globalServiceConfigs.put(entry.getKey(), ServiceConfig.copyOf(entry.getValue())); // Defensive copy
-        }
+        globalServiceConfigs.putAll(configurations);
     }
 
     public void removeServiceConfig(ServiceName serviceName) {
@@ -51,7 +48,8 @@ public class ConfigRegistry {
             throw new IllegalArgumentException("The service " + serviceName + " does not exist in the ConfigRegistry");
         }
         
-        globalServiceConfigs.get(serviceName).modifyCurrentBehaviourForMethod(className, methodName, newBehaviourId);
+        ServiceConfig modifiedServiceConfig = globalServiceConfigs.get(serviceName).modifyCurrentBehaviourForMethod(className, methodName, newBehaviourId);
+        globalServiceConfigs.put(serviceName, modifiedServiceConfig);
     }
 
 }
