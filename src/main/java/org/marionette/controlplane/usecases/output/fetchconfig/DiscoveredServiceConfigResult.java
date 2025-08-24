@@ -22,11 +22,19 @@ public class DiscoveredServiceConfigResult {
         return new DiscoveredServiceConfigResult(null, false, errorMessage);
     }
 
-    public ServiceConfigData getServiceConfigData() {
+    public ServiceConfigData serviceConfigData() {
         if(!success) {
             throw new IllegalAccessError("Trying to access the service configuration data from an unsuccessful response");
         }
         return serviceConfigData;
+    }
+
+
+    public String errorMessage() {
+        if(success) {
+            throw new IllegalAccessError("Trying to access the error message from an successful response");
+        }
+        return errorMessage;
     }
 
 }
