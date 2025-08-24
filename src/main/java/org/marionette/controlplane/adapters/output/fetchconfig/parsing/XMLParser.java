@@ -1,11 +1,11 @@
-package org.marionette.controlplane.adapters.output.parsing;
+package org.marionette.controlplane.adapters.output.fetchconfig.parsing;
 
 import java.io.StringReader;
 
 import javax.xml.transform.stream.StreamSource;
 
-import org.marionette.controlplane.adapters.output.parsing.dto.MarionetteConfigDTO;
-import org.marionette.controlplane.adapters.output.parsing.exceptions.XMLMarionetteConfigParsingException;
+import org.marionette.controlplane.adapters.output.fetchconfig.parsing.dto.MarionetteConfigDTO;
+import org.marionette.controlplane.adapters.output.fetchconfig.parsing.exceptions.XMLMarionetteConfigParsingException;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;

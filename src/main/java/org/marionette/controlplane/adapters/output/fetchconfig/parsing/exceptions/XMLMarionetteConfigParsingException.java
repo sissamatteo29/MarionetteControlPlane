@@ -1,4 +1,4 @@
-package org.marionette.controlplane.adapters.output.parsing.exceptions;
+package org.marionette.controlplane.adapters.output.fetchconfig.parsing.exceptions;
 
 public class XMLMarionetteConfigParsingException extends Exception {
 

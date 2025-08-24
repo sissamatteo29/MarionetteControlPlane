@@ -1,4 +1,4 @@
-package org.marionette.controlplane.adapters.output.parsing.dto;
+package org.marionette.controlplane.adapters.output.fetchconfig.parsing.dto;
 
 public class BehaviourConfigDTO {
 
