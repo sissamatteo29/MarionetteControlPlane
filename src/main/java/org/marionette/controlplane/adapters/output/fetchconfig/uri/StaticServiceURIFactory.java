@@ -2,9 +2,9 @@ package org.marionette.controlplane.adapters.output.fetchconfig.uri;
 
 import java.util.Map;
 
-import org.marionette.controlplane.usecases.output.fetchconfig.ExternalServiceURI;
-
 import static java.util.Objects.requireNonNull;
+
+import java.net.URI;
 
 /**
  * Static configuration implementation of ServiceURIFactory.
@@ -28,12 +28,12 @@ public class StaticServiceURIFactory implements ServiceURIFactory {
     }
     
     @Override
-    public ExternalServiceURI createServiceURI(String serviceName) {
+    public URI createServiceURI(String serviceName) {
         return createServiceURI(serviceName, defaultPath);
     }
     
     @Override
-    public ExternalServiceURI createServiceURI(String serviceName, String path) {
+    public URI createServiceURI(String serviceName, String path) {
         requireNonNull(serviceName, "Service name cannot be null");
         requireNonNull(path, "Path cannot be null");
         
@@ -43,7 +43,7 @@ public class StaticServiceURIFactory implements ServiceURIFactory {
         }
         
         String fullUri = baseUrl + formatPath(path);
-        return ExternalServiceURI.fromString(fullUri);
+        return URI.create(fullUri);
     }
     
     private String formatPath(String path) {

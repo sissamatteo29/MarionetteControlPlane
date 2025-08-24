@@ -22,7 +22,7 @@ public class FetchAllConfigurationsAndStoreUseCase implements FetchAllConfigurat
 
         for(String serviceName : request.serviceNames()) {
             DiscoveredServiceConfigResult serviceConfigResult = nodeConfigGateway.fetchConfiguration(serviceName);
-            AddServiceConfigRequest addServiceConfigRequest = new AddServiceConfigRequest(serviceConfigResult.serviceConfigData());
+            AddServiceConfigRequest addServiceConfigRequest = new AddServiceConfigRequest(serviceConfigResult.getServiceConfigData());
             addServiceConfigPort.execute(addServiceConfigRequest);
         }
 

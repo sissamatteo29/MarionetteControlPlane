@@ -1,61 +1,46 @@
 package org.marionette.controlplane.adapters.output.parsing.mapping;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.marionette.controlplane.adapters.output.parsing.dto.BehaviourConfigDTO;
 import org.marionette.controlplane.adapters.output.parsing.dto.GenericClassConfigDTO;
 import org.marionette.controlplane.adapters.output.parsing.dto.MarionetteClassConfigDTO;
-import org.marionette.controlplane.domain.entities.ClassConfig;
-import org.marionette.controlplane.domain.entities.MethodConfig;
-import org.marionette.controlplane.domain.values.MethodName;
+import org.marionette.controlplane.usecases.domain.ClassConfigData;
+import org.marionette.controlplane.usecases.domain.MethodConfigData;
 
 public class MarionetteClassConfigMapper {
 
-    public static ClassConfig toDomain(MarionetteClassConfigDTO classConfigDTO) {
+    public static ClassConfigData toDomainClassConfigData(MarionetteClassConfigDTO classConfigDTO) {
 
-        Map<String, List<String>> behavioursByMethod = new HashMap<>();
-        behavioursByMethod.putAll(extractBehavioursByMethod(classConfigDTO.originalClass));
-        for(GenericClassConfigDTO variantsConfigs : classConfigDTO.variantClasses) {
-            behavioursByMethod.putAll(extractBehavioursByMethod(variantsConfigs));
+        String className = classConfigDTO.originalClass.path;
+
+        List<MethodConfigData> methodConfigs = new ArrayList<>();
+        // originalclass
+        for(BehaviourConfigDTO originalBehaviour : classConfigDTO.originalClass.behaviours) {
+
+            List<String> behaviourIds = new ArrayList<>();
+            behaviourIds.add(originalBehaviour.behaviourId);
+            String methodName = originalBehaviour.behaviourName;
+            String originalBehaviourId = originalBehaviour.behaviourId;
+
+            for(GenericClassConfigDTO variantClass : classConfigDTO.variantClasses) {
+                for(BehaviourConfigDTO variantBehaviour : variantClass.behaviours) {
+                    if(variantBehaviour.behaviourName.equals(originalBehaviour.behaviourName)) {
+                        behaviourIds.add(variantBehaviour.behaviourId);
+                    }
+                }
+            }
+
+            methodConfigs.add(
+                new MethodConfigData(methodName, originalBehaviourId, behaviourIds)
+            );
+
         }
 
-        return generateDomainClassConfig(behavioursByMethod);
+        return new ClassConfigData(className, methodConfigs);
         
     }
-
-
-    private static Map<String, List<String>> extractBehavioursByMethod(GenericClassConfigDTO classConfigDTO) {
-        Map<String, List<String>> behavioursByMethod = new HashMap<>();
-        for(BehaviourConfigDTO behaviourConfigDTO : classConfigDTO.behaviours) {
-            behavioursByMethod.computeIfAbsent(behaviourConfigDTO.behaviourName, s -> new ArrayList<>()).add(behaviourConfigDTO.behaviourId);
-        }
-        return behavioursByMethod;
-    }
-
-    
-    private static ClassConfig generateDomainClassConfig(Map<String, List<String>> behavioursByMethod) {
-        ClassConfig classConfig = new ClassConfig();
-
-        for(Entry<String, List<String>> entry : behavioursByMethod.entrySet()) {
-
-            MethodName methodName = new MethodName(entry.getKey());
-            String defaultBehaviourId = entry.getValue().get(0);
-            String currentBehaviourId = defaultBehaviourId;
-            MethodConfig methodConfig = MethodConfig.of(defaultBehaviourId, currentBehaviourId, entry.getValue());
-
-            classConfig.addMethodConfig(methodName, methodConfig);
-            
-        }
-
-        return classConfig;
-
-    }
-
-
 
     
 }
