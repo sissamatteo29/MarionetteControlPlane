@@ -20,8 +20,8 @@ public class FetchAllConfigurationsAndStoreUseCase implements FetchAllConfigurat
     @Override
     public void fetchAllConfigurationsAndStore(FetchAllConfigsRequest request) {
 
-        for(String serviceName : request.serviceNames()) {
-            DiscoveredServiceConfigResult serviceConfigResult = nodeConfigGateway.fetchConfiguration(serviceName);
+        for(String serviceEndpoint : request.serviceEndpoints()) {
+            DiscoveredServiceConfigResult serviceConfigResult = nodeConfigGateway.fetchConfiguration(serviceEndpoint);
             AddServiceConfigRequest addServiceConfigRequest = new AddServiceConfigRequest(serviceConfigResult.serviceConfigData());
             addServiceConfigPort.execute(addServiceConfigRequest);
         }

@@ -17,8 +17,8 @@ public class ConfigRegistry {
     public void addServiceConfig(ServiceName serviceName, ServiceConfig serviceConfig) {
         requireNonNull(serviceName, "Trying to a service config in the ConfigRegistry with a null service name");
         requireNonNull(serviceConfig, "The service configuration cannot be a null value");
-        
-        globalServiceConfigs.put(serviceName, serviceConfig); 
+
+        globalServiceConfigs.put(serviceName, serviceConfig);
     }
 
     public void addAll(Map<ServiceName, ServiceConfig> configurations) {
@@ -28,28 +28,52 @@ public class ConfigRegistry {
     }
 
     public void removeServiceConfig(ServiceName serviceName) {
-        requireNonNull(serviceName, "Cannot delete an element from the ConfigRegistry with a null value for the serviceName");
+        requireNonNull(serviceName,
+                "Cannot delete an element from the ConfigRegistry with a null value for the serviceName");
 
-        if(!globalServiceConfigs.containsKey(serviceName)) {
+        if (!globalServiceConfigs.containsKey(serviceName)) {
             throw new IllegalArgumentException("The service " + serviceName + " does not exist in the ConfigRegistry");
         }
 
         globalServiceConfigs.remove(serviceName);
     }
 
-    public void modifyCurrentBehaviourForMethod(ServiceName serviceName, ClassName className, MethodName methodName, BehaviourId newBehaviourId) {
+    public void modifyCurrentBehaviourForMethod(ServiceName serviceName, ClassName className, MethodName methodName,
+            BehaviourId newBehaviourId) {
 
-        requireNonNull(serviceName, "Service name cannot be null when trying to modify the current behaviour of a method in the global configuration");
-        requireNonNull(className, "Class name cannot be null when trying to modify the current behaviour of a method in the global configuration");
-        requireNonNull(methodName, "Method name cannot be null when trying to modify the current behaviour of a method in the global configuration");
-        requireNonNull(newBehaviourId, "The new behaviour id cannot be null when trying to modify the current behaviour of a method in the global configuration");
+        requireNonNull(serviceName,
+                "Service name cannot be null when trying to modify the current behaviour of a method in the global configuration");
+        requireNonNull(className,
+                "Class name cannot be null when trying to modify the current behaviour of a method in the global configuration");
+        requireNonNull(methodName,
+                "Method name cannot be null when trying to modify the current behaviour of a method in the global configuration");
+        requireNonNull(newBehaviourId,
+                "The new behaviour id cannot be null when trying to modify the current behaviour of a method in the global configuration");
 
-        if(!globalServiceConfigs.containsKey(serviceName)) {
+        if (!globalServiceConfigs.containsKey(serviceName)) {
             throw new IllegalArgumentException("The service " + serviceName + " does not exist in the ConfigRegistry");
         }
-        
-        ServiceConfig modifiedServiceConfig = globalServiceConfigs.get(serviceName).withNewBehaviourForMethod(className, methodName, newBehaviourId);
+
+        ServiceConfig modifiedServiceConfig = globalServiceConfigs.get(serviceName).withNewBehaviourForMethod(className,
+                methodName, newBehaviourId);
         globalServiceConfigs.put(serviceName, modifiedServiceConfig);
+    }
+
+    @Override
+    public String toString() {
+        if (globalServiceConfigs.isEmpty()) {
+            return "ConfigRegistry{empty}";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("ConfigRegistry{\n");
+
+        globalServiceConfigs.forEach((serviceName, serviceConfig) -> {
+            sb.append("  ").append(serviceName).append(" -> ").append(serviceConfig).append("\n");
+        });
+
+        sb.append("}");
+        return sb.toString();
     }
 
 }

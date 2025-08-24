@@ -11,7 +11,7 @@ import org.marionette.controlplane.usecases.domain.ServiceConfigData;
 
 public class DomainServiceConfigFactory {
 
-    public ServiceConfig createServiceConfig(ServiceConfigData serviceConfigData) {
+    public static ServiceConfig createServiceConfig(ServiceConfigData serviceConfigData) {
 
         ServiceConfig resultingServiceConfig = new ServiceConfig(new ServiceName(serviceConfigData.serviceName()));
 
@@ -23,7 +23,7 @@ public class DomainServiceConfigFactory {
         return resultingServiceConfig;
     }
 
-    private ClassConfig toDomainClassConfig(ClassConfigData rawClassConfig) {
+    private static ClassConfig toDomainClassConfig(ClassConfigData rawClassConfig) {
         ClassConfig resultingClassConfig = new ClassConfig(new ClassName(rawClassConfig.className()));
 
         for(MethodConfigData rawMethodConfig : rawClassConfig.methodConfigData()) {
@@ -34,7 +34,7 @@ public class DomainServiceConfigFactory {
         return resultingClassConfig;
     }
 
-    private MethodConfig toDomainMethodConfig(MethodConfigData rawMethodConfig) {
+    private static MethodConfig toDomainMethodConfig(MethodConfigData rawMethodConfig) {
         return MethodConfig.of(
             rawMethodConfig.methodName(),
             rawMethodConfig.originalBehaviourId(),

@@ -3,12 +3,10 @@ package org.marionette.controlplane.adapters.output.fetchconfig;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.XMLParser;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.dto.MarionetteConfigDTO;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.mapping.MarionetteConfigMapper;
-import org.marionette.controlplane.adapters.output.fetchconfig.uri.ServiceURIFactory;
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
 import org.marionette.controlplane.usecases.output.fetchconfig.DiscoveredServiceConfigResult;
 import org.marionette.controlplane.usecases.output.fetchconfig.NodeConfigGateway;
 
-import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,13 +19,9 @@ import java.time.Duration;
 
 public class NodeConfigAdapter implements NodeConfigGateway {
 
-    private final ServiceURIFactory uriFactory;
     private final HttpClient httpClient;
 
-    public NodeConfigAdapter(ServiceURIFactory uriFactory) {
-        requireNonNull(uriFactory, "The uri factory cannot be null");
-        
-        this.uriFactory = uriFactory;
+    public NodeConfigAdapter() {        
         this.httpClient = createHttpClient();
     }
 
@@ -40,12 +34,11 @@ public class NodeConfigAdapter implements NodeConfigGateway {
     }
 
     @Override
-    public DiscoveredServiceConfigResult fetchConfiguration(String serviceName) {
+    public DiscoveredServiceConfigResult fetchConfiguration(String serviceEndpoint) {
         try {
-            URI resourceURI = uriFactory.createServiceURI(serviceName);
             
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(resourceURI)
+                .uri(URI.create(serviceEndpoint))
                 .timeout(Duration.ofSeconds(30))
                 .GET()
                 .build();

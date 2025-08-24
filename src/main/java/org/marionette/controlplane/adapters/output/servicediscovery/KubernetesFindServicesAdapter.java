@@ -16,12 +16,12 @@ import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.openapi.models.V1ServicePort;
 import io.kubernetes.client.util.Config;
 
-public class KubernetesServiceDiscoveryAdapter implements FindServicesPort {
+public class KubernetesFindServicesAdapter implements FindServicesPort {
 
     private final CoreV1Api coreV1Api;
     private final String namespace;
 
-    public KubernetesServiceDiscoveryAdapter(String namespace) throws RuntimeException {
+    public KubernetesFindServicesAdapter(String namespace) throws RuntimeException {
         this.namespace = namespace; // e.g., "default" or "marionette"
         
         try {
