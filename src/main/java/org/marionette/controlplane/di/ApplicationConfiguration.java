@@ -31,7 +31,13 @@ public class ApplicationConfiguration {
 
     @Bean
     public FindServicesPort createFindServicesPort() {
-        return new KubernetesFindServicesAdapter(""); // namespace
+        String namespace = System.getenv("KUBERNETES_NAMESPACE");
+        if (namespace == null || namespace.trim().isEmpty()) {
+            // Fallback to default namespace if environment variable is not set
+            namespace = "default";
+            // Optional: log a warning about using default namespace
+        }
+        return new KubernetesFindServicesAdapter(namespace);
     }
 
     @Bean

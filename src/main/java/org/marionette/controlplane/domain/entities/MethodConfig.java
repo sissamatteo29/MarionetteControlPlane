@@ -133,6 +133,15 @@ public class MethodConfig {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return String.format("MethodConfig{method=%s, default=%s, current=%s, available=%s}", 
+            methodName, 
+            defaultBehaviourId, 
+            currentBehaviourId, 
+            availableBehaviourIds);
+    }
+
 
 
    

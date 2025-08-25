@@ -103,4 +103,23 @@ public class ServiceConfig {
         return copy;
     }
 
+    @Override
+    public String toString() {
+        if (classConfigs.isEmpty()) {
+            return String.format("ServiceConfig{service=%s, classes=empty}", serviceName);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("ServiceConfig{service=%s, classes=[\n", serviceName));
+
+        classConfigs.forEach((className, classConfig) -> {
+            // Indent the class config representation
+            String classConfigStr = classConfig.toString().replace("\n", "\n  ");
+            sb.append("  ").append(classConfigStr).append("\n");
+        });
+
+        sb.append("]}");
+        return sb.toString();
+    }
+
 }

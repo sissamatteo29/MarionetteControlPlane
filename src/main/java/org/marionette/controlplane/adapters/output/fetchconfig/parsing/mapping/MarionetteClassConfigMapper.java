@@ -20,14 +20,14 @@ public class MarionetteClassConfigMapper {
         for(BehaviourConfigDTO originalBehaviour : classConfigDTO.originalClass.behaviours) {
 
             List<String> behaviourIds = new ArrayList<>();
-            behaviourIds.add(originalBehaviour.behaviourId);
-            String methodName = originalBehaviour.behaviourName;
-            String originalBehaviourId = originalBehaviour.behaviourId;
+            behaviourIds.add(originalBehaviour.id);
+            String methodName = originalBehaviour.name;
+            String originalBehaviourId = originalBehaviour.id;
 
             for(GenericClassConfigDTO variantClass : classConfigDTO.variantClasses) {
                 for(BehaviourConfigDTO variantBehaviour : variantClass.behaviours) {
-                    if(variantBehaviour.behaviourName.equals(originalBehaviour.behaviourName)) {
-                        behaviourIds.add(variantBehaviour.behaviourId);
+                    if(variantBehaviour.name.equals(originalBehaviour.name)) {
+                        behaviourIds.add(variantBehaviour.id);
                     }
                 }
             }

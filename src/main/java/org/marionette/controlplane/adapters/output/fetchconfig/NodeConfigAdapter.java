@@ -48,9 +48,13 @@ public class NodeConfigAdapter implements NodeConfigGateway {
                 HttpResponse.BodyHandlers.ofString()
             );
 
+            System.out.println(response.body());
+
             if (response.statusCode() == 200) {
                 // Parse the XML response
                 MarionetteConfigDTO configDTO = XMLParser.parseFromXMLString(response.body());
+
+                
 
                 // Map
                 ServiceConfigData serviceConfigData = MarionetteConfigMapper.toDomainServiceConfigData(configDTO);

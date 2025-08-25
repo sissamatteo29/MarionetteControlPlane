@@ -1,0 +1,75 @@
+---
+# ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: marionette-control-plane-sa
+  namespace: outfit-app
+---
+# Role with permissions to read services in the namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: marionette-control-plane-role
+rules:
+- apiGroups: [""]
+  resources: ["services", "endpoints"]
+  verbs: ["get", "list"]
+---
+# RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: marionette-control-plane-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: marionette-control-plane-role
+subjects:
+- kind: ServiceAccount
+  name: marionette-control-plane-sa
+  namespace: outfit-app
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: marionette-control-plane
+  namespace: outfit-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: marionette-control-plane
+  template:
+    metadata:
+      labels:
+        app: marionette-control-plane
+    spec:
+      serviceAccountName: marionette-control-plane-sa
+      containers:
+      - name: marionette-control-plane
+        image: marionette-control-plane:latest
+        imagePullPolicy: Never  # For local development
+        ports:
+        - containerPort: 8080
+        env:
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: TARGET_NAMESPACES
+          value: "frontend,backend,payment-service"  # Comma-separated list
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: marionette-control-plane
+  namespace: outfit-app
+spec:
+  selector:
+    app: marionette-control-plane
+  ports:
+  - port: 8080
+    targetPort: 8080

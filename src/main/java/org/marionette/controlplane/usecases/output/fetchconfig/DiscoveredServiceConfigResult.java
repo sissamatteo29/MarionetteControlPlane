@@ -37,4 +37,8 @@ public class DiscoveredServiceConfigResult {
         return errorMessage;
     }
 
+    public boolean isSuccessfull() {
+        return success;
+    }
+
 }

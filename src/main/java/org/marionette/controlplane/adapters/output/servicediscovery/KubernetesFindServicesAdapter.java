@@ -19,10 +19,8 @@ import io.kubernetes.client.util.Config;
 public class KubernetesFindServicesAdapter implements FindServicesPort {
 
     private final CoreV1Api coreV1Api;
-    private final String namespace;
 
     public KubernetesFindServicesAdapter(String namespace) throws RuntimeException {
-        this.namespace = namespace; // e.g., "default" or "marionette"
         
         try {
             // Auto-configure from cluster (if running inside K8s) or kubeconfig

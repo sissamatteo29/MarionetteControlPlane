@@ -21,12 +21,17 @@ public class FetchAllConfigurationsAndStoreUseCase implements FetchAllConfigurat
     public void fetchAllConfigurationsAndStore(FetchAllConfigsRequest request) {
 
         for(String serviceEndpoint : request.serviceEndpoints()) {
-            DiscoveredServiceConfigResult serviceConfigResult = nodeConfigGateway.fetchConfiguration(serviceEndpoint);
-            AddServiceConfigRequest addServiceConfigRequest = new AddServiceConfigRequest(serviceConfigResult.serviceConfigData());
-            addServiceConfigPort.execute(addServiceConfigRequest);
+            System.out.println("Contacting the service " + serviceEndpoint + "/api/getConfiguration");
+            DiscoveredServiceConfigResult serviceConfigResult = nodeConfigGateway.fetchConfiguration(serviceEndpoint + "/api/getConfiguration");
+            if(serviceConfigResult.isSuccessfull()) {
+                AddServiceConfigRequest addServiceConfigRequest = new AddServiceConfigRequest(serviceConfigResult.serviceConfigData());
+                addServiceConfigPort.execute(addServiceConfigRequest);
+            } else {
+                System.out.println("There was an error trying to contact the service " + serviceEndpoint + "/api/getConfiguration");
+                System.out.println(serviceConfigResult.errorMessage());
+            }
         }
 
     }
-
     
 }

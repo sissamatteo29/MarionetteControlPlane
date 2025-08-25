@@ -1,4 +1,7 @@
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/App.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/AppStartupCode.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/output/clusterconfig/KubernetesServiceURIFactory.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/output/clusterconfig/StaticServiceURIFactory.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/output/fetchconfig/NodeConfigAdapter.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/output/fetchconfig/parsing/XMLParser.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/output/fetchconfig/parsing/dto/BehaviourConfigDTO.java
@@ -26,6 +29,8 @@
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/domain/ClassConfigData.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/domain/MethodConfigData.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/domain/ServiceConfigData.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/fetchconfig/AFetchExternalConfigUseCase.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/fetchconfig/FetchExternalConfigUseCase.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/input/AddServiceConfigPort.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/input/DiscoverServicesPort.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/input/FetchAllConfigurationsAndStorePort.java
@@ -39,3 +44,12 @@
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/output/fetchconfig/DiscoveredServiceConfigResult.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/output/fetchconfig/NodeConfigGateway.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/output/servicediscovery/FindServicesPort.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/ports/in/FetchExternalConfigPort.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/ports/out/clusterconfig/ExternalServiceURI.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/ports/out/clusterconfig/ServiceURIFactory.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/ports/out/config/FetchedConfigRepository.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/ports/out/discovery/ServiceDiscovery.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/ports/out/http/HttpClient.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/ports/out/http/HttpClientException.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/ports/out/http/HttpHeaders.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/ports/out/http/HttpResponse.java

@@ -91,7 +91,22 @@ public class ClassConfig {
         return copy;
     }
 
+    @Override
+    public String toString() {
+        if (methodConfigs.isEmpty()) {
+            return String.format("ClassConfig{class=%s, methods=empty}", className);
+        }
 
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("ClassConfig{class=%s, methods=[\n", className));
+
+        methodConfigs.forEach((methodName, methodConfig) -> {
+            sb.append("    ").append(methodConfig).append("\n");
+        });
+
+        sb.append("  ]}");
+        return sb.toString();
+    }
 
     
 }
