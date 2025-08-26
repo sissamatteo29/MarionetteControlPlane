@@ -141,7 +141,7 @@ public class ConfigurationController {
     // TODO: Method to notify marionette nodes when configuration changes
     private void notifyServiceInstances(String serviceName, String className, String methodName,
             BehaviourId newBehaviour) {
-        System.out.println("Notifying marionette nodes: " + serviceName + "." + className + "." + methodName + " -> "
+        System.out.println("Notifying marionette nodes: " + serviceName + " ## " + className + " ## " + methodName + " -> "
                 + newBehaviour);
 
                 changeConfigService.notifyAllServiceInstances(namespace, serviceName, className, methodName, newBehaviour);

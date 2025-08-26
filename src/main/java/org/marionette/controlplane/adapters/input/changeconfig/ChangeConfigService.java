@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.marionette.controlplane.domain.values.BehaviourId;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,23 +27,44 @@ public class ChangeConfigService {
 
     private final CoreV1Api coreV1Api;
     private final RestTemplate restTemplate;
+    
+    @Value("${kubernetes.service.host:https://kubernetes.default.svc}")
+    private String kubernetesHost;
 
     public ChangeConfigService() {
         try {
-            ApiClient client = Config.defaultClient();
+            // Try to use in-cluster config first, fall back to default config
+            ApiClient client;
+            try {
+                // This works when running inside the cluster
+                client = Config.fromCluster();
+                System.out.println("Using in-cluster Kubernetes configuration");
+            } catch (Exception e) {
+                // Fall back to default config (for local development)
+                client = Config.defaultClient();
+                System.out.println("Using default Kubernetes configuration");
+            }
+            
+            // Set reasonable timeouts
+            client.setConnectTimeout(30_000);
+            client.setReadTimeout(30_000);
+            client.setWriteTimeout(30_000);
+            
             Configuration.setDefaultApiClient(client);
-            this.coreV1Api = new CoreV1Api();
+            this.coreV1Api = new CoreV1Api(client); // Pass the configured client
             this.restTemplate = new RestTemplate();
+            
         } catch (Exception e) {
-            throw new RuntimeException("Impossible to build the object ChangeConfigService");
+            System.err.println("Error building ChangeConfigService: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Impossible to build the object ChangeConfigService", e);
         }
-
     }
 
     public void notifyAllServiceInstances(String namespace, String serviceName, String className, String methodName,
             BehaviourId newBehavior) {
         try {
-            System.out.println("Looking up service: " + serviceName);
+            System.out.println("Looking up service: " + serviceName + " in namespace: " + namespace);
 
             // Step 1: Get the Service to find its selector
             V1Service service = coreV1Api.readNamespacedService(serviceName, namespace, null);
@@ -73,20 +95,28 @@ public class ChangeConfigService {
 
             System.out.println("Found " + runningPods.size() + " running pods for service " + serviceName);
 
+            if (runningPods.isEmpty()) {
+                System.err.println("No running pods found for service: " + serviceName);
+                return;
+            }
+
             // Step 4: Notify each pod
             notifyPods(runningPods, className, methodName, newBehavior);
 
         } catch (ApiException e) {
+            System.err.println("Kubernetes API error - Code: " + e.getCode() + ", Message: " + e.getMessage());
+            System.err.println("Response body: " + e.getResponseBody());
+            
             if (e.getCode() == 404) {
-                System.err.println("Service " + serviceName + " not found in default namespace");
-            } else {
-                System.err.println("Kubernetes API error: " + e.getMessage());
+                System.err.println("Service " + serviceName + " not found in namespace " + namespace);
+            } else if (e.getCode() == 403) {
+                System.err.println("Permission denied. Check RBAC permissions for the service account");
             }
         } catch (Exception e) {
             System.err.println("Error discovering pods for service " + serviceName + ": " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
 
     private void notifyPods(List<V1Pod> pods, String className, String methodName, BehaviourId newBehavior) {
         BehaviourChangeRequestDTO request = new BehaviourChangeRequestDTO();
@@ -112,13 +142,14 @@ public class ChangeConfigService {
         System.out.println("Notification complete: " + successCount + "/" + results.size() + " pods updated");
     }
 
-
     private String notifySinglePod(V1Pod pod, HttpEntity<BehaviourChangeRequestDTO> request) {
         String podIP = pod.getStatus().getPodIP();
         String podName = pod.getMetadata().getName();
         
         try {
             String podUrl = "http://" + podIP + ":8080/api/changeBehaviour";
+            System.out.println("Notifying pod: " + podName + " at URL: " + podUrl);
+            
             String response = restTemplate.postForObject(podUrl, request, String.class);
             System.out.println("Pod " + podName + " (" + podIP + "): " + response);
             return response != null ? response : "Success";
@@ -128,5 +159,4 @@ public class ChangeConfigService {
             return "Failed";
         }
     }
-
 }

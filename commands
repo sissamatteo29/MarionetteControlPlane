@@ -1,0 +1,21 @@
+
+
+kubectl get pods -n outfit-app
+
+minikube service marionette-control-plane -n outfit-app
+minikube service ui-service -n outfit-app
+
+kubectl logs deployments/image-processor-service -n outfit-app
+kubectl logs deployments/marionette-control-plane -n outfit-app
+kubectl logs deployments/imagestore-service -n outfit-app
+kubectl logs deployments/ui-service -n outfit-app
+
+kubectl port-forward deployment/your-microservice 8080:8080 -n outfit-app
+
+
+
+# TO RESTART PROMETHEUS
+kubectl get pods -n <namespace>
+helm list --all-namespaces
+helm upgrade
+kubectl port-forward -n <namespace> svc/prometheus-server 9090:80
