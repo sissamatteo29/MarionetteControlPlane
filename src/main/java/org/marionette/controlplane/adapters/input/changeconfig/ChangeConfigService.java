@@ -26,22 +26,20 @@ public class ChangeConfigService {
 
     private final CoreV1Api coreV1Api;
     private final RestTemplate restTemplate;
-    private final String namespace;
 
-    public ChangeConfigService(String namespace) {
+    public ChangeConfigService() {
         try {
             ApiClient client = Config.defaultClient();
             Configuration.setDefaultApiClient(client);
             this.coreV1Api = new CoreV1Api();
             this.restTemplate = new RestTemplate();
-            this.namespace = namespace;
         } catch (Exception e) {
             throw new RuntimeException("Impossible to build the object ChangeConfigService");
         }
 
     }
 
-    public void notifyAllServiceInstances(String serviceName, String className, String methodName,
+    public void notifyAllServiceInstances(String namespace, String serviceName, String className, String methodName,
             BehaviourId newBehavior) {
         try {
             System.out.println("Looking up service: " + serviceName);

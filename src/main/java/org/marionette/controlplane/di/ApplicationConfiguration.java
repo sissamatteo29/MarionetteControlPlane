@@ -1,6 +1,5 @@
 package org.marionette.controlplane.di;
 
-import org.marionette.controlplane.adapters.input.changeconfig.ChangeConfigService;
 import org.marionette.controlplane.adapters.output.fetchconfig.NodeConfigAdapter;
 import org.marionette.controlplane.adapters.output.servicediscovery.KubernetesFindServicesAdapter;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
@@ -39,17 +38,6 @@ public class ApplicationConfiguration {
             // Optional: log a warning about using default namespace
         }
         return new KubernetesFindServicesAdapter(namespace);
-    }
-
-    @Bean
-    public ChangeConfigService changeConfigService() {
-         String namespace = System.getenv("KUBERNETES_NAMESPACE");
-        if (namespace == null || namespace.trim().isEmpty()) {
-            // Fallback to default namespace if environment variable is not set
-            namespace = "default";
-            // Optional: log a warning about using default namespace
-        }
-        return new ChangeConfigService(namespace);
     }
 
     @Bean
