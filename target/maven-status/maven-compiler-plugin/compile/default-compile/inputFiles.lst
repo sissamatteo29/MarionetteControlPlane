@@ -1,5 +1,10 @@
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/App.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/AppStartupCode.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/input/controllers/ConfigurationController.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/input/controllers/WebConfig.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/input/dto/ClassConfigDTO.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/input/dto/MethodConfigDTO.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/input/dto/ServiceConfigDTO.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/output/clusterconfig/KubernetesServiceURIFactory.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/output/clusterconfig/StaticServiceURIFactory.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/adapters/output/fetchconfig/NodeConfigAdapter.java
@@ -37,6 +42,7 @@
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/input/addserviceconfig/AddServiceConfigRequest.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/input/addserviceconfig/AddServiceConfigUseCase.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/input/addserviceconfig/DomainServiceConfigFactory.java
+/home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/input/changebehaviour/BehaviourChangeRequest.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/input/fetchconfig/FetchAllConfigsRequest.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/input/fetchconfig/FetchAllConfigurationsAndStoreUseCase.java
 /home/matteo/Desktop/MARIONETTE_PROJECT/marionette-control-plane/src/main/java/org/marionette/controlplane/usecases/input/servicediscovery/DiscoverServicesResult.java

@@ -3,6 +3,9 @@
 
 eval $(minikube docker-env)
 
+echo "Building frontend"
+cd frontend && npm run build && cp -r build/* ../src/main/resources/static && cd ..
+
 echo "Building maven project"
 mvn clean package
 
