@@ -57,17 +57,29 @@
       <version>4.0.2</version>
     </dependency>
 
-        <!-- JAXB Runtime Implementation (this is what you're missing) -->
+    <!-- JAXB Runtime Implementation (this is what you're missing) -->
     <dependency>
-        <groupId>org.glassfish.jaxb</groupId>
-        <artifactId>jaxb-runtime</artifactId>
-        <version>4.0.4</version>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>4.0.4</version>
     </dependency>
 
     <dependency>
       <groupId>io.kubernetes</groupId>
       <artifactId>client-java</artifactId>
       <version>18.0.1</version>
+    </dependency>
+
+    <!-- Serving static files -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+
+    <!-- JSON processing -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
     </dependency>
   </dependencies>
 
