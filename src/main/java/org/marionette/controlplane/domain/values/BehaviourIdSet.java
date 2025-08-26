@@ -46,6 +46,10 @@ public class BehaviourIdSet {
         return new BehaviourIdSet(next);
     }
 
+    public Set<BehaviourId> getBehaviours() {
+        return Set.copyOf(behaviours);
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

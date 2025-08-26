@@ -76,4 +76,12 @@ public class ConfigRegistry {
         return sb.toString();
     }
 
+    public Map<ServiceName, ServiceConfig> getAllServices() {
+        return Map.copyOf(globalServiceConfigs);
+    }
+
+    public ServiceConfig getServiceConfiguration(ServiceName serviceName) {
+        return globalServiceConfigs.get(serviceName);
+    }
+
 }

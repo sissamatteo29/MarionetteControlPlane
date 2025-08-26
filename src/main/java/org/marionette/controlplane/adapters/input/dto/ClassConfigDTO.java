@@ -2,7 +2,7 @@ package org.marionette.controlplane.adapters.input.dto;
 
 import java.util.Map;
 
-class ClassConfigDTO {
+public class ClassConfigDTO {
     private String className;
     private Map<String, MethodConfigDTO> methods;
 
