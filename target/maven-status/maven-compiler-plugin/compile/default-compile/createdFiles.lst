@@ -1,6 +1,7 @@
 org/marionette/controlplane/domain/entities/ServiceConfig.class
 org/marionette/controlplane/usecases/domain/MethodConfigData.class
 org/marionette/controlplane/adapters/output/fetchconfig/parsing/dto/MarionetteClassConfigDTO.class
+org/marionette/controlplane/adapters/input/changeconfig/ChangeConfigService.class
 org/marionette/controlplane/domain/values/MethodName.class
 org/marionette/controlplane/adapters/output/fetchconfig/parsing/mapping/MarionetteClassConfigMapper.class
 org/marionette/controlplane/usecases/input/servicediscovery/DiscoverServicesResult.class
@@ -26,6 +27,7 @@ org/marionette/controlplane/adapters/input/dto/MethodConfigDTO.class
 org/marionette/controlplane/domain/helpers/StringValidator.class
 org/marionette/controlplane/usecases/input/AddServiceConfigPort.class
 org/marionette/controlplane/usecases/input/fetchconfig/FetchAllConfigsRequest.class
+org/marionette/controlplane/adapters/input/changeconfig/BehaviourChangeRequestDTO.class
 org/marionette/controlplane/adapters/input/dto/ClassConfigDTO.class
 org/marionette/controlplane/domain/entities/ClassConfig.class
 org/marionette/controlplane/adapters/output/fetchconfig/uri/StaticServiceURIFactory.class
