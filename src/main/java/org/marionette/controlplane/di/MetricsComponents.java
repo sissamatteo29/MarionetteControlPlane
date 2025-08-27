@@ -20,7 +20,7 @@ import java.time.Duration;
 @Configuration
 @EnableAsync
 @EnableScheduling
-public class MetricsConfiguration {
+public class MetricsComponents {
 
     /**
      * Namespace configuration
