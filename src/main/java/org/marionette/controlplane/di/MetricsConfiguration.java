@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -32,11 +34,15 @@ public class MetricsConfiguration {
      * RestTemplate configured for Prometheus API calls
      */
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder
-                .setConnectTimeout(Duration.ofSeconds(10))
-                .setReadTimeout(Duration.ofSeconds(30))
-                .build();
+    public RestTemplate restTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Configure URI template handling to avoid double encoding
+        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory();
+        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
+        restTemplate.setUriTemplateHandler(factory);
+
+        return restTemplate;
     }
 
     @Bean
