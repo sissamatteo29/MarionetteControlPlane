@@ -11,60 +11,41 @@ import java.util.*;
 
 @Component
 public class PrometheusClient {
-    
+
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    private final KubernetesPrometheusDiscovery prometheusDiscovery;
-    
-    @Value("${prometheus.url:}")
-    private String configuredPrometheusUrl;
-    
-    private String prometheusBaseUrl;
-    private boolean prometheusAvailable = false;
+    private final PrometheusConfigurationResolver configResolver;
 
-    public PrometheusClient(RestTemplate restTemplate, ObjectMapper objectMapper, 
-                           KubernetesPrometheusDiscovery prometheusDiscovery) {
+    public PrometheusClient(RestTemplate restTemplate, ObjectMapper objectMapper,
+            PrometheusConfigurationResolver configResolver) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
-        this.prometheusDiscovery = prometheusDiscovery;
+        this.configResolver = configResolver;
     }
 
     @PostConstruct
-    public void initializePrometheusUrl() {
-        try {
-            if (configuredPrometheusUrl != null && !configuredPrometheusUrl.isEmpty()) {
-                prometheusBaseUrl = configuredPrometheusUrl;
-            } else {
-                // Auto-discover Prometheus in the cluster
-                prometheusBaseUrl = prometheusDiscovery.discoverPrometheus();
-            }
-            
-            if (prometheusBaseUrl == null) {
-                System.err.println("Could not find Prometheus instance. Metrics will be unavailable.");
-                prometheusAvailable = false;
-            } else {
-                System.out.println("Using Prometheus at: " + prometheusBaseUrl);
-                prometheusAvailable = true;
-            }
-        } catch (Exception e) {
-            System.err.println("Failed to initialize Prometheus client: " + e.getMessage());
-            System.err.println("Metrics will be unavailable. Application will continue without metrics.");
-            prometheusAvailable = false;
+    public void initializePrometheusClient() {
+        // Configuration is handled by PrometheusConfigurationResolver
+        if (configResolver.isPrometheusAvailable()) {
+            System.out.println("PrometheusClient initialized successfully with: " + configResolver.getPrometheusUrl());
+        } else {
+            System.out
+                    .println("PrometheusClient initialized but Prometheus is not available - metrics will be disabled");
         }
     }
 
-    /**
+/**
      * Query Prometheus for range data
      */
     public List<TimeSeriesDataDTO> queryRange(String query, Instant startTime, Instant endTime, String step) {
-        if (!prometheusAvailable) {
+        if (!configResolver.isPrometheusAvailable()) {
             System.out.println("Prometheus not available - returning empty metrics");
             return Collections.emptyList();
         }
 
         try {
             String url = String.format("%s/api/v1/query_range?query=%s&start=%s&end=%s&step=%s",
-                prometheusBaseUrl,
+                configResolver.getPrometheusUrl(),
                 java.net.URLEncoder.encode(query, "UTF-8"),
                 startTime.getEpochSecond(),
                 endTime.getEpochSecond(),
@@ -138,7 +119,7 @@ public class PrometheusClient {
      * Get current metric values (instant query)
      */
     public Map<String, Double> getCurrentMetrics(String serviceName) {
-        if (!prometheusAvailable) {
+        if (!configResolver.isPrometheusAvailable()) {
             return Collections.emptyMap();
         }
 
@@ -174,11 +155,11 @@ public class PrometheusClient {
     }
 
     private Double queryInstant(String query) {
-        if (!prometheusAvailable) return null;
+        if (!configResolver.isPrometheusAvailable()) return null;
 
         try {
             String url = String.format("%s/api/v1/query?query=%s",
-                prometheusBaseUrl,
+                configResolver.getPrometheusUrl(),
                 java.net.URLEncoder.encode(query, "UTF-8")
             );
 
@@ -199,7 +180,7 @@ public class PrometheusClient {
     }
 
     private List<TimeSeriesDataDTO> parsePrometheusResponse(String response) {
-        if (!prometheusAvailable) return Collections.emptyList();
+        if (!configResolver.isPrometheusAvailable()) return Collections.emptyList();
 
         try {
             com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(response);
@@ -242,7 +223,15 @@ public class PrometheusClient {
     }
 
     public boolean isPrometheusAvailable() {
-        return prometheusAvailable;
+        return configResolver.isPrometheusAvailable();
+    }
+
+    // For admin/debugging - expose current configuration
+    public String getPrometheusConfiguration() {
+        if (configResolver.isPrometheusAvailable()) {
+            return configResolver.getPrometheusUrl();
+        }
+        return "Prometheus not configured";
     }
 
 }
