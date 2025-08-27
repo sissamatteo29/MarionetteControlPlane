@@ -2,7 +2,7 @@ package org.marionette.controlplane.di;
 
 import org.marionette.controlplane.adapters.input.metrics.KubernetesPrometheusDiscovery;
 import org.marionette.controlplane.adapters.input.metrics.PrometheusClient;
-import org.marionette.controlplane.domain.entities.ConfigRegistry;
+import org.marionette.controlplane.adapters.input.metrics.PrometheusConfigurationResolver;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,12 +57,24 @@ public class MetricsConfiguration {
     }
 
     /**
+     * Prometheus configuration resolver - handles all configuration sources
+     */
+    @Bean
+    public PrometheusConfigurationResolver prometheusConfigurationResolver(
+            RestTemplate restTemplate,
+            ObjectMapper objectMapper,
+            KubernetesPrometheusDiscovery prometheusDiscovery) {
+        return new PrometheusConfigurationResolver(restTemplate, objectMapper, prometheusDiscovery);
+    }
+
+    /**
      * Prometheus client for metrics collection
      */
     @Bean
-    public PrometheusClient prometheusClient(RestTemplate restTemplate,
+    public PrometheusClient prometheusClient(
+            RestTemplate restTemplate,
             ObjectMapper objectMapper,
-            KubernetesPrometheusDiscovery prometheusDiscovery) {
-        return new PrometheusClient(restTemplate, objectMapper, prometheusDiscovery);
+            PrometheusConfigurationResolver configResolver) {
+        return new PrometheusClient(restTemplate, objectMapper, configResolver);
     }
 }
