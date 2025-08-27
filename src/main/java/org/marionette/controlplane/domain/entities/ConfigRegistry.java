@@ -1,6 +1,12 @@
 package org.marionette.controlplane.domain.entities;
 
+import org.marionette.controlplane.domain.values.BehaviourId;
+import org.marionette.controlplane.domain.values.ClassName;
+import org.marionette.controlplane.domain.values.MethodName;
 import org.marionette.controlplane.domain.values.ServiceName;
+
+import static java.util.Objects.requireNonNull;
+
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,6 +90,28 @@ public class ConfigRegistry {
         templateConfigurations.remove(serviceName);
         runtimeConfigurations.remove(serviceName);
         serviceMetadata.remove(serviceName);
+    }
+
+
+    public void modifyCurrentBehaviourForMethod(ServiceName serviceName, ClassName className, MethodName methodName,
+            BehaviourId newBehaviourId) {
+
+        requireNonNull(serviceName,
+                "Service name cannot be null when trying to modify the current behaviour of a method in the global configuration");
+        requireNonNull(className,
+                "Class name cannot be null when trying to modify the current behaviour of a method in the global configuration");
+        requireNonNull(methodName,
+                "Method name cannot be null when trying to modify the current behaviour of a method in the global configuration");
+        requireNonNull(newBehaviourId,
+                "The new behaviour id cannot be null when trying to modify the current behaviour of a method in the global configuration");
+
+        if (!runtimeConfigurations.containsKey(serviceName)) {
+            throw new IllegalArgumentException("The service " + serviceName + " does not exist in the ConfigRegistry");
+        }
+
+        ServiceConfig modifiedServiceConfig = runtimeConfigurations.get(serviceName).withNewBehaviourForMethod(className,
+                methodName, newBehaviourId);
+        runtimeConfigurations.put(serviceName, modifiedServiceConfig);
     }
 
     /**
