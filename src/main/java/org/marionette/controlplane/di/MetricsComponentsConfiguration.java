@@ -1,6 +1,8 @@
 package org.marionette.controlplane.di;
 
+import org.marionette.controlplane.adapters.input.metrics.ConfigurablePrometheusClient;
 import org.marionette.controlplane.adapters.input.metrics.KubernetesPrometheusDiscovery;
+import org.marionette.controlplane.adapters.input.metrics.MetricsConfiguration;
 import org.marionette.controlplane.adapters.input.metrics.PrometheusClient;
 import org.marionette.controlplane.adapters.input.metrics.PrometheusConfigurationResolver;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -20,7 +22,7 @@ import java.time.Duration;
 @Configuration
 @EnableAsync
 @EnableScheduling
-public class MetricsComponents {
+public class MetricsComponentsConfiguration {
 
     /**
      * Namespace configuration
@@ -74,13 +76,14 @@ public class MetricsComponents {
     }
 
     /**
-     * Prometheus client for metrics collection
+     * Configurable Prometheus client for metrics collection
      */
     @Bean
-    public PrometheusClient prometheusClient(
+    public ConfigurablePrometheusClient configurablePrometheusClient(
             RestTemplate restTemplate,
             ObjectMapper objectMapper,
-            PrometheusConfigurationResolver configResolver) {
-        return new PrometheusClient(restTemplate, objectMapper, configResolver);
+            PrometheusConfigurationResolver configResolver,
+            MetricsConfiguration metricsConfiguration) {
+        return new ConfigurablePrometheusClient(restTemplate, objectMapper, configResolver, metricsConfiguration);
     }
 }
