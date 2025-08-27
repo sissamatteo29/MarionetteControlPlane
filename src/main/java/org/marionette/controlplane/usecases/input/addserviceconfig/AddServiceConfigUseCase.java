@@ -18,7 +18,7 @@ public class AddServiceConfigUseCase implements AddServiceConfigPort {
     public void execute(AddServiceConfigRequest request) {
         Objects.requireNonNull(request, "The request object cannot be null");
         ServiceConfig serviceConfigToAdd = DomainServiceConfigFactory.createServiceConfig(request.serviceConfigData());
-        globalRegistry.addServiceConfig(serviceConfigToAdd.getServiceName(), serviceConfigToAdd);
+        // globalRegistry.addDiscoveredService(serviceConfigToAdd.getServiceName(), serviceConfigToAdd);
     }
     
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronRight, ChevronDown, Settings, Activity, Layers, Code, BarChart3, Zap, AlertTriangle } from 'lucide-react';
+import { ChevronRight, ChevronDown, Settings, Activity, Layers, Code, BarChart3, Zap, AlertTriangle, Search, RotateCcw } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import './App.css';
 
@@ -454,7 +454,7 @@ const ClassConfigSection = ({ classConfig, onBehaviorChange }) => {
   );
 };
 
-const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onBehaviorChange }) => {
+const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onReset, onBehaviorChange }) => {
   const [showMetrics, setShowMetrics] = useState(false);
   const classCount = Object.keys(serviceConfig.classes).length;
   const methodCount = Object.values(serviceConfig.classes).reduce(
@@ -480,6 +480,14 @@ const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onBehaviorChang
             </div>
           </div>
           <div className="service-actions">
+            <button 
+              onClick={onReset}
+              className="reset-button"
+              title="Reset to template configuration"
+            >
+              <RotateCcw size={20} />
+              Reset to Template
+            </button>
             <button 
               onClick={() => setShowMetrics(!showMetrics)}
               className={`metrics-toggle ${showMetrics ? 'active' : ''}`}
@@ -520,10 +528,33 @@ const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onBehaviorChang
 };
 
 // API functions to communicate with your Java backend
-const fetchAllServices = async () => {
-  const response = await fetch(`${API_BASE_URL}/services`);
+const fetchAllServices = async (refresh = false) => {
+  const url = refresh ? `${API_BASE_URL}/services?refresh=true` : `${API_BASE_URL}/services`;
+  const response = await fetch(url);
   if (!response.ok) throw new Error('Failed to fetch services');
   return response.json();
+};
+
+const triggerServiceDiscovery = async (fullRefresh = false) => {
+  const response = await fetch(`${API_BASE_URL}/services/discover?fullRefresh=${fullRefresh}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
+  if (!response.ok) throw new Error('Failed to trigger discovery');
+  return response.json();
+};
+
+const resetServiceToTemplate = async (serviceName) => {
+  const response = await fetch(`${API_BASE_URL}/services/${serviceName}/reset`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
+  if (!response.ok) throw new Error('Failed to reset service');
+  return response.text();
 };
 
 const updateMethodBehavior = async (serviceName, className, methodName, newBehavior) => {
@@ -542,18 +573,19 @@ const updateMethodBehavior = async (serviceName, className, methodName, newBehav
 };
 
 const MarionetteControlPanel = () => {
-  const [configRegistry, setConfigRegistry] = useState({});
+  const [servicesData, setServicesData] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isDiscovering, setIsDiscovering] = useState(false);
 
   // Load data from your Java API when component mounts
   useEffect(() => {
     const loadServices = async () => {
       try {
         setLoading(true);
-        const services = await fetchAllServices();
-        setConfigRegistry(services);
+        const data = await fetchAllServices();
+        setServicesData(data);
       } catch (err) {
         setError(err.message);
         console.error('Failed to load services:', err);
@@ -564,6 +596,43 @@ const MarionetteControlPanel = () => {
 
     loadServices();
   }, []);
+
+  const handleRefreshServices = async (fullRefresh = false) => {
+    try {
+      setIsDiscovering(true);
+      
+      if (fullRefresh) {
+        // Trigger full discovery
+        await triggerServiceDiscovery(true);
+        // Wait a bit for discovery to complete, then refresh
+        setTimeout(async () => {
+          const data = await fetchAllServices(true);
+          setServicesData(data);
+          setIsDiscovering(false);
+        }, 3000);
+      } else {
+        // Quick refresh
+        const data = await fetchAllServices(true);
+        setServicesData(data);
+        setIsDiscovering(false);
+      }
+    } catch (err) {
+      setError(err.message);
+      setIsDiscovering(false);
+    }
+  };
+
+  const handleResetService = async (serviceName) => {
+    try {
+      await resetServiceToTemplate(serviceName);
+      // Refresh the data to show the reset
+      const data = await fetchAllServices(true);
+      setServicesData(data);
+      alert(`Successfully reset ${serviceName} to template configuration`);
+    } catch (err) {
+      alert(`Failed to reset service: ${err.message}`);
+    }
+  };
 
   const handleServiceClick = (serviceName) => {
     setSelectedService(serviceName);
@@ -576,19 +645,22 @@ const MarionetteControlPanel = () => {
   const handleBehaviorChange = async (serviceName, className, methodName, newBehavior) => {
     try {
       // Optimistically update the UI
-      setConfigRegistry(prev => ({
+      setServicesData(prev => ({
         ...prev,
-        [serviceName]: {
-          ...prev[serviceName],
-          classes: {
-            ...prev[serviceName].classes,
-            [className]: {
-              ...prev[serviceName].classes[className],
-              methods: {
-                ...prev[serviceName].classes[className].methods,
-                [methodName]: {
-                  ...prev[serviceName].classes[className].methods[methodName],
-                  currentBehaviourId: newBehavior
+        services: {
+          ...prev.services,
+          [serviceName]: {
+            ...prev.services[serviceName],
+            classes: {
+              ...prev.services[serviceName].classes,
+              [className]: {
+                ...prev.services[serviceName].classes[className],
+                methods: {
+                  ...prev.services[serviceName].classes[className].methods,
+                  [methodName]: {
+                    ...prev.services[serviceName].classes[className].methods[methodName],
+                    currentBehaviourId: newBehavior
+                  }
                 }
               }
             }
@@ -604,7 +676,15 @@ const MarionetteControlPanel = () => {
       console.error('Failed to update behavior:', err);
       // You might want to revert the UI change here or show an error message
       alert('Failed to update behavior: ' + err.message);
+      // Refresh to get the correct state
+      const data = await fetchAllServices();
+      setServicesData(data);
     }
+  };
+
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return 'Never';
+    return new Date(timestamp).toLocaleString();
   };
 
   if (loading) {
@@ -624,7 +704,7 @@ const MarionetteControlPanel = () => {
         <div className="error-content">
           <div className="error-message">Error loading services</div>
           <p>{error}</p>
-          <button onClick={() => window.location.reload()} className="retry-button">
+          <button onClick={() => handleRefreshServices(false)} className="retry-button">
             Retry
           </button>
         </div>
@@ -632,12 +712,13 @@ const MarionetteControlPanel = () => {
     );
   }
 
-  if (selectedService) {
+  if (selectedService && servicesData?.services) {
     return (
       <ServiceDetailView
         serviceName={selectedService}
-        serviceConfig={configRegistry[selectedService]}
+        serviceConfig={servicesData.services[selectedService]}
         onBack={handleBack}
+        onReset={() => handleResetService(selectedService)}
         onBehaviorChange={(className, methodName, newBehavior) =>
           handleBehaviorChange(selectedService, className, methodName, newBehavior)
         }
@@ -656,17 +737,55 @@ const MarionetteControlPanel = () => {
               <p>Manage microservice behavior configurations with real-time metrics</p>
             </div>
           </div>
+          <div className="app-actions">
+            <button 
+              onClick={() => handleRefreshServices(false)}
+              className="refresh-button"
+              disabled={isDiscovering}
+            >
+              <Activity size={20} />
+              {isDiscovering ? 'Refreshing...' : 'Refresh'}
+            </button>
+            <button 
+              onClick={() => handleRefreshServices(true)}
+              className="discover-button"
+              disabled={isDiscovering}
+            >
+              <Search size={20} />
+              {isDiscovering ? 'Discovering...' : 'Full Discovery'}
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="app-content">
         <div className="services-section">
-          <h2>Services Overview</h2>
-          <p>Click on a service to configure its behavior settings and view metrics</p>
+          <div className="services-header">
+            <div>
+              <h2>Services Overview</h2>
+              <p>Click on a service to configure its behavior settings and view metrics</p>
+            </div>
+            <div className="discovery-status">
+              <div className="status-item">
+                <span className="label">Total Services:</span>
+                <span className="value">{servicesData?.totalServices || 0}</span>
+              </div>
+              <div className="status-item">
+                <span className="label">Unavailable:</span>
+                <span className={`value ${servicesData?.unavailableServices > 0 ? 'warning' : ''}`}>
+                  {servicesData?.unavailableServices || 0}
+                </span>
+              </div>
+              <div className="status-item">
+                <span className="label">Last Discovery:</span>
+                <span className="value">{formatTimestamp(servicesData?.lastDiscovery)}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="services-grid">
-          {Object.entries(configRegistry).map(([serviceName, serviceConfig]) => (
+          {servicesData?.services && Object.entries(servicesData.services).map(([serviceName, serviceConfig]) => (
             <ServiceOverviewCard
               key={serviceName}
               serviceName={serviceName}
@@ -675,6 +794,18 @@ const MarionetteControlPanel = () => {
             />
           ))}
         </div>
+        
+        {(!servicesData?.services || Object.keys(servicesData.services).length === 0) && (
+          <div className="no-services">
+            <Activity size={48} />
+            <h3>No Services Found</h3>
+            <p>No marionette-enabled services were discovered in your cluster.</p>
+            <button onClick={() => handleRefreshServices(true)} className="discover-button">
+              <Search size={20} />
+              Discover Services
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
