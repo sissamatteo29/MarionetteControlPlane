@@ -1,24 +1,294 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronDown, Settings, Activity, Layers, Code } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ChevronRight, ChevronDown, Settings, Activity, Layers, Code, BarChart3, Zap, AlertTriangle } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import './App.css';
 
 // API base URL - dynamically detect the current host for Minikube compatibility
 const API_BASE_URL = (() => {
-  // Get the current protocol, hostname, and port
   const { protocol, hostname, port } = window.location;
   
-  // In development with React dev server, use localhost:8080
   if (hostname === 'localhost' && port === '3000') {
     return 'http://localhost:8080/api';
   }
   
-  // For all other cases (including Minikube), use the same host as the frontend
   return `${protocol}//${hostname}${port ? ':' + port : ''}/api`;
 })();
 
-// Debug logging to help troubleshoot
-console.log('Current location:', window.location.href);
-console.log('API_BASE_URL determined as:', API_BASE_URL);
+const MetricsCard = ({ title, value, unit, change, icon: Icon, color = "blue" }) => {
+  return (
+    <div className={`metrics-card ${color}`}>
+      <div className="metrics-card-header">
+        <div className="metrics-icon">
+          <Icon size={20} />
+        </div>
+        <div className="metrics-title">{title}</div>
+      </div>
+      <div className="metrics-value">
+        {value !== null ? `${value.toFixed(2)}${unit}` : 'N/A'}
+      </div>
+      {change && (
+        <div className={`metrics-change ${change >= 0 ? 'positive' : 'negative'}`}>
+          {change >= 0 ? '+' : ''}{change.toFixed(1)}%
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MetricsChart = ({ data, title, yAxisLabel, color = "#8884d8" }) => {
+  const formatTooltipValue = (value, name) => {
+    if (name.toLowerCase().includes('time') || name.toLowerCase().includes('latency')) {
+      return `${(value * 1000).toFixed(2)}ms`;
+    }
+    if (name.toLowerCase().includes('rate') && !name.toLowerCase().includes('error')) {
+      return `${value.toFixed(2)} req/s`;
+    }
+    if (name.toLowerCase().includes('error')) {
+      return `${(value * 100).toFixed(2)}%`;
+    }
+    return value.toFixed(2);
+  };
+
+  const formatXAxisTick = (tickItem) => {
+    return new Date(tickItem).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  return (
+    <div className="metrics-chart">
+      <h4>{title}</h4>
+      <div style={{ width: '100%', height: 200 }}>
+        <ResponsiveContainer>
+          <AreaChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis 
+              dataKey="timestamp" 
+              tickFormatter={formatXAxisTick}
+              stroke="#9CA3AF"
+            />
+            <YAxis 
+              stroke="#9CA3AF"
+              label={{ value: yAxisLabel, angle: -90, position: 'insideLeft' }}
+            />
+            <Tooltip 
+              formatter={formatTooltipValue}
+              labelFormatter={(label) => new Date(label).toLocaleString()}
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '1px solid #374151',
+                borderRadius: '6px'
+              }}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="value" 
+              stroke={color} 
+              fill={color}
+              fillOpacity={0.3}
+              strokeWidth={2}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+};
+
+const ServiceMetricsPanel = ({ serviceName, onClose }) => {
+  const [metrics, setMetrics] = useState(null);
+  const [liveMetrics, setLiveMetrics] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [timeRange, setTimeRange] = useState(15); // minutes
+  const intervalRef = useRef(null);
+
+  const fetchMetrics = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/metrics/${serviceName}?minutes=${timeRange}`);
+      if (!response.ok) throw new Error('Failed to fetch metrics');
+      const data = await response.json();
+      setMetrics(data);
+    } catch (err) {
+      setError(err.message);
+      console.error('Failed to load metrics:', err);
+    }
+  };
+
+  const fetchLiveMetrics = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/metrics/${serviceName}/live`);
+      if (!response.ok) throw new Error('Failed to fetch live metrics');
+      const data = await response.json();
+      setLiveMetrics(data);
+    } catch (err) {
+      console.error('Failed to load live metrics:', err);
+    }
+  };
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setLoading(true);
+      await Promise.all([fetchMetrics(), fetchLiveMetrics()]);
+      setLoading(false);
+    };
+
+    loadInitialData();
+
+    // Set up periodic updates for live metrics
+    intervalRef.current = setInterval(fetchLiveMetrics, 30000); // Update every 30 seconds
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [serviceName, timeRange]);
+
+  const transformMetricsData = (timeSeriesArray) => {
+    if (!timeSeriesArray || timeSeriesArray.length === 0) return [];
+    
+    // Combine all time series into a single dataset
+    const allDataPoints = [];
+    timeSeriesArray.forEach(series => {
+      series.dataPoints.forEach(point => {
+        allDataPoints.push({
+          timestamp: point.timestamp,
+          value: point.value
+        });
+      });
+    });
+    
+    // Sort by timestamp and return
+    return allDataPoints.sort((a, b) => a.timestamp - b.timestamp);
+  };
+
+  if (loading) {
+    return (
+      <div className="metrics-panel">
+        <div className="metrics-header">
+          <h3>Metrics for {serviceName}</h3>
+          <button onClick={onClose} className="close-button">×</button>
+        </div>
+        <div className="loading-metrics">
+          <div className="spinner"></div>
+          <p>Loading metrics...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="metrics-panel">
+        <div className="metrics-header">
+          <h3>Metrics for {serviceName}</h3>
+          <button onClick={onClose} className="close-button">×</button>
+        </div>
+        <div className="error-metrics">
+          <AlertTriangle size={24} />
+          <p>Failed to load metrics: {error}</p>
+          <button onClick={fetchMetrics} className="retry-button">Retry</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="metrics-panel">
+      <div className="metrics-header">
+        <h3>
+          <BarChart3 size={24} />
+          Metrics for {serviceName}
+        </h3>
+        <div className="metrics-controls">
+          <select 
+            value={timeRange} 
+            onChange={(e) => setTimeRange(parseInt(e.target.value))}
+            className="time-range-select"
+          >
+            <option value={5}>Last 5 minutes</option>
+            <option value={15}>Last 15 minutes</option>
+            <option value={30}>Last 30 minutes</option>
+            <option value={60}>Last 1 hour</option>
+          </select>
+          <button onClick={onClose} className="close-button">×</button>
+        </div>
+      </div>
+
+      {/* Live Metrics Cards */}
+      <div className="live-metrics">
+        <MetricsCard
+          title="Response Time"
+          value={liveMetrics.responseTime ? liveMetrics.responseTime * 1000 : null}
+          unit="ms"
+          icon={Zap}
+          color="blue"
+        />
+        <MetricsCard
+          title="Request Rate"
+          value={liveMetrics.requestRate}
+          unit=" req/s"
+          icon={Activity}
+          color="green"
+        />
+        <MetricsCard
+          title="Error Rate"
+          value={liveMetrics.errorRate ? liveMetrics.errorRate * 100 : null}
+          unit="%"
+          icon={AlertTriangle}
+          color={liveMetrics.errorRate > 0.01 ? "red" : "green"}
+        />
+      </div>
+
+      {/* Historical Charts */}
+      <div className="metrics-charts">
+        {metrics?.responseTime && (
+          <MetricsChart
+            data={transformMetricsData(metrics.responseTime)}
+            title="Response Time (95th percentile)"
+            yAxisLabel="Time (s)"
+            color="#3B82F6"
+          />
+        )}
+        
+        {metrics?.requestRate && (
+          <MetricsChart
+            data={transformMetricsData(metrics.requestRate)}
+            title="Request Rate"
+            yAxisLabel="Requests/sec"
+            color="#10B981"
+          />
+        )}
+        
+        {metrics?.errorRate && (
+          <MetricsChart
+            data={transformMetricsData(metrics.errorRate)}
+            title="Error Rate"
+            yAxisLabel="Error %"
+            color="#EF4444"
+          />
+        )}
+        
+        {metrics?.cpuUsage && (
+          <MetricsChart
+            data={transformMetricsData(metrics.cpuUsage)}
+            title="CPU Usage"
+            yAxisLabel="CPU %"
+            color="#F59E0B"
+          />
+        )}
+        
+        {metrics?.memoryUsage && (
+          <MetricsChart
+            data={transformMetricsData(metrics.memoryUsage)}
+            title="Memory Usage"
+            yAxisLabel="Memory (bytes)"
+            color="#8B5CF6"
+          />
+        )}
+      </div>
+    </div>
+  );
+};
 
 const ServiceOverviewCard = ({ serviceName, serviceConfig, onServiceClick }) => {
   const classCount = Object.keys(serviceConfig.classes).length;
@@ -185,6 +455,7 @@ const ClassConfigSection = ({ classConfig, onBehaviorChange }) => {
 };
 
 const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onBehaviorChange }) => {
+  const [showMetrics, setShowMetrics] = useState(false);
   const classCount = Object.keys(serviceConfig.classes).length;
   const methodCount = Object.values(serviceConfig.classes).reduce(
     (total, classConfig) => total + Object.keys(classConfig.methods).length, 0
@@ -208,18 +479,40 @@ const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onBehaviorChang
               </div>
             </div>
           </div>
+          <div className="service-actions">
+            <button 
+              onClick={() => setShowMetrics(!showMetrics)}
+              className={`metrics-toggle ${showMetrics ? 'active' : ''}`}
+            >
+              <BarChart3 size={20} />
+              {showMetrics ? 'Hide Metrics' : 'Show Metrics'}
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="service-detail-content">
-        <div className="classes-list">
-          {Object.values(serviceConfig.classes).map(classConfig => (
-            <ClassConfigSection
-              key={classConfig.className}
-              classConfig={classConfig}
-              onBehaviorChange={onBehaviorChange}
-            />
-          ))}
+        <div className="service-detail-layout">
+          <div className="service-config-section">
+            <div className="classes-list">
+              {Object.values(serviceConfig.classes).map(classConfig => (
+                <ClassConfigSection
+                  key={classConfig.className}
+                  classConfig={classConfig}
+                  onBehaviorChange={onBehaviorChange}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {showMetrics && (
+            <div className="service-metrics-section">
+              <ServiceMetricsPanel 
+                serviceName={serviceName}
+                onClose={() => setShowMetrics(false)}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -360,7 +653,7 @@ const MarionetteControlPanel = () => {
             <Settings size={32} />
             <div>
               <h1>Marionette Control Panel</h1>
-              <p>Manage microservice behavior configurations</p>
+              <p>Manage microservice behavior configurations with real-time metrics</p>
             </div>
           </div>
         </div>
@@ -369,7 +662,7 @@ const MarionetteControlPanel = () => {
       <div className="app-content">
         <div className="services-section">
           <h2>Services Overview</h2>
-          <p>Click on a service to configure its behavior settings</p>
+          <p>Click on a service to configure its behavior settings and view metrics</p>
         </div>
 
         <div className="services-grid">
