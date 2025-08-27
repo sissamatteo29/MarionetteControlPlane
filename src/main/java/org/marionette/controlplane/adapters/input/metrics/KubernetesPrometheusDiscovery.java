@@ -25,7 +25,8 @@ public class KubernetesPrometheusDiscovery {
         "http://prometheus-service:9090",
         "http://kube-prometheus-prometheus:9090",
         "http://prometheus-operator-prometheus:9090",
-        "http://monitoring-prometheus:9090"
+        "http://monitoring-prometheus:9090",
+        "http://prometheus-kube-prometheus-prometheus:9090"
     );
 
     public KubernetesPrometheusDiscovery(RestTemplate restTemplate, ObjectMapper objectMapper) {

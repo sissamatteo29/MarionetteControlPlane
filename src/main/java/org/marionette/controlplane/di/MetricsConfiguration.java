@@ -19,14 +19,6 @@ import java.time.Duration;
 public class MetricsConfiguration {
 
     /**
-     * Enhanced Config Registry (replaces the old ConfigRegistry)
-     */
-    @Bean
-    public ConfigRegistry configRegistry() {
-        return new ConfigRegistry();
-    }
-
-    /**
      * Namespace configuration
      */
     @Bean

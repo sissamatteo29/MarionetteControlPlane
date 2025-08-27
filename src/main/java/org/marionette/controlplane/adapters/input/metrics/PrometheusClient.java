@@ -1,19 +1,13 @@
 package org.marionette.controlplane.adapters.input.metrics;
 
-import org.marionette.controlplane.adapters.input.metrics.TimeSeriesDataDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.client.HttpClientErrorException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 @Component
 public class PrometheusClient {
@@ -26,6 +20,7 @@ public class PrometheusClient {
     private String configuredPrometheusUrl;
     
     private String prometheusBaseUrl;
+    private boolean prometheusAvailable = false;
 
     public PrometheusClient(RestTemplate restTemplate, ObjectMapper objectMapper, 
                            KubernetesPrometheusDiscovery prometheusDiscovery) {
@@ -36,28 +31,41 @@ public class PrometheusClient {
 
     @PostConstruct
     public void initializePrometheusUrl() {
-        if (configuredPrometheusUrl != null && !configuredPrometheusUrl.isEmpty()) {
-            prometheusBaseUrl = configuredPrometheusUrl;
-        } else {
-            // Auto-discover Prometheus in the cluster
-            prometheusBaseUrl = prometheusDiscovery.discoverPrometheus();
+        try {
+            if (configuredPrometheusUrl != null && !configuredPrometheusUrl.isEmpty()) {
+                prometheusBaseUrl = configuredPrometheusUrl;
+            } else {
+                // Auto-discover Prometheus in the cluster
+                prometheusBaseUrl = prometheusDiscovery.discoverPrometheus();
+            }
+            
+            if (prometheusBaseUrl == null) {
+                System.err.println("Could not find Prometheus instance. Metrics will be unavailable.");
+                prometheusAvailable = false;
+            } else {
+                System.out.println("Using Prometheus at: " + prometheusBaseUrl);
+                prometheusAvailable = true;
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to initialize Prometheus client: " + e.getMessage());
+            System.err.println("Metrics will be unavailable. Application will continue without metrics.");
+            prometheusAvailable = false;
         }
-        
-        if (prometheusBaseUrl == null) {
-            throw new RuntimeException("Could not find Prometheus instance. Please configure prometheus.url or ensure Prometheus is running in the cluster.");
-        }
-        
-        System.out.println("Using Prometheus at: " + prometheusBaseUrl);
     }
 
     /**
      * Query Prometheus for range data
      */
     public List<TimeSeriesDataDTO> queryRange(String query, Instant startTime, Instant endTime, String step) {
+        if (!prometheusAvailable) {
+            System.out.println("Prometheus not available - returning empty metrics");
+            return Collections.emptyList();
+        }
+
         try {
             String url = String.format("%s/api/v1/query_range?query=%s&start=%s&end=%s&step=%s",
                 prometheusBaseUrl,
-                URLEncoder.encode(query, StandardCharsets.UTF_8),
+                java.net.URLEncoder.encode(query, "UTF-8"),
                 startTime.getEpochSecond(),
                 endTime.getEpochSecond(),
                 step
@@ -66,11 +74,8 @@ public class PrometheusClient {
             String response = restTemplate.getForObject(url, String.class);
             return parsePrometheusResponse(response);
             
-        } catch (HttpClientErrorException e) {
-            System.err.println("Error querying Prometheus: " + e.getMessage());
-            return Collections.emptyList();
         } catch (Exception e) {
-            System.err.println("Unexpected error: " + e.getMessage());
+            System.err.println("Error querying Prometheus: " + e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -133,6 +138,10 @@ public class PrometheusClient {
      * Get current metric values (instant query)
      */
     public Map<String, Double> getCurrentMetrics(String serviceName) {
+        if (!prometheusAvailable) {
+            return Collections.emptyMap();
+        }
+
         Map<String, Double> metrics = new HashMap<>();
         
         try {
@@ -165,18 +174,20 @@ public class PrometheusClient {
     }
 
     private Double queryInstant(String query) {
+        if (!prometheusAvailable) return null;
+
         try {
             String url = String.format("%s/api/v1/query?query=%s",
                 prometheusBaseUrl,
-                URLEncoder.encode(query, StandardCharsets.UTF_8)
+                java.net.URLEncoder.encode(query, "UTF-8")
             );
 
             String response = restTemplate.getForObject(url, String.class);
-            JsonNode root = objectMapper.readTree(response);
-            JsonNode result = root.path("data").path("result");
+            com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(response);
+            com.fasterxml.jackson.databind.JsonNode result = root.path("data").path("result");
             
             if (result.isArray() && result.size() > 0) {
-                JsonNode value = result.get(0).path("value");
+                com.fasterxml.jackson.databind.JsonNode value = result.get(0).path("value");
                 if (value.isArray() && value.size() > 1) {
                     return value.get(1).asDouble();
                 }
@@ -188,18 +199,20 @@ public class PrometheusClient {
     }
 
     private List<TimeSeriesDataDTO> parsePrometheusResponse(String response) {
+        if (!prometheusAvailable) return Collections.emptyList();
+
         try {
-            JsonNode root = objectMapper.readTree(response);
-            JsonNode result = root.path("data").path("result");
+            com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(response);
+            com.fasterxml.jackson.databind.JsonNode result = root.path("data").path("result");
             
             List<TimeSeriesDataDTO> timeSeriesData = new ArrayList<>();
             
-            for (JsonNode series : result) {
+            for (com.fasterxml.jackson.databind.JsonNode series : result) {
                 String metricName = extractMetricName(series.path("metric"));
-                JsonNode values = series.path("values");
+                com.fasterxml.jackson.databind.JsonNode values = series.path("values");
                 
                 List<TimeSeriesDataDTO.DataPoint> dataPoints = new ArrayList<>();
-                for (JsonNode value : values) {
+                for (com.fasterxml.jackson.databind.JsonNode value : values) {
                     long timestamp = value.get(0).asLong() * 1000; // Convert to milliseconds
                     double val = Double.parseDouble(value.get(1).asText());
                     dataPoints.add(new TimeSeriesDataDTO.DataPoint(timestamp, val));
@@ -216,7 +229,7 @@ public class PrometheusClient {
         }
     }
 
-    private String extractMetricName(JsonNode metric) {
+    private String extractMetricName(com.fasterxml.jackson.databind.JsonNode metric) {
         // Extract a meaningful name from metric labels
         String job = metric.path("job").asText("");
         String instance = metric.path("instance").asText("");
@@ -227,4 +240,9 @@ public class PrometheusClient {
         if (!instance.isEmpty()) return instance;
         return "unknown";
     }
+
+    public boolean isPrometheusAvailable() {
+        return prometheusAvailable;
+    }
+
 }
