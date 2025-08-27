@@ -1,8 +1,8 @@
 package org.marionette.controlplane.adapters.input.controllers;
 
-import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.domain.entities.ServiceConfig;
 import org.marionette.controlplane.domain.entities.ClassConfig;
+import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.domain.entities.MethodConfig;
 import org.marionette.controlplane.domain.values.*;
 import org.marionette.controlplane.adapters.input.changeconfig.ChangeConfigService;
@@ -28,7 +28,7 @@ public class ConfigurationController {
     private final ServiceDiscoveryService discoveryService;
 
     public ConfigurationController(
-            EnhancedConfigRegistry configRegistry, 
+            ConfigRegistry configRegistry, 
             String namespace,
             ChangeConfigService changeConfigService,
             ServiceDiscoveryService discoveryService) {
@@ -281,4 +281,19 @@ public class ConfigurationController {
     }
 
     public static class DiscoveryResponseDTO {
-        private final String
+        private final String message;
+        private final String type;
+        private final Instant timestamp;
+
+        public DiscoveryResponseDTO(String message, String type, Instant timestamp) {
+            this.message = message;
+            this.type = type;
+            this.timestamp = timestamp;
+        }
+
+        // Getters
+        public String getMessage() { return message; }
+        public String getType() { return type; }
+        public Instant getTimestamp() { return timestamp; }
+    }
+}
