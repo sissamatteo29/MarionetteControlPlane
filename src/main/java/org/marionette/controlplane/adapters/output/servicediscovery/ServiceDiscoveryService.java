@@ -91,6 +91,8 @@ public class ServiceDiscoveryService {
             );
             
             System.out.println("✅ Discovery completed: " + result);
+            System.out.println("## CURRENT STATE OF REGISTRY ##");
+            System.out.println(configRegistry);
             return CompletableFuture.completedFuture(result);
             
         } catch (Exception e) {

@@ -10,6 +10,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.time.Duration;
 
@@ -23,8 +25,7 @@ public class MetricsConfiguration {
      */
     @Bean
     public String namespace() {
-        return System.getenv("KUBERNETES_NAMESPACE") != null ? 
-               System.getenv("KUBERNETES_NAMESPACE") : "default";
+        return System.getenv("KUBERNETES_NAMESPACE") != null ? System.getenv("KUBERNETES_NAMESPACE") : "default";
     }
 
     /**
@@ -38,12 +39,12 @@ public class MetricsConfiguration {
                 .build();
     }
 
-    /**
-     * ObjectMapper for JSON parsing
-     */
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return mapper;
     }
 
     /**
@@ -59,9 +60,9 @@ public class MetricsConfiguration {
      * Prometheus client for metrics collection
      */
     @Bean
-    public PrometheusClient prometheusClient(RestTemplate restTemplate, 
-                                           ObjectMapper objectMapper,
-                                           KubernetesPrometheusDiscovery prometheusDiscovery) {
+    public PrometheusClient prometheusClient(RestTemplate restTemplate,
+            ObjectMapper objectMapper,
+            KubernetesPrometheusDiscovery prometheusDiscovery) {
         return new PrometheusClient(restTemplate, objectMapper, prometheusDiscovery);
     }
 }

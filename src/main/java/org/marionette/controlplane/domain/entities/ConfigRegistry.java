@@ -183,7 +183,7 @@ public class ConfigRegistry {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("=== Enhanced ConfigRegistry State ===\n");
+        sb.append("=== ConfigRegistry State ===\n");
         sb.append("Last discovery: ").append(lastDiscovery).append("\n");
         sb.append("Total services: ").append(runtimeConfigurations.size()).append("\n\n");
         
@@ -199,6 +199,7 @@ public class ConfigRegistry {
                 sb.append("  Endpoint: ").append(metadata.getEndpoint()).append("\n");
                 sb.append("  Last seen: ").append(metadata.getLastSeen()).append("\n");
             }
+            sb.append(" Content: " + config);
             sb.append("\n");
         });
         
