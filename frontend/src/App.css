@@ -438,6 +438,12 @@
   transition: all 0.2s ease;
 }
 
+.time-range-select option{
+  color: #000000;
+}
+
+
+
 .time-range-select:hover {
   border-color: rgba(59, 130, 246, 0.5);
 }
@@ -769,6 +775,10 @@
   transition: all 0.2s ease;
 }
 
+.behavior-selector select option {
+  color: black;
+}
+
 .behavior-selector select:hover {
   border-color: rgba(59, 130, 246, 0.5);
 }
@@ -799,6 +809,7 @@
 
 /* Behavior Badges */
 .badge {
+  color: white;
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;

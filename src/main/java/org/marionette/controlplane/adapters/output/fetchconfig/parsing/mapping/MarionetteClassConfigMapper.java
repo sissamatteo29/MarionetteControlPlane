@@ -19,7 +19,7 @@ public class MarionetteClassConfigMapper {
            methodConfigs.add(new MethodConfigData(
                 methodConfigDTO.getName(),
                 methodConfigDTO.getCurrentBehaviourId(),
-                methodConfigDTO.getAvailableBehaviourIds()
+                methodConfigDTO.getAvailableBehaviours()
             ));
         }
 

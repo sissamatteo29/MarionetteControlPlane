@@ -5,19 +5,19 @@ import java.util.List;
 public class MarionetteMethodConfigDTO {
 
     private String name;
-    private String currentBehaviourId;
-    private List<String> availableBehaviourIds;
+    private String currentBehaviour;
+    private List<String> availableBehaviours;
     public String getCurrentBehaviourId() {
-        return currentBehaviourId;
+        return currentBehaviour;
     }
-    public void setCurrentBehaviourId(String currentBehaviourId) {
-        this.currentBehaviourId = currentBehaviourId;
+    public void setCurrentBehaviour(String currentBehaviour) {
+        this.currentBehaviour = currentBehaviour;
     }
-    public List<String> getAvailableBehaviourIds() {
-        return availableBehaviourIds;
+    public List<String> getAvailableBehaviours() {
+        return availableBehaviours;
     }
-    public void setAvailableBehaviourIds(List<String> availableBehaviourIds) {
-        this.availableBehaviourIds = availableBehaviourIds;
+    public void setAvailableBehaviours(List<String> availableBehaviours) {
+        this.availableBehaviours = availableBehaviours;
     }
     public String getName() {
         return name;
