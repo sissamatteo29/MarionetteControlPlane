@@ -2,11 +2,13 @@ package org.marionette.controlplane.adapters.output.fetchconfig;
 
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.XMLParser;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.dto.MarionetteConfigDTO;
+import org.marionette.controlplane.adapters.output.fetchconfig.parsing.dto.MarionetteServiceConfigDTO;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.mapping.MarionetteConfigMapper;
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
 import org.marionette.controlplane.usecases.output.fetchconfig.DiscoveredServiceConfigResult;
 import org.marionette.controlplane.usecases.output.fetchconfig.NodeConfigGateway;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.URI;
@@ -55,8 +57,9 @@ public class NodeConfigAdapter implements NodeConfigGateway {
                 System.out.println("Obtained config from endpoint " + serviceEndpoint);
                 System.out.println("### PRINTING CONFIG ###");
                 System.out.println(response.body());
-                // Parse the XML response
-                MarionetteConfigDTO configDTO = XMLParser.parseFromXMLString(response.body());
+
+                ObjectMapper mapper = new ObjectMapper();
+                MarionetteServiceConfigDTO marionetteServiceConfigDTO = mapper.readValue(response.body(), MarionetteServiceConfigDTO.class);
 
                 // Map
                 ServiceConfigData serviceConfigData = MarionetteConfigMapper.toDomainServiceConfigData(configDTO);
