@@ -1,7 +1,5 @@
 package org.marionette.controlplane.adapters.output.fetchconfig;
 
-import org.marionette.controlplane.adapters.output.fetchconfig.parsing.XMLParser;
-import org.marionette.controlplane.adapters.output.fetchconfig.parsing.dto.MarionetteConfigDTO;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.dto.MarionetteServiceConfigDTO;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.mapping.MarionetteConfigMapper;
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
@@ -62,7 +60,7 @@ public class NodeConfigAdapter implements NodeConfigGateway {
                 MarionetteServiceConfigDTO marionetteServiceConfigDTO = mapper.readValue(response.body(), MarionetteServiceConfigDTO.class);
 
                 // Map
-                ServiceConfigData serviceConfigData = MarionetteConfigMapper.toDomainServiceConfigData(configDTO);
+                ServiceConfigData serviceConfigData = MarionetteConfigMapper.toDomainServiceConfigData(marionetteServiceConfigDTO);
                 
                 return DiscoveredServiceConfigResult.success(serviceConfigData);
             } else {
