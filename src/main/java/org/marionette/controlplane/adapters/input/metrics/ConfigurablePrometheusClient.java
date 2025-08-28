@@ -63,7 +63,9 @@ public class ConfigurablePrometheusClient {
                 try {
                     String query = substituteServiceName(config.getQuery(), serviceName);
                     List<TimeSeriesDataDTO> data = executeQuery(query, startTime, endTime, step);
-                    
+                    if(data.isEmpty()) {
+                        System.out.println("Found no data for the query { " + config.getQuery() + " }");
+                    }
                     if (!data.isEmpty()) {
                         results.put(metricKey, data);
                         System.out.println("Found " + data.size() + " series for metric: " + metricKey);
@@ -96,6 +98,7 @@ public class ConfigurablePrometheusClient {
                     Double value = executeInstantQuery(query);
                     
                     if (value != null) {
+                        System.out.println("Executed query { " + query + " }, obtained the data { " + value);
                         results.put(metricKey, value);
                     }
                 } catch (Exception e) {

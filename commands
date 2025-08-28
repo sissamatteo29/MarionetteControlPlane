@@ -15,6 +15,14 @@ kubectl port-forward svc/your-microservice 8080:8080 -n outfit-app
 
 
 
+# To redeploy prometheus
+kubectl create namespace monitoring
+# Install the kube-prometheus stack
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --set prometheus.prometheusSpec.resources.requests.memory=512Mi \
+  --set prometheus.prometheusSpec.resources.requests.cpu=250m
+
 # TO RESTART PROMETHEUS
 kubectl get pods -n <namespace>
 helm list --all-namespaces

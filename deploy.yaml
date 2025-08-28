@@ -68,10 +68,10 @@ spec:
         - name: MARIONETTE_METRICS_DEFAULT_TIME_RANGE_MINUTES
           value: "15"
         - name: MARIONETTE_METRICS_DEFAULT_STEP
-          value: "30s"
+          value: "3s"
         
         # JVM Memory Metric
-        - name: MARIONETTE_METRICS_QUERIES_JVM_MEMORY_DISPLAY_NAME
+        - name: MARIONETTE_METRICS_QUERIES_JVM_MEMORY_DISPLAYNAME
           value: "JVM Heap Memory"
         - name: MARIONETTE_METRICS_QUERIES_JVM_MEMORY_QUERY
           value: "jvm_memory_used_bytes{job=~\".*{service}.*\",area=\"heap\"}"
@@ -81,7 +81,7 @@ spec:
           value: "true"
         
         # HTTP Requests (Spring Boot Actuator)
-        - name: MARIONETTE_METRICS_QUERIES_HTTP_REQUESTS_DISPLAY_NAME
+        - name: MARIONETTE_METRICS_QUERIES_HTTP_REQUESTS_DISPLAYNAME
           value: "HTTP Request Rate"
         - name: MARIONETTE_METRICS_QUERIES_HTTP_REQUESTS_QUERY
           value: "rate(http_server_requests_seconds_count{job=~\".*{service}.*\"}[1m])"
@@ -90,23 +90,18 @@ spec:
         - name: MARIONETTE_METRICS_QUERIES_HTTP_REQUESTS_ENABLED
           value: "true"
         
-        # CPU Usage
-        - name: MARIONETTE_METRICS_QUERIES_CPU_USAGE_DISPLAY_NAME
-          value: "Process CPU Usage"
-        - name: MARIONETTE_METRICS_QUERIES_CPU_USAGE_QUERY
-          value: "rate(process_cpu_seconds_total{job=~\".*{service}.*\"}[1m]) * 100"
-        - name: MARIONETTE_METRICS_QUERIES_CPU_USAGE_UNIT
+        # New System CPU Usage Metric
+        - name: MARIONETTE_METRICS_QUERIES_SYSTEM_CPU_DISPLAYNAME
+          value: "System CPU Usage"
+        - name: MARIONETTE_METRICS_QUERIES_SYSTEM_CPU_QUERY
+          value: "system_cpu_usage{job=~\".*{service}.*\"} * 100"
+        - name: MARIONETTE_METRICS_QUERIES_SYSTEM_CPU_UNIT
           value: "%"
-        - name: MARIONETTE_METRICS_QUERIES_CPU_USAGE_ENABLED
+        - name: MARIONETTE_METRICS_QUERIES_SYSTEM_CPU_DESCRIPTION
+          value: "System CPU usage percentage"
+        - name: MARIONETTE_METRICS_QUERIES_SYSTEM_CPU_ENABLED
           value: "true"
-        
-        # Disable metrics that don't work with your setup
-        - name: MARIONETTE_METRICS_QUERIES_RESPONSE_TIME_ENABLED
-          value: "false"
-        - name: MARIONETTE_METRICS_QUERIES_REQUEST_RATE_ENABLED
-          value: "false"
-        - name: MARIONETTE_METRICS_QUERIES_ERROR_RATE_ENABLED
-          value: "false"
+
 ---
 # Service
 apiVersion: v1

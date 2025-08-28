@@ -3,9 +3,11 @@ package org.marionette.controlplane.adapters.input.metrics;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 @ConfigurationProperties(prefix = "marionette.metrics")
@@ -16,73 +18,56 @@ public class MetricsConfiguration {
     private int defaultTimeRangeMinutes = 15;
     private String defaultStep = "30s";
     
-    // Default configuration that works with common setups
     public MetricsConfiguration() {
-        initializeDefaults();
     }
     
-    private void initializeDefaults() {
-        // Standard Prometheus metrics (if available)
-        queries.put("response_time", new MetricQueryConfig(
-            "Response Time (95th percentile)",
-            "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{service=\"{service}\"}[1m]))",
-            "seconds",
-            "Time"
-        ));
+    @PostConstruct
+    public void populateQueriesFromEnvironment() {
+        // Pattern to match: MARIONETTE_METRICS_QUERIES_<KEY>_<PROPERTY>
+        Pattern pattern = Pattern.compile("^MARIONETTE_METRICS_QUERIES_([A-Z_]+)_(DISPLAYNAME|QUERY|UNIT|DESCRIPTION|ENABLED)$");
         
-        queries.put("request_rate", new MetricQueryConfig(
-            "Request Rate",
-            "rate(http_requests_total{service=\"{service}\"}[1m])",
-            "req/s",
-            "Requests per second"
-        ));
+        Map<String, MetricQueryConfig> tempQueries = new HashMap<>();
         
-        queries.put("error_rate", new MetricQueryConfig(
-            "Error Rate",
-            "rate(http_requests_total{service=\"{service}\",status=~\"4..|5..\"}[1m]) / rate(http_requests_total{service=\"{service}\"}[1m])",
-            "%",
-            "Error percentage"
-        ));
+        // Iterate through all environment variables
+        System.getenv().forEach((key, value) -> {
+            Matcher matcher = pattern.matcher(key);
+            if (matcher.matches()) {
+                String queryKey = matcher.group(1).toLowerCase();
+                String property = matcher.group(2).toLowerCase();
+                
+                // Get or create MetricQueryConfig for this queryKey
+                MetricQueryConfig config = tempQueries.computeIfAbsent(queryKey, k -> new MetricQueryConfig());
+                
+                // Set the appropriate property
+                switch (property) {
+                    case "displayname":
+                        config.setDisplayName(value);
+                        break;
+                    case "query":
+                        config.setQuery(value);
+                        break;
+                    case "unit":
+                        config.setUnit(value);
+                        break;
+                    case "description":
+                        config.setDescription(value);
+                        break;
+                    case "enabled":
+                        config.setEnabled(Boolean.parseBoolean(value));
+                        break;
+                }
+            }
+        });
         
-        // JVM/Spring Boot Actuator metrics (more common)
-        queries.put("jvm_memory", new MetricQueryConfig(
-            "JVM Memory Usage",
-            "jvm_memory_used_bytes{job=~\".*{service}.*\"}",
-            "bytes",
-            "Memory usage"
-        ));
-        
-        queries.put("jvm_gc", new MetricQueryConfig(
-            "JVM GC Time",
-            "rate(jvm_gc_collection_seconds_total{job=~\".*{service}.*\"}[1m])",
-            "s/s",
-            "GC time per second"
-        ));
-        
-        queries.put("cpu_usage", new MetricQueryConfig(
-            "Process CPU Usage",
-            "rate(process_cpu_seconds_total{job=~\".*{service}.*\"}[1m])",
-            "%",
-            "CPU usage"
-        ));
-        
-        // Generic container metrics
-        queries.put("container_memory", new MetricQueryConfig(
-            "Container Memory",
-            "container_memory_usage_bytes{container=~\".*{service}.*\"}",
-            "bytes",
-            "Container memory"
-        ));
-        
-        queries.put("container_cpu", new MetricQueryConfig(
-            "Container CPU",
-            "rate(container_cpu_usage_seconds_total{container=~\".*{service}.*\"}[1m])",
-            "cores",
-            "CPU cores used"
-        ));
+        // Only add complete configurations (those with at least displayName and query)
+        tempQueries.forEach((key, config) -> {
+            if (config.getDisplayName() != null && config.getQuery() != null) {
+                queries.put(key, config);
+            }
+        });
     }
     
-    // Getters and setters for Spring Boot configuration binding
+    // Getters and setters
     public Map<String, MetricQueryConfig> getQueries() {
         return queries;
     }
