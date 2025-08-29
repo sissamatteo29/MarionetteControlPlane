@@ -12,9 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
 
-/**
- * Enhanced ConfigRegistry that maintains both template and runtime configurations
- */
+
 public class ConfigRegistry {
     
     // Template configurations (never change after initial load)
