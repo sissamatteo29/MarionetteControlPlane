@@ -4,6 +4,8 @@ package org.marionette.controlplane.domain.entities;
 import java.net.URI;
 import java.time.Instant;
 
+import javax.sql.rowset.serial.SerialArray;
+
 import org.marionette.controlplane.domain.values.ServiceName;
 
 import static java.util.Objects.requireNonNull;
@@ -36,6 +38,14 @@ public class ServiceMetadata {
                 URI.create(endpointUri),
                 lastSeen,
                 status);
+    }
+
+    public static ServiceMetadata of(ServiceName serviceName, URI endpointUri, Instant lastSeen, ServiceStatus status) {
+        return new ServiceMetadata(serviceName, endpointUri, lastSeen, status);
+    }
+
+    public static ServiceMetadata discoveredNew(ServiceName serviceName, URI endpointUri) {
+        return new ServiceMetadata(serviceName, endpointUri, Instant.now(), ServiceStatus.DISCOVERED);
     }
 
     public ServiceMetadata withStatus(ServiceStatus newStatus) {
