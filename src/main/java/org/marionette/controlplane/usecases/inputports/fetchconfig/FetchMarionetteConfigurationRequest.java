@@ -1,3 +1,3 @@
 package org.marionette.controlplane.usecases.inputports.fetchconfig;
 
-public record FetchMarionetteConfigurationRequest (String completeMarionetteConfigEndpoint) {}
+public record FetchMarionetteConfigurationRequest (String serviceEndpoint) {}

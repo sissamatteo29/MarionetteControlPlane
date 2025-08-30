@@ -108,6 +108,26 @@ public class ConfigRegistry {
         return Map.copyOf(serviceMetadata);
     }
 
+    public ServiceMetadata getMetadataOfService(ServiceName serviceName) {
+        requireNonNull(serviceName, "The service name cannot be null");
+        if(!serviceMetadata.containsKey(serviceName)) {
+            System.out.println("Could not find metadata for the service " + serviceName);
+        }
+
+        return serviceMetadata.get(serviceName);
+
+    }
+
+    public URI getEndpointOfService(ServiceName serviceName) {
+        requireNonNull(serviceName, "The service name cannot be null");
+        if(!serviceMetadata.containsKey(serviceName)) {
+            System.out.println("Could not find metadata for the service " + serviceName);
+        }
+
+        return serviceMetadata.get(serviceName).getEndpoint();
+
+    }
+
     public boolean isServiceModified(ServiceName serviceName) {
         ServiceConfig template = templateConfigurations.get(serviceName);
         ServiceConfig runtime = runtimeConfigurations.get(serviceName);

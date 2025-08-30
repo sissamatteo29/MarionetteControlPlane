@@ -18,7 +18,7 @@ public class FetchMarionetteConfigurationUseCaseImpl implements FetchMarionetteC
 
     @Override
     public FetchMarionetteConfigurationResult execute(FetchMarionetteConfigurationRequest request) {
-        ServiceConfigData fetchedMarionetteConfig = fetchMarionetteConfigurationGateway.fetchMarionetteConfiguration(request.completeMarionetteConfigEndpoint());
+        ServiceConfigData fetchedMarionetteConfig = fetchMarionetteConfigurationGateway.fetchMarionetteConfiguration(request.serviceEndpoint());
         return new FetchMarionetteConfigurationResult(fetchedMarionetteConfig);
     }
     

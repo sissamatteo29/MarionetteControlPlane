@@ -25,7 +25,7 @@ public class FetchAllMarionetteConfigurationsUseCaseImpl implements FetchAllMari
         
         List<ServiceConfigData> fetchedMarionetteConfigs = new ArrayList<>();
 
-        for(String marionetteConfigEndpoint : marionetteServices.completeMarionetteConfigEndpoints()) {
+        for(String marionetteConfigEndpoint : marionetteServices.serviceEndpoints()) {
 
             fetchedMarionetteConfigs.add(
                 fetchSingleConfigurationUseCase.execute(new FetchMarionetteConfigurationRequest(marionetteConfigEndpoint)).serviceData()
