@@ -1,6 +1,5 @@
 package org.marionette.controlplane.usecases.inputports.fetchconfig;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,8 @@ public class FetchAllMarionetteConfigurationsUseCaseImpl implements FetchAllMari
         
         List<ServiceConfigData> fetchedMarionetteConfigs = new ArrayList<>();
 
-        for(URI marionetteConfigEndpoint : marionetteServices.completeMarionetteConfigEndpoints()) {
+        for(String marionetteConfigEndpoint : marionetteServices.completeMarionetteConfigEndpoints()) {
+
             fetchedMarionetteConfigs.add(
                 fetchSingleConfigurationUseCase.execute(new FetchMarionetteConfigurationRequest(marionetteConfigEndpoint)).serviceData()
             );
