@@ -3,8 +3,8 @@ package org.marionette.controlplane.adapters.output.fetchconfig;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.dto.MarionetteServiceConfigDTO;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.mapping.MarionetteConfigMapper;
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
-import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchMarionetteConfigurationResult;
-import org.marionette.controlplane.usecases.outputports.fetchconfig.NodeConfigGateway;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchRemoteMarionetteConfigurationResult;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchMarionetteConfigurationGateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -17,7 +17,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-public class NodeConfigAdapter implements NodeConfigGateway {
+public class NodeConfigAdapter implements FetchMarionetteConfigurationGateway {
 
     private final HttpClient httpClient;
 
@@ -34,7 +34,7 @@ public class NodeConfigAdapter implements NodeConfigGateway {
     }
 
     @Override
-    public FetchMarionetteConfigurationResult fetchConfiguration(String serviceEndpoint) {
+    public FetchRemoteMarionetteConfigurationResult fetchConfiguration(String serviceEndpoint) {
         try {
             
             HttpRequest request = HttpRequest.newBuilder()
@@ -62,17 +62,17 @@ public class NodeConfigAdapter implements NodeConfigGateway {
                 // Map
                 ServiceConfigData serviceConfigData = MarionetteConfigMapper.toDomainServiceConfigData(marionetteServiceConfigDTO);
                 
-                return FetchMarionetteConfigurationResult.success(serviceConfigData);
+                return FetchRemoteMarionetteConfigurationResult.success(serviceConfigData);
             } else {
-                return FetchMarionetteConfigurationResult.failure(
+                return FetchRemoteMarionetteConfigurationResult.failure(
                     "HTTP " + response.statusCode()
                 );
             }
             
         } catch (IOException | InterruptedException e) {
-            return FetchMarionetteConfigurationResult.failure(e.getMessage());
+            return FetchRemoteMarionetteConfigurationResult.failure(e.getMessage());
         } catch (Exception e) {
-            return FetchMarionetteConfigurationResult.failure(e.getMessage());
+            return FetchRemoteMarionetteConfigurationResult.failure(e.getMessage());
         }
     }
     

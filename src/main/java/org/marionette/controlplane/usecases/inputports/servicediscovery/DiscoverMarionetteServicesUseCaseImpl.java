@@ -2,8 +2,8 @@ package org.marionette.controlplane.usecases.inputports.servicediscovery;
 
 import java.util.List;
 
+import org.marionette.controlplane.usecases.domain.DiscoveredMarionetteServiceMetadata;
 import org.marionette.controlplane.usecases.inputports.DiscoverMarionetteServicesUseCase;
-import org.marionette.controlplane.usecases.outputports.servicediscovery.DiscoveredMarionetteServiceData;
 import org.marionette.controlplane.usecases.outputports.servicediscovery.FindMarionetteServicesPort;
 
 public class DiscoverMarionetteServicesUseCaseImpl implements DiscoverMarionetteServicesUseCase {
@@ -20,7 +20,7 @@ public class DiscoverMarionetteServicesUseCaseImpl implements DiscoverMarionette
     @Override
     public DiscoverMarionetteServicesResult findAllMarionetteServices() {
     
-        List<DiscoveredMarionetteServiceData> discoveredServices = findServicesPort.findAllMarionetteServices();
+        List<DiscoveredMarionetteServiceMetadata> discoveredServices = findServicesPort.findAllMarionetteServices();
         return new DiscoverMarionetteServicesResult(discoveredServices);
         
     }

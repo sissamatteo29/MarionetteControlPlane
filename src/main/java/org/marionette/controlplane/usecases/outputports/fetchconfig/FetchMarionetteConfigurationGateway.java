@@ -1,10 +1,11 @@
 package org.marionette.controlplane.usecases.outputports.fetchconfig;
 
+import java.net.URI;
+
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
-import org.marionette.controlplane.usecases.outputports.servicediscovery.DiscoveredMarionetteServiceData;
 
-public interface NodeConfigGateway {
+public interface FetchMarionetteConfigurationGateway {
 
-    public ServiceConfigData fetchMarionetteConfiguration(DiscoveredMarionetteServiceData discoveredServiceData);
+    public ServiceConfigData fetchMarionetteConfiguration(URI completeMarionetteConfigEndpoint);
 
 }

@@ -6,13 +6,13 @@ import org.marionette.controlplane.adapters.output.fetchconfig.NodeConfigAdapter
 import org.marionette.controlplane.adapters.output.servicediscovery.KubernetesFindServicesAdapter;
 import org.marionette.controlplane.adapters.output.servicediscovery.ServiceDiscoveryService;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
-import org.marionette.controlplane.usecases.inputports.AddServiceConfigPort;
+import org.marionette.controlplane.usecases.inputports.StoreMarionetteServiceConfigurationUseCase;
 import org.marionette.controlplane.usecases.inputports.DiscoverMarionetteServicesUseCase;
 import org.marionette.controlplane.usecases.inputports.FetchAllConfigurationsAndStorePort;
-import org.marionette.controlplane.usecases.inputports.addserviceconfig.AddServiceConfigUseCase;
 import org.marionette.controlplane.usecases.inputports.fetchconfig.FetchAllConfigurationsAndStoreUseCase;
 import org.marionette.controlplane.usecases.inputports.servicediscovery.DiscoverMarionetteServicesUseCaseImpl;
-import org.marionette.controlplane.usecases.outputports.fetchconfig.NodeConfigGateway;
+import org.marionette.controlplane.usecases.inputports.storeconfig.StoreMarionetteServiceConfigurationUseCaseImpl;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchMarionetteConfigurationGateway;
 import org.marionette.controlplane.usecases.outputports.servicediscovery.FindMarionetteServicesPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +28,8 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public AddServiceConfigPort createAddServiceConfigPort(ConfigRegistry globalRegistry) {
-        return new AddServiceConfigUseCase(globalRegistry);
+    public StoreMarionetteServiceConfigurationUseCase createAddServiceConfigPort(ConfigRegistry globalRegistry) {
+        return new StoreMarionetteServiceConfigurationUseCaseImpl(globalRegistry);
     }
 
     @Bean
@@ -60,13 +60,13 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public NodeConfigGateway createNodeConfigGateway() {
+    public FetchMarionetteConfigurationGateway createNodeConfigGateway() {
         return new NodeConfigAdapter();
     }
 
     @Bean
     public FetchAllConfigurationsAndStorePort createFetchAllConfigurationsAndStorePort(
-            NodeConfigGateway nodeConfigGateway, AddServiceConfigPort addServiceConfigPort) {
+            FetchMarionetteConfigurationGateway nodeConfigGateway, StoreMarionetteServiceConfigurationUseCase addServiceConfigPort) {
         return new FetchAllConfigurationsAndStoreUseCase(addServiceConfigPort, nodeConfigGateway);
 
     };

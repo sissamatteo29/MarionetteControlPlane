@@ -4,11 +4,11 @@ import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.domain.entities.ServiceConfig;
 import org.marionette.controlplane.domain.entities.ServiceMetadata.ServiceStatus;
 import org.marionette.controlplane.domain.values.ServiceName;
+import org.marionette.controlplane.usecases.domain.mappers.ServiceConfigDataMapper;
 import org.marionette.controlplane.usecases.inputports.DiscoverMarionetteServicesUseCase;
-import org.marionette.controlplane.usecases.inputports.addserviceconfig.DomainServiceConfigFactory;
 import org.marionette.controlplane.usecases.inputports.servicediscovery.DiscoverMarionetteServicesResult;
-import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchMarionetteConfigurationResult;
-import org.marionette.controlplane.usecases.outputports.fetchconfig.NodeConfigGateway;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchRemoteMarionetteConfigurationResult;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchMarionetteConfigurationGateway;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +23,12 @@ public class ServiceDiscoveryService {
 
     private final ConfigRegistry configRegistry;
     private final DiscoverMarionetteServicesUseCase serviceDiscovery;
-    private final NodeConfigGateway nodeConfigGateway;
+    private final FetchMarionetteConfigurationGateway nodeConfigGateway;
 
     public ServiceDiscoveryService(
             ConfigRegistry configRegistry,
             DiscoverMarionetteServicesUseCase serviceDiscovery,
-            NodeConfigGateway nodeConfigGateway) {
+            FetchMarionetteConfigurationGateway nodeConfigGateway) {
         this.configRegistry = configRegistry;
         this.serviceDiscovery = serviceDiscovery;
         this.nodeConfigGateway = nodeConfigGateway;
@@ -158,10 +158,10 @@ public class ServiceDiscoveryService {
             String configEndpoint = endpoint + "/api/getConfiguration";
             System.out.println("Fetching template config for " + serviceName + " from " + configEndpoint);
             
-            FetchMarionetteConfigurationResult result = nodeConfigGateway.fetchConfiguration(configEndpoint);
+            FetchRemoteMarionetteConfigurationResult result = nodeConfigGateway.fetchConfiguration(configEndpoint);
             
             if (result.isSuccessfull()) {
-                ServiceConfig templateConfig = DomainServiceConfigFactory.createServiceConfig(result.serviceConfigData());
+                ServiceConfig templateConfig = ServiceConfigDataMapper.createServiceConfig(result.serviceConfigData());
                 configRegistry.addDiscoveredService(serviceName, templateConfig, endpoint);
                 return true;
             } else {

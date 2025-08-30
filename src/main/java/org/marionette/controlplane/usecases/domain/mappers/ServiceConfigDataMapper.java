@@ -1,4 +1,4 @@
-package org.marionette.controlplane.usecases.inputports.addserviceconfig;
+package org.marionette.controlplane.usecases.domain.mappers;
 
 import org.marionette.controlplane.domain.entities.ClassConfig;
 import org.marionette.controlplane.domain.entities.MethodConfig;
@@ -9,9 +9,9 @@ import org.marionette.controlplane.usecases.domain.ClassConfigData;
 import org.marionette.controlplane.usecases.domain.MethodConfigData;
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
 
-public class DomainServiceConfigFactory {
+public class ServiceConfigDataMapper {
 
-    public static ServiceConfig createServiceConfig(ServiceConfigData serviceConfigData) {
+    public static ServiceConfig toDomainServiceConfig(ServiceConfigData serviceConfigData) {
 
         ServiceConfig resultingServiceConfig = new ServiceConfig(new ServiceName(serviceConfigData.serviceName()));
 

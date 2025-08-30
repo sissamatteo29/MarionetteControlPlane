@@ -14,7 +14,6 @@ import java.util.HashMap;
 
 public class ServiceConfig {
 
-
     private final ServiceName serviceName;
     private final Map<ClassName, ClassConfig> classConfigs;
 

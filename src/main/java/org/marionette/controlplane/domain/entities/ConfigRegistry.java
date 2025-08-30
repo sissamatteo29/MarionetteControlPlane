@@ -22,7 +22,7 @@ public class ConfigRegistry {
     private volatile Instant lastDiscovery = Instant.now();
 
     public synchronized void addDiscoveredService(ServiceName serviceName, ServiceConfig templateConfig,
-            String endpoint) {
+            URI endpoint) {
 
         requireNonNull(serviceName, "The service name cannot be null");
         requireNonNull(templateConfig, "The service configuration cannot be null");
@@ -33,7 +33,7 @@ public class ConfigRegistry {
         if (!runtimeConfigurations.containsKey(serviceName)) {
             runtimeConfigurations.put(serviceName, ServiceConfig.copyOf(templateConfig));
         }
-        serviceMetadata.put(serviceName, ServiceMetadata.discoveredNew(serviceName, URI.create(endpoint)));
+        serviceMetadata.put(serviceName, ServiceMetadata.discoveredNew(serviceName, endpoint));
         System.out.println("Added service: " + serviceName + " (template stored, runtime preserved)");
     }
 

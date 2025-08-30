@@ -1,5 +1,5 @@
 package org.marionette.controlplane.usecases.inputports.fetchconfig;
 
-import org.marionette.controlplane.usecases.outputports.servicediscovery.DiscoveredMarionetteServiceData;
+import java.net.URI;
 
-public record FetchMarionetteConfigurationRequest (DiscoveredMarionetteServiceData serviceData) {}
+public record FetchMarionetteConfigurationRequest (URI completeMarionetteConfigEndpoint) {}
