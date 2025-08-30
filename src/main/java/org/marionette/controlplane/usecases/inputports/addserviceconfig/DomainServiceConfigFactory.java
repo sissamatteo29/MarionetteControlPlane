@@ -1,4 +1,4 @@
-package org.marionette.controlplane.usecases.input.addserviceconfig;
+package org.marionette.controlplane.usecases.inputports.addserviceconfig;
 
 import org.marionette.controlplane.domain.entities.ClassConfig;
 import org.marionette.controlplane.domain.entities.MethodConfig;

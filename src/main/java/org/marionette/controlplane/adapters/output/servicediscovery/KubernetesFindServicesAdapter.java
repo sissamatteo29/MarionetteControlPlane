@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.marionette.controlplane.usecases.output.servicediscovery.FindServicesPort;
+import org.marionette.controlplane.usecases.outputports.servicediscovery.FindMarionetteServicesPort;
 
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
@@ -16,7 +16,7 @@ import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.openapi.models.V1ServicePort;
 import io.kubernetes.client.util.Config;
 
-public class KubernetesFindServicesAdapter implements FindServicesPort {
+public class KubernetesFindServicesAdapter implements FindMarionetteServicesPort {
 
     private final CoreV1Api coreV1Api;
 

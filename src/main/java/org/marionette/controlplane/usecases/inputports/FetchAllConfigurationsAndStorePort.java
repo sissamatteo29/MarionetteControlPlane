@@ -1,6 +1,6 @@
-package org.marionette.controlplane.usecases.input;
+package org.marionette.controlplane.usecases.inputports;
 
-import org.marionette.controlplane.usecases.input.fetchconfig.FetchAllConfigsRequest;
+import org.marionette.controlplane.usecases.inputports.fetchconfig.FetchAllConfigsRequest;
 
 /**
  * Port interface for fetching external configurations.

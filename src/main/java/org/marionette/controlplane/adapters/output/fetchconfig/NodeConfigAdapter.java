@@ -3,8 +3,8 @@ package org.marionette.controlplane.adapters.output.fetchconfig;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.dto.MarionetteServiceConfigDTO;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.mapping.MarionetteConfigMapper;
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
-import org.marionette.controlplane.usecases.output.fetchconfig.DiscoveredServiceConfigResult;
-import org.marionette.controlplane.usecases.output.fetchconfig.NodeConfigGateway;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.DiscoveredServiceConfigResult;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.NodeConfigGateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

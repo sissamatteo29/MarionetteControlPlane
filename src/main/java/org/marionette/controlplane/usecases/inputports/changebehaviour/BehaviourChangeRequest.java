@@ -1,4 +1,4 @@
-package org.marionette.controlplane.usecases.input.changebehaviour;
+package org.marionette.controlplane.usecases.inputports.changebehaviour;
 
 public class BehaviourChangeRequest {
     private String newBehaviourId;

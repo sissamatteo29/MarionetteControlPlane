@@ -6,14 +6,14 @@ import org.marionette.controlplane.adapters.output.fetchconfig.NodeConfigAdapter
 import org.marionette.controlplane.adapters.output.servicediscovery.KubernetesFindServicesAdapter;
 import org.marionette.controlplane.adapters.output.servicediscovery.ServiceDiscoveryService;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
-import org.marionette.controlplane.usecases.input.AddServiceConfigPort;
-import org.marionette.controlplane.usecases.input.DiscoverServicesPort;
-import org.marionette.controlplane.usecases.input.FetchAllConfigurationsAndStorePort;
-import org.marionette.controlplane.usecases.input.addserviceconfig.AddServiceConfigUseCase;
-import org.marionette.controlplane.usecases.input.fetchconfig.FetchAllConfigurationsAndStoreUseCase;
-import org.marionette.controlplane.usecases.input.servicediscovery.DiscoverServicesUseCase;
-import org.marionette.controlplane.usecases.output.fetchconfig.NodeConfigGateway;
-import org.marionette.controlplane.usecases.output.servicediscovery.FindServicesPort;
+import org.marionette.controlplane.usecases.inputports.AddServiceConfigPort;
+import org.marionette.controlplane.usecases.inputports.DiscoverMarionetteServicesUseCase;
+import org.marionette.controlplane.usecases.inputports.FetchAllConfigurationsAndStorePort;
+import org.marionette.controlplane.usecases.inputports.addserviceconfig.AddServiceConfigUseCase;
+import org.marionette.controlplane.usecases.inputports.fetchconfig.FetchAllConfigurationsAndStoreUseCase;
+import org.marionette.controlplane.usecases.inputports.servicediscovery.DiscoverMarionetteServicesUseCaseImpl;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.NodeConfigGateway;
+import org.marionette.controlplane.usecases.outputports.servicediscovery.FindMarionetteServicesPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -33,7 +33,7 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public FindServicesPort createFindServicesPort() {
+    public FindMarionetteServicesPort createFindServicesPort() {
         String namespace = System.getenv("KUBERNETES_NAMESPACE");
         if (namespace == null || namespace.trim().isEmpty()) {
             // Fallback to default namespace if environment variable is not set
@@ -55,8 +55,8 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public DiscoverServicesPort createDiscoverServicesPort(FindServicesPort findServicesPort) {
-        return new DiscoverServicesUseCase(findServicesPort);
+    public DiscoverMarionetteServicesUseCase createDiscoverServicesPort(FindMarionetteServicesPort findServicesPort) {
+        return new DiscoverMarionetteServicesUseCase(findServicesPort);
     }
 
     @Bean

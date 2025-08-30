@@ -1,4 +1,4 @@
-package org.marionette.controlplane.usecases.input.fetchconfig;
+package org.marionette.controlplane.usecases.inputports.fetchconfig;
 
 import java.util.List;
 

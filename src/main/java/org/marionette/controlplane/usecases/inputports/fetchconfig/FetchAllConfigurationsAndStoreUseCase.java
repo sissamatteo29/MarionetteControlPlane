@@ -1,10 +1,10 @@
-package org.marionette.controlplane.usecases.input.fetchconfig;
+package org.marionette.controlplane.usecases.inputports.fetchconfig;
 
-import org.marionette.controlplane.usecases.input.AddServiceConfigPort;
-import org.marionette.controlplane.usecases.input.FetchAllConfigurationsAndStorePort;
-import org.marionette.controlplane.usecases.input.addserviceconfig.AddServiceConfigRequest;
-import org.marionette.controlplane.usecases.output.fetchconfig.DiscoveredServiceConfigResult;
-import org.marionette.controlplane.usecases.output.fetchconfig.NodeConfigGateway;
+import org.marionette.controlplane.usecases.inputports.AddServiceConfigPort;
+import org.marionette.controlplane.usecases.inputports.FetchAllConfigurationsAndStorePort;
+import org.marionette.controlplane.usecases.inputports.addserviceconfig.AddServiceConfigRequest;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.DiscoveredServiceConfigResult;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.NodeConfigGateway;
 
 
 public class FetchAllConfigurationsAndStoreUseCase implements FetchAllConfigurationsAndStorePort {

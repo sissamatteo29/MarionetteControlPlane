@@ -1,4 +1,4 @@
-package org.marionette.controlplane.usecases.output.fetchconfig;
+package org.marionette.controlplane.usecases.outputports.fetchconfig;
 
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
 

@@ -1,10 +1,10 @@
-package org.marionette.controlplane.usecases.input.addserviceconfig;
+package org.marionette.controlplane.usecases.inputports.addserviceconfig;
 
 import java.util.Objects;
 
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.domain.entities.ServiceConfig;
-import org.marionette.controlplane.usecases.input.AddServiceConfigPort;
+import org.marionette.controlplane.usecases.inputports.AddServiceConfigPort;
 
 public class AddServiceConfigUseCase implements AddServiceConfigPort {
 

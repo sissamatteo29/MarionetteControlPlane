@@ -2,13 +2,13 @@ package org.marionette.controlplane.adapters.output.servicediscovery;
 
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.domain.entities.ServiceConfig;
+import org.marionette.controlplane.domain.entities.ServiceMetadata.ServiceStatus;
 import org.marionette.controlplane.domain.values.ServiceName;
-import org.marionette.controlplane.usecases.input.DiscoverServicesPort;
-import org.marionette.controlplane.usecases.output.fetchconfig.NodeConfigGateway;
-import org.marionette.controlplane.usecases.input.addserviceconfig.DomainServiceConfigFactory;
-import org.marionette.controlplane.usecases.output.fetchconfig.DiscoveredServiceConfigResult;
-import org.marionette.controlplane.usecases.input.servicediscovery.DiscoverServicesResult;
-
+import org.marionette.controlplane.usecases.inputports.DiscoverMarionetteServicesUseCase;
+import org.marionette.controlplane.usecases.inputports.addserviceconfig.DomainServiceConfigFactory;
+import org.marionette.controlplane.usecases.inputports.servicediscovery.DiscoverMarionetteServicesResult;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.DiscoveredServiceConfigResult;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.NodeConfigGateway;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 public class ServiceDiscoveryService {
 
     private final ConfigRegistry configRegistry;
-    private final DiscoverServicesPort serviceDiscovery;
+    private final DiscoverMarionetteServicesUseCase serviceDiscovery;
     private final NodeConfigGateway nodeConfigGateway;
 
     public ServiceDiscoveryService(
             ConfigRegistry configRegistry,
-            DiscoverServicesPort serviceDiscovery,
+            DiscoverMarionetteServicesUseCase serviceDiscovery,
             NodeConfigGateway nodeConfigGateway) {
         this.configRegistry = configRegistry;
         this.serviceDiscovery = serviceDiscovery;
@@ -44,7 +44,7 @@ public class ServiceDiscoveryService {
         
         try {
             // 1. Discover all services in the cluster
-            DiscoverServicesResult discoveryResult = serviceDiscovery.findAllServices();
+            DiscoverMarionetteServicesResult discoveryResult = serviceDiscovery.findAllServices();
             List<String> allServiceEndpoints = discoveryResult.serviceNames();
             
             System.out.println("Found " + allServiceEndpoints.size() + " services in cluster");
@@ -109,7 +109,7 @@ public class ServiceDiscoveryService {
         System.out.println("⚡ Starting quick service discovery...");
         
         try {
-            DiscoverServicesResult discoveryResult = serviceDiscovery.findAllServices();
+            DiscoverMarionetteServicesResult discoveryResult = serviceDiscovery.findAllServices();
             List<String> allServiceEndpoints = discoveryResult.serviceNames();
             
             Set<ServiceName> currentServices = allServiceEndpoints.stream()
@@ -227,7 +227,7 @@ public class ServiceDiscoveryService {
             configRegistry.getLastDiscovery(),
             configRegistry.getAllRuntimeConfigurations().size(),
             (int) configRegistry.getAllServiceMetadata().values().stream()
-                .filter(metadata -> metadata.getStatus() == ConfigRegistry.ServiceStatus.UNAVAILABLE)
+                .filter(metadata -> metadata.getStatus() == ServiceStatus.UNAVAILABLE)
                 .count()
         );
     }
