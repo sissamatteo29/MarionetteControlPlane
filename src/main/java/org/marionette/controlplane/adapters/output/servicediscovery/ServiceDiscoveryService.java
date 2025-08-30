@@ -7,7 +7,7 @@ import org.marionette.controlplane.domain.values.ServiceName;
 import org.marionette.controlplane.usecases.inputports.DiscoverMarionetteServicesUseCase;
 import org.marionette.controlplane.usecases.inputports.addserviceconfig.DomainServiceConfigFactory;
 import org.marionette.controlplane.usecases.inputports.servicediscovery.DiscoverMarionetteServicesResult;
-import org.marionette.controlplane.usecases.outputports.fetchconfig.DiscoveredServiceConfigResult;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchMarionetteConfigurationResult;
 import org.marionette.controlplane.usecases.outputports.fetchconfig.NodeConfigGateway;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -158,7 +158,7 @@ public class ServiceDiscoveryService {
             String configEndpoint = endpoint + "/api/getConfiguration";
             System.out.println("Fetching template config for " + serviceName + " from " + configEndpoint);
             
-            DiscoveredServiceConfigResult result = nodeConfigGateway.fetchConfiguration(configEndpoint);
+            FetchMarionetteConfigurationResult result = nodeConfigGateway.fetchConfiguration(configEndpoint);
             
             if (result.isSuccessfull()) {
                 ServiceConfig templateConfig = DomainServiceConfigFactory.createServiceConfig(result.serviceConfigData());

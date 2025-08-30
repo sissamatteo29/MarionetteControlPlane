@@ -3,7 +3,7 @@ package org.marionette.controlplane.adapters.output.fetchconfig;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.dto.MarionetteServiceConfigDTO;
 import org.marionette.controlplane.adapters.output.fetchconfig.parsing.mapping.MarionetteConfigMapper;
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
-import org.marionette.controlplane.usecases.outputports.fetchconfig.DiscoveredServiceConfigResult;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchMarionetteConfigurationResult;
 import org.marionette.controlplane.usecases.outputports.fetchconfig.NodeConfigGateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +34,7 @@ public class NodeConfigAdapter implements NodeConfigGateway {
     }
 
     @Override
-    public DiscoveredServiceConfigResult fetchConfiguration(String serviceEndpoint) {
+    public FetchMarionetteConfigurationResult fetchConfiguration(String serviceEndpoint) {
         try {
             
             HttpRequest request = HttpRequest.newBuilder()
@@ -62,17 +62,17 @@ public class NodeConfigAdapter implements NodeConfigGateway {
                 // Map
                 ServiceConfigData serviceConfigData = MarionetteConfigMapper.toDomainServiceConfigData(marionetteServiceConfigDTO);
                 
-                return DiscoveredServiceConfigResult.success(serviceConfigData);
+                return FetchMarionetteConfigurationResult.success(serviceConfigData);
             } else {
-                return DiscoveredServiceConfigResult.failure(
+                return FetchMarionetteConfigurationResult.failure(
                     "HTTP " + response.statusCode()
                 );
             }
             
         } catch (IOException | InterruptedException e) {
-            return DiscoveredServiceConfigResult.failure(e.getMessage());
+            return FetchMarionetteConfigurationResult.failure(e.getMessage());
         } catch (Exception e) {
-            return DiscoveredServiceConfigResult.failure(e.getMessage());
+            return FetchMarionetteConfigurationResult.failure(e.getMessage());
         }
     }
     

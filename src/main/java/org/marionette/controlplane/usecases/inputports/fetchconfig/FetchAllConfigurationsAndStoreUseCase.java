@@ -3,7 +3,7 @@ package org.marionette.controlplane.usecases.inputports.fetchconfig;
 import org.marionette.controlplane.usecases.inputports.AddServiceConfigPort;
 import org.marionette.controlplane.usecases.inputports.FetchAllConfigurationsAndStorePort;
 import org.marionette.controlplane.usecases.inputports.addserviceconfig.AddServiceConfigRequest;
-import org.marionette.controlplane.usecases.outputports.fetchconfig.DiscoveredServiceConfigResult;
+import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchMarionetteConfigurationResult;
 import org.marionette.controlplane.usecases.outputports.fetchconfig.NodeConfigGateway;
 
 
@@ -22,7 +22,7 @@ public class FetchAllConfigurationsAndStoreUseCase implements FetchAllConfigurat
 
         for(String serviceEndpoint : request.serviceEndpoints()) {
             System.out.println("Contacting the service " + serviceEndpoint + "/api/getConfiguration");
-            DiscoveredServiceConfigResult serviceConfigResult = nodeConfigGateway.fetchConfiguration(serviceEndpoint + "/api/getConfiguration");
+            FetchMarionetteConfigurationResult serviceConfigResult = nodeConfigGateway.fetchConfiguration(serviceEndpoint + "/api/getConfiguration");
             if(serviceConfigResult.isSuccessfull()) {
                 AddServiceConfigRequest addServiceConfigRequest = new AddServiceConfigRequest(serviceConfigResult.serviceConfigData());
                 addServiceConfigPort.execute(addServiceConfigRequest);
