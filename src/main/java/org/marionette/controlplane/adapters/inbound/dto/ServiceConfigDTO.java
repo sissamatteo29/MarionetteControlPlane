@@ -2,4 +2,9 @@ package org.marionette.controlplane.adapters.inbound.dto;
 
 import java.util.List;
 
-public record ServiceConfigDTO (String serviceName, List<ClassConfigDTO> classConfigs) {}
+public record ServiceConfigDTO (String serviceName, List<ClassConfigDTO> classConfigs) {
+
+    public ServiceConfigDTO {
+        classConfigs = List.copyOf(classConfigs());
+    }
+}

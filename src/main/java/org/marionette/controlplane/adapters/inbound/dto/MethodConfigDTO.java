@@ -8,4 +8,8 @@ public record MethodConfigDTO (
     String defaultBehaviourId,
     String currentBehaviourId,
     List<String> availableBehaviourIds) {
+
+    public MethodConfigDTO {
+        availableBehaviourIds = List.copyOf(availableBehaviourIds());
+    }
 }
