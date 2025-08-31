@@ -81,6 +81,10 @@ public class ClassConfig {
         return className;
     }
 
+    public String classNameAsString() {
+        return className.getClassName();
+    }
+
     public Map<MethodName, MethodConfig> getMethodsConfigurations() {
         return Collections.unmodifiableMap(methodConfigs);       // Immutable view of the map, content of the map immutable by design
     }

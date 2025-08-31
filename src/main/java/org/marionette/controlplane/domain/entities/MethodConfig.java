@@ -78,8 +78,16 @@ public class MethodConfig {
         return methodName;
     }
 
+    public String methodNameAsString() {
+        return methodName.getMethodName();
+    }
+
     public BehaviourId getDefaultBehaviourId() {
         return defaultBehaviourId;
+    }    
+    
+    public String defaultBehaviourIdAsString() {
+        return defaultBehaviourId.getBehaviourId();
     }
 
     public BehaviourId getCurrentBehaviourId() {

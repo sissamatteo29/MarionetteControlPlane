@@ -83,6 +83,10 @@ public class ServiceConfig {
         return serviceName;
     }
 
+    public String serviceNameAsString() {
+        return serviceName.toString();
+    }
+
     public Map<ClassName, ClassConfig> getClassConfigurations() {
         return Collections.unmodifiableMap(classConfigs);
     }
