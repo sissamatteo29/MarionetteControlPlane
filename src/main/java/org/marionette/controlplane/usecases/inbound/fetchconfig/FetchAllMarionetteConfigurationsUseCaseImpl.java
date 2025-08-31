@@ -3,6 +3,7 @@ package org.marionette.controlplane.usecases.inbound.fetchconfig;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.marionette.controlplane.exceptions.infrastructure.checked.FetchMarionetteConfigurationException;
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
 import org.marionette.controlplane.usecases.inbound.FetchAllMarionetteConfigurationsUseCase;
 import org.marionette.controlplane.usecases.outbound.fetchconfig.FetchMarionetteConfigurationGateway;
@@ -26,7 +27,14 @@ public class FetchAllMarionetteConfigurationsUseCaseImpl implements FetchAllMari
         List<ServiceConfigData> fetchedMarionetteConfigs = new ArrayList<>();
 
         for(String marionetteConfigEndpoint : marionetteServices.serviceEndpoints()) {
-            fetchedMarionetteConfigs.add(fetchMarionetteConfigurationGateway.fetchMarionetteConfiguration(marionetteConfigEndpoint));
+
+            try {
+                ServiceConfigData fetchedConfig = fetchMarionetteConfigurationGateway.fetchMarionetteConfiguration(marionetteConfigEndpoint);
+                fetchedMarionetteConfigs.add(fetchedConfig);
+            } catch (FetchMarionetteConfigurationException e) {     // Handle the exception, keep going with other nodes
+                System.out.println("Impossible to fetch config data for " + marionetteConfigEndpoint + ". Continuing...");
+            }
+        
         }
 
         return new FetchAllMarionetteConfigurationsResult(fetchedMarionetteConfigs);
