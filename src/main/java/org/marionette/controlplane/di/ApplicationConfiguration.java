@@ -1,19 +1,20 @@
 package org.marionette.controlplane.di;
 
-import org.marionette.controlplane.adapters.inbound.changeconfig.ChangeConfigService;
+import org.marionette.controlplane.adapters.inbound.changeconfig.ControlMarionetteServiceBehaviourAdapter;
 import org.marionette.controlplane.adapters.inbound.controllers.ConfigurationController;
 import org.marionette.controlplane.adapters.outbound.fetchconfig.HttpFetchMarionetteConfigAdapter;
+import org.marionette.controlplane.adapters.outbound.servicediscovery.HttpValidateMarionetteServiceAdapter;
 import org.marionette.controlplane.adapters.outbound.servicediscovery.KubernetesFindServicesAdapter;
-import org.marionette.controlplane.adapters.outbound.servicediscovery.ServiceDiscoveryService;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
-import org.marionette.controlplane.usecases.inbound.DiscoverMarionetteServicesUseCase;
-import org.marionette.controlplane.usecases.inbound.FetchAllConfigurationsAndStorePort;
-import org.marionette.controlplane.usecases.inbound.StoreMarionetteServiceConfigurationUseCase;
-import org.marionette.controlplane.usecases.inbound.fetchconfig.FetchAllConfigurationsAndStoreUseCase;
-import org.marionette.controlplane.usecases.inbound.servicediscovery.DiscoverMarionetteServicesUseCaseImpl;
-import org.marionette.controlplane.usecases.inbound.storeconfig.StoreMarionetteServiceConfigurationUseCaseImpl;
+import org.marionette.controlplane.usecases.inbound.ChangeMarionetteServiceBehaviourUseCase;
+import org.marionette.controlplane.usecases.inbound.FullMarionetteServiceConfigDiscoveryUseCase;
+import org.marionette.controlplane.usecases.inbound.ReadAllMarionetteConfigsUseCase;
+import org.marionette.controlplane.usecases.inbound.changebehaviour.ChangeMarionetteServiceBehaviourUseCaseImpl;
+import org.marionette.controlplane.usecases.inbound.fulldiscovery.FullMarionetteServiceConfigDiscoveryUseCaseImpl;
 import org.marionette.controlplane.usecases.outbound.fetchconfig.FetchMarionetteConfigurationGateway;
 import org.marionette.controlplane.usecases.outbound.servicediscovery.FindCandidateServicesPort;
+import org.marionette.controlplane.usecases.outbound.servicediscovery.ValidateMarionetteServicePort;
+import org.marionette.controlplane.usecases.outbound.servicemanipulation.ControlMarionetteServiceBehaviourGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -28,35 +29,13 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public StoreMarionetteServiceConfigurationUseCase createAddServiceConfigPort(ConfigRegistry globalRegistry) {
-        return new StoreMarionetteServiceConfigurationUseCaseImpl(globalRegistry);
-    }
-
-    @Bean
     public FindCandidateServicesPort createFindServicesPort() {
-        String namespace = System.getenv("KUBERNETES_NAMESPACE");
-        if (namespace == null || namespace.trim().isEmpty()) {
-            // Fallback to default namespace if environment variable is not set
-            namespace = "default";
-            // Optional: log a warning about using default namespace
-        }
-        return new KubernetesFindServicesAdapter(namespace);
+        return new KubernetesFindServicesAdapter();
     }
 
     @Bean 
-    public ConfigurationController configurationController(ConfigRegistry configRegistry, ChangeConfigService changeConfigService, ServiceDiscoveryService discoveryService) {
-        String namespace = System.getenv("KUBERNETES_NAMESPACE");
-        if (namespace == null || namespace.trim().isEmpty()) {
-            // Fallback to default namespace if environment variable is not set
-            namespace = "default";
-            // Optional: log a warning about using default namespace
-        }
-        return new ConfigurationController(configRegistry, namespace, changeConfigService, discoveryService);
-    }
-
-    @Bean
-    public DiscoverMarionetteServicesUseCase createDiscoverServicesPort(FindCandidateServicesPort findServicesPort) {
-        return new DiscoverMarionetteServicesUseCase(findServicesPort);
+    public ConfigurationController configurationController(ReadAllMarionetteConfigsUseCase readAllMarionetteConfigsUseCase, ChangeMarionetteServiceBehaviourUseCase changeMarionetteServiceBehaviourUseCase) {
+        return new ConfigurationController(readAllMarionetteConfigsUseCase, changeMarionetteServiceBehaviourUseCase);
     }
 
     @Bean
@@ -65,10 +44,42 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public FetchAllConfigurationsAndStorePort createFetchAllConfigurationsAndStorePort(
-            FetchMarionetteConfigurationGateway nodeConfigGateway, StoreMarionetteServiceConfigurationUseCase addServiceConfigPort) {
-        return new FetchAllConfigurationsAndStoreUseCase(addServiceConfigPort, nodeConfigGateway);
+    public FullMarionetteServiceConfigDiscoveryUseCase fullDiscoveryUseCase(
+        FindCandidateServicesPort findServicesPort, 
+        ValidateMarionetteServicePort marionetteServiceValidator, 
+        FetchMarionetteConfigurationGateway fetchMarionetteConfigurationGateway, 
+        ConfigRegistry globalRegistry) {
 
-    };
+        return new FullMarionetteServiceConfigDiscoveryUseCaseImpl(
+            findServicesPort,
+            marionetteServiceValidator,
+            fetchMarionetteConfigurationGateway,
+            globalRegistry
+        );
+
+    }
+
+    @Bean
+    public ValidateMarionetteServicePort validateMarionetteServicePort() {
+        return new HttpValidateMarionetteServiceAdapter();
+    }
+
+    @Bean 
+    ChangeMarionetteServiceBehaviourUseCase changeMarionetteServiceBehaviourUseCase(
+        ConfigRegistry globalRegistry, 
+        ControlMarionetteServiceBehaviourGateway controlMarionetteBehaviourGateway) {
+        
+        return new ChangeMarionetteServiceBehaviourUseCaseImpl(
+            globalRegistry, 
+            controlMarionetteBehaviourGateway);
+    
+    }
+
+    @Bean
+    ControlMarionetteServiceBehaviourGateway controlMarionetteServiceBehaviourGateway() {
+        return new ControlMarionetteServiceBehaviourAdapter();
+    }
+
+
 
 }

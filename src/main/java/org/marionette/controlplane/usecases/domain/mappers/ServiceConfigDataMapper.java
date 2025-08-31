@@ -45,7 +45,7 @@ public class ServiceConfigDataMapper {
         return MethodConfig.of(
             rawMethodConfig.methodName(),
             rawMethodConfig.defaultBehaviourId(),
-            rawMethodConfig.defaultBehaviourId(),
+            rawMethodConfig.currentBehaviourId(),
             rawMethodConfig.availableBehaviourIds()
         );
     }
@@ -84,6 +84,7 @@ public class ServiceConfigDataMapper {
         return new MethodConfigData(
             domainMethodConfig.methodNameAsString(),
             domainMethodConfig.defaultBehaviourIdAsString(),
+            domainMethodConfig.currentBehaviourAsString(),
             availableBehaviourIds
         );
     }

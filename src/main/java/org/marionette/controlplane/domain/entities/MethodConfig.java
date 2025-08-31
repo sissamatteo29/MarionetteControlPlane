@@ -94,6 +94,10 @@ public class MethodConfig {
         return currentBehaviourId;
     }
 
+    public String currentBehaviourAsString() {
+        return currentBehaviourId.getBehaviourId();
+    }
+
     public BehaviourIdSet getAvailableBehaviourIds() {
         return availableBehaviourIds;
     }
