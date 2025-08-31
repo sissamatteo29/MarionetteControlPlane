@@ -4,8 +4,6 @@ package org.marionette.controlplane.domain.entities;
 import java.net.URI;
 import java.time.Instant;
 
-import javax.sql.rowset.serial.SerialArray;
-
 import org.marionette.controlplane.domain.values.ServiceName;
 
 import static java.util.Objects.requireNonNull;

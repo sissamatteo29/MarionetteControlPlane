@@ -1,6 +1,7 @@
 package org.marionette.controlplane.usecases.inbound.servicediscovery;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.marionette.controlplane.usecases.domain.DiscoveredServiceMetadata;
 import org.marionette.controlplane.usecases.inbound.DiscoverMarionetteServicesUseCase;
@@ -30,9 +31,10 @@ public class DiscoverMarionetteServicesUseCaseImpl implements DiscoverMarionette
     public DiscoverMarionetteServicesResult findAllMarionetteServices() {
     
         List<DiscoveredServiceMetadata> discoveredServices = findServicesPort.findCandidateServices();
-        List<DiscoveredServiceMetadata> validServices = marionetteServiceValidator.filterValidMarionetteNodes(discoveredServices);
 
-        return new DiscoverMarionetteServicesResult(validServices);
+        return new DiscoverMarionetteServicesResult(
+            discoveredServices.stream().filter(marionetteServiceValidator::validateCandidateNode).collect(Collectors.toList())
+        );
         
     }
     

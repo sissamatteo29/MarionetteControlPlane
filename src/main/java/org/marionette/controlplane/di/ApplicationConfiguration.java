@@ -2,7 +2,7 @@ package org.marionette.controlplane.di;
 
 import org.marionette.controlplane.adapters.inbound.changeconfig.ChangeConfigService;
 import org.marionette.controlplane.adapters.inbound.controllers.ConfigurationController;
-import org.marionette.controlplane.adapters.outbound.fetchconfig.NodeConfigAdapter;
+import org.marionette.controlplane.adapters.outbound.fetchconfig.HttpFetchMarionetteConfigAdapter;
 import org.marionette.controlplane.adapters.outbound.servicediscovery.KubernetesFindServicesAdapter;
 import org.marionette.controlplane.adapters.outbound.servicediscovery.ServiceDiscoveryService;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
@@ -61,7 +61,7 @@ public class ApplicationConfiguration {
 
     @Bean
     public FetchMarionetteConfigurationGateway createNodeConfigGateway() {
-        return new NodeConfigAdapter();
+        return new HttpFetchMarionetteConfigAdapter();
     }
 
     @Bean

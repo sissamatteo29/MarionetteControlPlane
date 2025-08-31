@@ -17,11 +17,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-public class NodeConfigAdapter implements FetchMarionetteConfigurationGateway {
+public class HttpFetchMarionetteConfigAdapter implements FetchMarionetteConfigurationGateway {
 
     private final HttpClient httpClient;
+    private final HttpFetchMarionetteConfigAdapterConfig config;
 
-    public NodeConfigAdapter() {        
+    public HttpFetchMarionetteConfigAdapter() {        
         this.httpClient = createHttpClient();
     }
 
