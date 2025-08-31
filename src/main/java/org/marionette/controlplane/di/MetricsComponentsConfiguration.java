@@ -1,10 +1,10 @@
 package org.marionette.controlplane.di;
 
-import org.marionette.controlplane.adapters.input.metrics.ConfigurablePrometheusClient;
-import org.marionette.controlplane.adapters.input.metrics.KubernetesPrometheusDiscovery;
-import org.marionette.controlplane.adapters.input.metrics.MetricsConfiguration;
-import org.marionette.controlplane.adapters.input.metrics.PrometheusClient;
-import org.marionette.controlplane.adapters.input.metrics.PrometheusConfigurationResolver;
+import org.marionette.controlplane.adapters.inbound.metrics.ConfigurablePrometheusClient;
+import org.marionette.controlplane.adapters.inbound.metrics.KubernetesPrometheusDiscovery;
+import org.marionette.controlplane.adapters.inbound.metrics.MetricsConfiguration;
+import org.marionette.controlplane.adapters.inbound.metrics.PrometheusClient;
+import org.marionette.controlplane.adapters.inbound.metrics.PrometheusConfigurationResolver;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

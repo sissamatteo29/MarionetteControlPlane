@@ -1,19 +1,19 @@
 package org.marionette.controlplane.di;
 
-import org.marionette.controlplane.adapters.input.changeconfig.ChangeConfigService;
-import org.marionette.controlplane.adapters.input.controllers.ConfigurationController;
-import org.marionette.controlplane.adapters.output.fetchconfig.NodeConfigAdapter;
-import org.marionette.controlplane.adapters.output.servicediscovery.KubernetesFindServicesAdapter;
-import org.marionette.controlplane.adapters.output.servicediscovery.ServiceDiscoveryService;
+import org.marionette.controlplane.adapters.inbound.changeconfig.ChangeConfigService;
+import org.marionette.controlplane.adapters.inbound.controllers.ConfigurationController;
+import org.marionette.controlplane.adapters.outbound.fetchconfig.NodeConfigAdapter;
+import org.marionette.controlplane.adapters.outbound.servicediscovery.KubernetesFindServicesAdapter;
+import org.marionette.controlplane.adapters.outbound.servicediscovery.ServiceDiscoveryService;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
-import org.marionette.controlplane.usecases.inputports.StoreMarionetteServiceConfigurationUseCase;
-import org.marionette.controlplane.usecases.inputports.DiscoverMarionetteServicesUseCase;
-import org.marionette.controlplane.usecases.inputports.FetchAllConfigurationsAndStorePort;
-import org.marionette.controlplane.usecases.inputports.fetchconfig.FetchAllConfigurationsAndStoreUseCase;
-import org.marionette.controlplane.usecases.inputports.servicediscovery.DiscoverMarionetteServicesUseCaseImpl;
-import org.marionette.controlplane.usecases.inputports.storeconfig.StoreMarionetteServiceConfigurationUseCaseImpl;
-import org.marionette.controlplane.usecases.outputports.fetchconfig.FetchMarionetteConfigurationGateway;
-import org.marionette.controlplane.usecases.outputports.servicediscovery.FindMarionetteServicesPort;
+import org.marionette.controlplane.usecases.inbound.DiscoverMarionetteServicesUseCase;
+import org.marionette.controlplane.usecases.inbound.FetchAllConfigurationsAndStorePort;
+import org.marionette.controlplane.usecases.inbound.StoreMarionetteServiceConfigurationUseCase;
+import org.marionette.controlplane.usecases.inbound.fetchconfig.FetchAllConfigurationsAndStoreUseCase;
+import org.marionette.controlplane.usecases.inbound.servicediscovery.DiscoverMarionetteServicesUseCaseImpl;
+import org.marionette.controlplane.usecases.inbound.storeconfig.StoreMarionetteServiceConfigurationUseCaseImpl;
+import org.marionette.controlplane.usecases.outbound.fetchconfig.FetchMarionetteConfigurationGateway;
+import org.marionette.controlplane.usecases.outbound.servicediscovery.FindCandidateServicesPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -33,7 +33,7 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public FindMarionetteServicesPort createFindServicesPort() {
+    public FindCandidateServicesPort createFindServicesPort() {
         String namespace = System.getenv("KUBERNETES_NAMESPACE");
         if (namespace == null || namespace.trim().isEmpty()) {
             // Fallback to default namespace if environment variable is not set
@@ -55,7 +55,7 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    public DiscoverMarionetteServicesUseCase createDiscoverServicesPort(FindMarionetteServicesPort findServicesPort) {
+    public DiscoverMarionetteServicesUseCase createDiscoverServicesPort(FindCandidateServicesPort findServicesPort) {
         return new DiscoverMarionetteServicesUseCase(findServicesPort);
     }
 

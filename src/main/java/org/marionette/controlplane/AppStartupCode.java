@@ -1,6 +1,6 @@
 package org.marionette.controlplane;
 
-import org.marionette.controlplane.adapters.output.servicediscovery.ServiceDiscoveryService;
+import org.marionette.controlplane.adapters.outbound.servicediscovery.ServiceDiscoveryService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
