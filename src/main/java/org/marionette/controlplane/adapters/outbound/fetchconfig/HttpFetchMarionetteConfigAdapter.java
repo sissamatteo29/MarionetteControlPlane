@@ -49,7 +49,6 @@ public class HttpFetchMarionetteConfigAdapter implements FetchMarionetteConfigur
     public ServiceConfigData fetchMarionetteConfiguration(String marionetteServiceEndpoint) throws FetchMarionetteConfigurationException {
         
         try {
-
             URI configFetchUri = buildFetchConfigEndpoint(marionetteServiceEndpoint); 
             HttpRequest request = buildHttpRequest(configFetchUri);
             HttpResponse<String> response = sendAndHandleExceptions(request);
