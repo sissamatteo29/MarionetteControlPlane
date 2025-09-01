@@ -28,3 +28,7 @@ kubectl get pods -n <namespace>
 helm list --all-namespaces
 helm upgrade
 kubectl port-forward -n <namespace> svc/prometheus-server 9090:80
+
+
+# DIAGNOSE CRASH (SERVICE NOT DEPLOYED IN KUBERNETES)
+simply use logs from that pod or service.

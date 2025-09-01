@@ -49,6 +49,8 @@ public class FullMarionetteServiceConfigDiscoveryUseCaseImpl implements FullMari
             .filter(marionetteServiceValidator::validateCandidateNode)
             .collect(Collectors.toList());
 
+        logValidatedServices(validatedServices);
+
         for(DiscoveredServiceMetadata serviceMetadata : validatedServices) {
             try {
                 ServiceConfigData serviceConfigData = fetchMarionetteConfigurationGateway.fetchMarionetteConfiguration(serviceMetadata.endpoint());
@@ -67,6 +69,13 @@ public class FullMarionetteServiceConfigDiscoveryUseCaseImpl implements FullMari
             }
         }
 
+    }
+
+    private void logValidatedServices(List<DiscoveredServiceMetadata> validatedServices) {
+        System.out.println("\n== MARIONETTE DISCOVERED SERVICES ==");
+        for(DiscoveredServiceMetadata serviceMetadata : validatedServices) {
+            System.out.println(serviceMetadata.endpoint());
+        }
     }
 
 }

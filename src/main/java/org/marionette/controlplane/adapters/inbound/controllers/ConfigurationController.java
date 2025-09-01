@@ -62,6 +62,11 @@ public class ConfigurationController {
                                         return new ClassConfigDTO(classConfigData.className(),
                                                 classConfigData.methodConfigData().stream().map(
                                                         methodConfigData -> {
+                                                            System.out.println("DEBUG: Controller mapping MethodConfigData - " +
+                                                                "method: " + methodConfigData.methodName() + 
+                                                                ", default: " + methodConfigData.defaultBehaviourId() + 
+                                                                ", current: " + methodConfigData.currentBehaviourId() + 
+                                                                ", available: " + methodConfigData.availableBehaviourIds());
                                                             return new MethodConfigDTO(methodConfigData.methodName(),
                                                                     methodConfigData.defaultBehaviourId(),
                                                                     methodConfigData.currentBehaviourId(),

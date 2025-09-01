@@ -5,6 +5,6 @@ import java.util.List;
 public record ClassConfigDTO (String className, List<MethodConfigDTO> methodConfigs) {
 
     public ClassConfigDTO {
-        methodConfigs = List.copyOf(methodConfigs());
+        methodConfigs = methodConfigs != null ? List.copyOf(methodConfigs) : List.of();
     }
 }

@@ -5,7 +5,8 @@ import java.util.List;
 public record AllServiceConfigsDTO (List<ServiceConfigDTO> serviceConfigs) {
 
     public AllServiceConfigsDTO {
-        serviceConfigs = List.copyOf(serviceConfigs);
+        // Defensive null check - if serviceConfigs is null, use empty list
+        serviceConfigs = serviceConfigs != null ? List.copyOf(serviceConfigs) : List.of();
     }
     
 }

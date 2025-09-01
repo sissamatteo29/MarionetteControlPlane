@@ -125,7 +125,7 @@ public class KubernetesFindServicesAdapter implements FindCandidateServicesPort 
     }
 
     private void logDiscoveredServices(List<DiscoveredServiceMetadata> discoveredServices) {
-        System.out.println("\n=== MICROSERVICE ENDPOINTS ===");
+        System.out.println("=== DISCOVERED ENDPOINTS ===");
 
         discoveredServices.forEach((metadata) -> {
             System.out.println(metadata.serviceName() + " -> " + metadata.endpoint());

@@ -6,34 +6,40 @@ import './App.css';
 // API base URL - dynamically detect the current host for Minikube compatibility
 const API_BASE_URL = (() => {
   const { protocol, hostname, port } = window.location;
-  
+
   if (hostname === 'localhost' && port === '3000') {
     return 'http://localhost:8080/api';
   }
-  
+
   return `${protocol}//${hostname}${port ? ':' + port : ''}/api`;
 })();
 
 const ServiceOverviewCard = ({ serviceName, serviceConfig, onServiceClick }) => {
-  const classCount = Object.keys(serviceConfig.classes).length;
-  const methodCount = Object.values(serviceConfig.classes).reduce(
-    (total, classConfig) => total + Object.keys(classConfig.methods).length, 0
-  );
-  
+  const classCount = serviceConfig.classConfigs ? serviceConfig.classConfigs.length : 0;
+  const methodCount = serviceConfig.classConfigs ?
+    serviceConfig.classConfigs.reduce(
+      (total, classConfig) => total + (classConfig.methodConfigs ? classConfig.methodConfigs.length : 0), 0
+    ) : 0;
+
   // Count methods by behavior status
-  const behaviorStats = Object.values(serviceConfig.classes).reduce((stats, classConfig) => {
-    Object.values(classConfig.methods).forEach(method => {
-      if (method.currentBehaviourId === method.defaultBehaviourId) {
-        stats.normal++;
-      } else {
-        stats.modified++;
+  const behaviorStats = serviceConfig.classConfigs ?
+    serviceConfig.classConfigs.reduce((stats, classConfig) => {
+      if (classConfig.methodConfigs) {
+        classConfig.methodConfigs.forEach(method => {
+          if (method.currentBehaviourId === method.defaultBehaviourId) {
+            stats.normal++;
+          } else {
+            stats.modified++;
+          }
+        });
       }
-    });
-    return stats;
-  }, { normal: 0, modified: 0 });
+      return stats;
+    }, { normal: 0, modified: 0 })
+    : { normal: 0, modified: 0 };
+
 
   return (
-    <div 
+    <div
       className="service-card"
       onClick={() => onServiceClick(serviceName)}
     >
@@ -49,7 +55,7 @@ const ServiceOverviewCard = ({ serviceName, serviceConfig, onServiceClick }) => 
         </div>
         <ChevronRight size={20} />
       </div>
-      
+
       <div className="service-stats">
         <div className="stat">
           <div className="stat-number">{classCount}</div>
@@ -91,7 +97,7 @@ const MethodConfigRow = ({ method, onBehaviorChange }) => {
 
   return (
     <div className="method-config">
-      <div 
+      <div
         className="method-header"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -100,17 +106,17 @@ const MethodConfigRow = ({ method, onBehaviorChange }) => {
           <Code size={16} />
           <span>{method.methodName}</span>
         </div>
-        <BehaviorBadge 
-          behavior={method.currentBehaviourId} 
+        <BehaviorBadge
+          behavior={method.currentBehaviourId}
           isCurrent={true}
         />
       </div>
-      
+
       {isExpanded && (
         <div className="method-details">
           <div className="behavior-selector">
             <label>Current Behavior</label>
-            <select 
+            <select
               value={method.currentBehaviourId}
               onChange={(e) => onBehaviorChange(method.methodName, e.target.value)}
             >
@@ -121,7 +127,7 @@ const MethodConfigRow = ({ method, onBehaviorChange }) => {
               ))}
             </select>
           </div>
-          
+
           <div className="available-behaviors">
             <span className="label">Available Behaviors:</span>
             <div className="behavior-list">
@@ -143,11 +149,11 @@ const MethodConfigRow = ({ method, onBehaviorChange }) => {
 
 const ClassConfigSection = ({ classConfig, onBehaviorChange }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const methodCount = Object.keys(classConfig.methods).length;
+  const methodCount = classConfig.methodConfigs ? classConfig.methodConfigs.length : 0;
 
   return (
     <div className="class-config">
-      <div 
+      <div
         className="class-header"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -160,14 +166,14 @@ const ClassConfigSection = ({ classConfig, onBehaviorChange }) => {
           </div>
         </div>
       </div>
-      
+
       {isExpanded && (
         <div className="class-methods">
-          {Object.values(classConfig.methods).map(method => (
+          {classConfig.methodConfigs && classConfig.methodConfigs.map(method =>  (
             <MethodConfigRow
               key={method.methodName}
               method={method}
-              onBehaviorChange={(methodName, newBehavior) => 
+              onBehaviorChange={(methodName, newBehavior) =>
                 onBehaviorChange(classConfig.className, methodName, newBehavior)
               }
             />
@@ -180,10 +186,10 @@ const ClassConfigSection = ({ classConfig, onBehaviorChange }) => {
 
 const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onReset, onBehaviorChange }) => {
   const [showMetrics, setShowMetrics] = useState(false);
-  const classCount = Object.keys(serviceConfig.classes).length;
-  const methodCount = Object.values(serviceConfig.classes).reduce(
-    (total, classConfig) => total + Object.keys(classConfig.methods).length, 0
-  );
+  const classCount = serviceConfig.classConfigs ? serviceConfig.classConfigs.length : 0;
+  const methodCount = serviceConfig.classConfigs ? serviceConfig.classConfigs.reduce(
+    (total, classConfig) => total + (classConfig.methodConfigs ? classConfig.methodConfigs.length : 0), 0
+  ) : 0;
 
   return (
     <div className="service-detail">
@@ -204,7 +210,7 @@ const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onReset, onBeha
             </div>
           </div>
           <div className="service-actions">
-            <button 
+            <button
               onClick={onReset}
               className="reset-button"
               title="Reset to template configuration"
@@ -212,7 +218,7 @@ const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onReset, onBeha
               <RotateCcw size={20} />
               Reset to Template
             </button>
-            <button 
+            <button
               onClick={() => setShowMetrics(!showMetrics)}
               className={`metrics-toggle ${showMetrics ? 'active' : ''}`}
             >
@@ -227,7 +233,7 @@ const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onReset, onBeha
         <div className="service-detail-layout">
           <div className="service-config-section">
             <div className="classes-list">
-              {Object.values(serviceConfig.classes).map(classConfig => (
+              {serviceConfig.classConfigs && serviceConfig.classConfigs.map(classConfig => (
                 <ClassConfigSection
                   key={classConfig.className}
                   classConfig={classConfig}
@@ -236,10 +242,10 @@ const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onReset, onBeha
               ))}
             </div>
           </div>
-          
+
           {showMetrics && (
             <div className="service-metrics-section">
-              <ServiceMetricsPanel 
+              <ServiceMetricsPanel
                 serviceName={serviceName}
                 onClose={() => setShowMetrics(false)}
               />
@@ -251,9 +257,9 @@ const ServiceDetailView = ({ serviceName, serviceConfig, onBack, onReset, onBeha
   );
 };
 
-// API functions to communicate with your Java backend
-const fetchAllServices = async (refresh = false) => {
-  const url = refresh ? `${API_BASE_URL}/services?refresh=true` : `${API_BASE_URL}/services`;
+// API functions to communicate with backend
+const fetchAllServices = async () => {
+  const url = `${API_BASE_URL}/services`;
   const response = await fetch(url);
   if (!response.ok) throw new Error('Failed to fetch services');
   return response.json();
@@ -291,7 +297,7 @@ const updateMethodBehavior = async (serviceName, className, methodName, newBehav
       }
     }
   );
-  
+
   if (!response.ok) throw new Error('Failed to update behavior');
   return response.text();
 };
@@ -309,6 +315,13 @@ const MarionetteControlPanel = () => {
       try {
         setLoading(true);
         const data = await fetchAllServices();
+
+        const transformedData = {
+          serviceConfigs: data.serviceConfigs || [],
+          totalServices: data.serviceConfigs ? data.serviceConfigs.length : 0,
+          unavailableServices: 0,
+          lastDiscovery: new Date().toISOString()
+        }
         setServicesData(data);
       } catch (err) {
         setError(err.message);
@@ -324,7 +337,7 @@ const MarionetteControlPanel = () => {
   const handleRefreshServices = async (fullRefresh = false) => {
     try {
       setIsDiscovering(true);
-      
+
       if (fullRefresh) {
         // Trigger full discovery
         await triggerServiceDiscovery(true);
@@ -394,7 +407,7 @@ const MarionetteControlPanel = () => {
 
       // Send the change to your Java backend
       await updateMethodBehavior(serviceName, className, methodName, newBehavior);
-      
+
       console.log(`Successfully updated ${serviceName}.${className}.${methodName} to ${newBehavior}`);
     } catch (err) {
       console.error('Failed to update behavior:', err);
@@ -436,18 +449,26 @@ const MarionetteControlPanel = () => {
     );
   }
 
-  if (selectedService && servicesData?.services) {
-    return (
-      <ServiceDetailView
-        serviceName={selectedService}
-        serviceConfig={servicesData.services[selectedService]}
-        onBack={handleBack}
-        onReset={() => handleResetService(selectedService)}
-        onBehaviorChange={(className, methodName, newBehavior) =>
-          handleBehaviorChange(selectedService, className, methodName, newBehavior)
-        }
-      />
+  if (selectedService && servicesData?.serviceConfigs) {
+
+    const selectedServiceConfig = servicesData.serviceConfigs.find(
+      service => service.serviceName === selectedService
     );
+
+    if (selectedServiceConfig) {
+      return (
+        <ServiceDetailView
+          serviceName={selectedService}
+          serviceConfig={selectedServiceConfig}
+          onBack={handleBack}
+          onReset={() => handleResetService(selectedService)}
+          onBehaviorChange={(className, methodName, newBehavior) =>
+            handleBehaviorChange(selectedService, className, methodName, newBehavior)
+          }
+        />
+      );
+    }
+
   }
 
   return (
@@ -462,7 +483,7 @@ const MarionetteControlPanel = () => {
             </div>
           </div>
           <div className="app-actions">
-            <button 
+            <button
               onClick={() => handleRefreshServices(false)}
               className="refresh-button"
               disabled={isDiscovering}
@@ -470,7 +491,7 @@ const MarionetteControlPanel = () => {
               <Activity size={20} />
               {isDiscovering ? 'Refreshing...' : 'Refresh'}
             </button>
-            <button 
+            <button
               onClick={() => handleRefreshServices(true)}
               className="discover-button"
               disabled={isDiscovering}
@@ -509,17 +530,17 @@ const MarionetteControlPanel = () => {
         </div>
 
         <div className="services-grid">
-          {servicesData?.services && Object.entries(servicesData.services).map(([serviceName, serviceConfig]) => (
+          {servicesData?.serviceConfigs && servicesData.serviceConfigs.map((serviceConfig) => (
             <ServiceOverviewCard
-              key={serviceName}
-              serviceName={serviceName}
+              key={serviceConfig.serviceName}
+              serviceName={serviceConfig.serviceName}
               serviceConfig={serviceConfig}
               onServiceClick={handleServiceClick}
             />
           ))}
         </div>
-        
-        {(!servicesData?.services || Object.keys(servicesData.services).length === 0) && (
+
+        {(!servicesData?.serviceConfigs || servicesData.serviceConfigs.length === 0) && (
           <div className="no-services">
             <Activity size={48} />
             <h3>No Services Found</h3>

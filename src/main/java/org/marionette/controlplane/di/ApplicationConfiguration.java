@@ -11,6 +11,7 @@ import org.marionette.controlplane.usecases.inbound.FullMarionetteServiceConfigD
 import org.marionette.controlplane.usecases.inbound.ReadAllMarionetteConfigsUseCase;
 import org.marionette.controlplane.usecases.inbound.changebehaviour.ChangeMarionetteServiceBehaviourUseCaseImpl;
 import org.marionette.controlplane.usecases.inbound.fulldiscovery.FullMarionetteServiceConfigDiscoveryUseCaseImpl;
+import org.marionette.controlplane.usecases.inbound.readconfigs.ReadAllMarionetteConfigsUseCaseImpl;
 import org.marionette.controlplane.usecases.outbound.fetchconfig.FetchMarionetteConfigurationGateway;
 import org.marionette.controlplane.usecases.outbound.servicediscovery.FindCandidateServicesPort;
 import org.marionette.controlplane.usecases.outbound.servicediscovery.ValidateMarionetteServicePort;
@@ -36,6 +37,12 @@ public class ApplicationConfiguration {
     @Bean 
     public ConfigurationController configurationController(ReadAllMarionetteConfigsUseCase readAllMarionetteConfigsUseCase, ChangeMarionetteServiceBehaviourUseCase changeMarionetteServiceBehaviourUseCase) {
         return new ConfigurationController(readAllMarionetteConfigsUseCase, changeMarionetteServiceBehaviourUseCase);
+    }
+
+    @Bean
+    public ReadAllMarionetteConfigsUseCase readMarionetteConfigsUseCase(ConfigRegistry globalRegistry) {
+        return new ReadAllMarionetteConfigsUseCaseImpl(globalRegistry);
+
     }
 
     @Bean

@@ -38,6 +38,8 @@ public class HttpValidateMarionetteServiceAdapter implements ValidateMarionetteS
         URI baseEndpoint = URI.create(serviceBaseUrl);
         URI validationEndpoint = baseEndpoint.resolve(config.validationEndpointPath());
         
+        System.out.println("Validating the marionette candidate " + validationEndpoint);
+        
         for (int attempt = 1; attempt <= config.maxRetries(); attempt++) {
             try {
                 HttpRequest request = HttpRequest.newBuilder()
@@ -50,10 +52,12 @@ public class HttpValidateMarionetteServiceAdapter implements ValidateMarionetteS
                 
                 int statusCode = response.statusCode();
                 if (statusCode >= 200 && statusCode < 300) {
+                    System.out.println("The service " + baseEndpoint + " responded successfully to the probing");
                     return true;
                 }
                 
                 if (statusCode >= 400 && statusCode < 500) {
+                    System.out.println("The service " + baseEndpoint + " returned an error code - discarding...");
                     return false;
                 }
                 
@@ -64,7 +68,9 @@ public class HttpValidateMarionetteServiceAdapter implements ValidateMarionetteS
                 // Could log here: System.err.println("Attempt " + attempt + " failed: " + e.getMessage());
             }
         }
-        
+
+        System.out.println("The service " + baseEndpoint + " did not respond to any of the attempts - discarding...");
+
         return false;
     }
 }

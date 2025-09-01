@@ -19,10 +19,25 @@ public class ServiceConfigDataMapper {
 
     // From data to domain objects
     public static ServiceConfig toDomainServiceConfig(ServiceConfigData serviceConfigData) {
+        if (serviceConfigData == null) {
+            throw new IllegalArgumentException("ServiceConfigData cannot be null");
+        }
+        if (serviceConfigData.serviceName() == null) {
+            throw new IllegalArgumentException("Service name cannot be null in ServiceConfigData");
+        }
+        if (serviceConfigData.classConfigs() == null) {
+            throw new IllegalArgumentException("Class configs list cannot be null in ServiceConfigData");
+        }
+
+        System.out.println("DEBUG: Converting ServiceConfigData - serviceName: " + serviceConfigData.serviceName() + ", classConfigs size: " + serviceConfigData.classConfigs().size());
 
         ServiceConfig resultingServiceConfig = new ServiceConfig(new ServiceName(serviceConfigData.serviceName()));
 
         for(ClassConfigData rawClassConfig : serviceConfigData.classConfigs()) {
+            if (rawClassConfig == null) {
+                System.err.println("WARNING: Found null ClassConfigData in list, skipping...");
+                continue;
+            }
             ClassConfig domainClassConfig = toDomainClassConfig(rawClassConfig);
             resultingServiceConfig = resultingServiceConfig.withAddedClassConfiguration(domainClassConfig.getClassName(), domainClassConfig);
         }
@@ -31,9 +46,25 @@ public class ServiceConfigDataMapper {
     }
 
     private static ClassConfig toDomainClassConfig(ClassConfigData rawClassConfig) {
+        if (rawClassConfig == null) {
+            throw new IllegalArgumentException("ClassConfigData cannot be null");
+        }
+        if (rawClassConfig.className() == null) {
+            throw new IllegalArgumentException("Class name cannot be null in ClassConfigData");
+        }
+        if (rawClassConfig.methodConfigData() == null) {
+            throw new IllegalArgumentException("Method configs list cannot be null in ClassConfigData");
+        }
+
+        System.out.println("DEBUG: Converting ClassConfigData - className: " + rawClassConfig.className() + ", methodConfigs size: " + rawClassConfig.methodConfigData().size());
+
         ClassConfig resultingClassConfig = new ClassConfig(new ClassName(rawClassConfig.className()));
 
         for(MethodConfigData rawMethodConfig : rawClassConfig.methodConfigData()) {
+            if (rawMethodConfig == null) {
+                System.err.println("WARNING: Found null MethodConfigData in list for class " + rawClassConfig.className() + ", skipping...");
+                continue;
+            }
             MethodConfig domainMethodConfig = toDomainMethodConfig(rawMethodConfig);
             resultingClassConfig = resultingClassConfig.withAddedMethodConfig(domainMethodConfig.getMethodName(), domainMethodConfig);
         }
@@ -42,6 +73,27 @@ public class ServiceConfigDataMapper {
     }
 
     private static MethodConfig toDomainMethodConfig(MethodConfigData rawMethodConfig) {
+        if (rawMethodConfig == null) {
+            throw new IllegalArgumentException("MethodConfigData cannot be null");
+        }
+        if (rawMethodConfig.methodName() == null) {
+            throw new IllegalArgumentException("Method name cannot be null in MethodConfigData");
+        }
+        if (rawMethodConfig.defaultBehaviourId() == null) {
+            throw new IllegalArgumentException("Default behaviour ID cannot be null in MethodConfigData for method: " + rawMethodConfig.methodName());
+        }
+        if (rawMethodConfig.currentBehaviourId() == null) {
+            throw new IllegalArgumentException("Current behaviour ID cannot be null in MethodConfigData for method: " + rawMethodConfig.methodName());
+        }
+        if (rawMethodConfig.availableBehaviourIds() == null) {
+            throw new IllegalArgumentException("Available behaviour IDs cannot be null in MethodConfigData for method: " + rawMethodConfig.methodName());
+        }
+
+        System.out.println("DEBUG: Converting MethodConfigData - method: " + rawMethodConfig.methodName() + 
+                          ", default: " + rawMethodConfig.defaultBehaviourId() + 
+                          ", current: " + rawMethodConfig.currentBehaviourId() + 
+                          ", available: " + rawMethodConfig.availableBehaviourIds());
+
         return MethodConfig.of(
             rawMethodConfig.methodName(),
             rawMethodConfig.defaultBehaviourId(),

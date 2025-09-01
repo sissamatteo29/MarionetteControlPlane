@@ -10,6 +10,7 @@ public record MethodConfigDTO (
     List<String> availableBehaviourIds) {
 
     public MethodConfigDTO {
-        availableBehaviourIds = List.copyOf(availableBehaviourIds());
+        // Defensive null check - if availableBehaviourIds is null, use empty list
+        availableBehaviourIds = availableBehaviourIds != null ? List.copyOf(availableBehaviourIds) : List.of();
     }
 }
