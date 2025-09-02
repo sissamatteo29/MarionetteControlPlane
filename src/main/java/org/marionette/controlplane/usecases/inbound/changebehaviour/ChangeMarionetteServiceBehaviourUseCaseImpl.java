@@ -46,6 +46,7 @@ public class ChangeMarionetteServiceBehaviourUseCaseImpl implements ChangeMarion
         controlMarionetteBehaviourGateway.changeMarionetteServiceBehaviour(
             serviceEndpoint.toString(),
             new ChangeBehaviourData(
+                request.serviceName(),
                 request.className(),
                 request.methodName(),
                 request.newBehaviourId()

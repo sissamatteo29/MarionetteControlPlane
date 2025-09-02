@@ -288,13 +288,21 @@ const resetServiceToTemplate = async (serviceName) => {
 };
 
 const updateMethodBehavior = async (serviceName, className, methodName, newBehavior) => {
+
+  const requestBody = {
+    className: className,
+    methodName: methodName,
+    behaviourId: newBehavior
+  }
+
   const response = await fetch(
-    `${API_BASE_URL}/services/${serviceName}/changeBehaviour?className=${encodeURIComponent(className)}&methodName=${encodeURIComponent(methodName)}&behaviourId=${encodeURIComponent(newBehavior)}`,
+    `${API_BASE_URL}/services/${serviceName}/changeBehaviour`,
     {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
+      body: JSON.stringify(requestBody)
     }
   );
 

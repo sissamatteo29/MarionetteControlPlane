@@ -11,8 +11,7 @@ import org.marionette.controlplane.usecases.inbound.ReadAllMarionetteConfigsUseC
 import org.marionette.controlplane.usecases.inbound.changebehaviour.ChangeMarionetteServiceBehaviourRequest;
 import org.marionette.controlplane.usecases.inbound.readconfigs.ReadAllMarionetteConfigsResponse;
 import org.marionette.controlplane.adapters.inbound.dto.*;
-import org.marionette.controlplane.adapters.outbound.changeconfig.ChangeBehaviourRequestDTO;
-import org.marionette.controlplane.adapters.outbound.changeconfig.ChangeConfigService;
+import org.marionette.controlplane.adapters.outbound.changeconfig.InboundChangeBehaviourRequestDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,10 +55,10 @@ public class ConfigurationController {
     }
 
 
-    @PostMapping("service/{serviceName}/changeBehaviour")
+    @PutMapping("services/{serviceName}/changeBehaviour")
     public ResponseEntity<?> changeBehaviour(
         @PathVariable String serviceName,
-        @RequestBody ChangeBehaviourRequestDTO changeRequestDTO
+        @RequestBody InboundChangeBehaviourRequestDTO changeRequestDTO
     ) {
         // Required by API contract
         requireNonNull(serviceName, "The name of the service in the request to change behaviour was absent");
@@ -70,7 +69,6 @@ public class ConfigurationController {
         changeBehaviourUseCase.execute(request);
         
         // Result handling
-
 
 
 
@@ -88,7 +86,7 @@ public class ConfigurationController {
 
 
     private ChangeMarionetteServiceBehaviourRequest mapToRequest(String serviceName,
-            ChangeBehaviourRequestDTO changeRequestDTO) {
+            InboundChangeBehaviourRequestDTO changeRequestDTO) {
 
         return new ChangeMarionetteServiceBehaviourRequest(
             serviceName, 
