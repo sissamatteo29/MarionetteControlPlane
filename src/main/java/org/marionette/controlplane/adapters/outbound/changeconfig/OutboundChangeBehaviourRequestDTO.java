@@ -2,9 +2,9 @@ package org.marionette.controlplane.adapters.outbound.changeconfig;
 
 import static java.util.Objects.requireNonNull;
 
-public record ChangeBehaviourRequestDTO (String className, String methodName, String newBehaviourId) {
+public record OutboundChangeBehaviourRequestDTO (String className, String methodName, String newBehaviourId) {
 
-    public ChangeBehaviourRequestDTO {
+    public OutboundChangeBehaviourRequestDTO {
 
         // Required fields from API contract
         requireNonNull(className, "The class name in the request to modify behaviour was not present");

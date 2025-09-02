@@ -8,6 +8,7 @@ import org.marionette.controlplane.domain.values.*;
 import org.marionette.controlplane.usecases.domain.ServiceConfigData;
 import org.marionette.controlplane.usecases.inbound.ChangeMarionetteServiceBehaviourUseCase;
 import org.marionette.controlplane.usecases.inbound.ReadAllMarionetteConfigsUseCase;
+import org.marionette.controlplane.usecases.inbound.changebehaviour.ChangeMarionetteServiceBehaviourRequest;
 import org.marionette.controlplane.usecases.inbound.readconfigs.ReadAllMarionetteConfigsResponse;
 import org.marionette.controlplane.adapters.inbound.dto.*;
 import org.marionette.controlplane.adapters.outbound.changeconfig.ChangeBehaviourRequestDTO;
@@ -63,8 +64,12 @@ public class ConfigurationController {
         // Required by API contract
         requireNonNull(serviceName, "The name of the service in the request to change behaviour was absent");
 
+        ChangeMarionetteServiceBehaviourRequest request = mapToRequest(serviceName, changeRequestDTO);
         
+        // Use case
+        changeBehaviourUseCase.execute(request);
         
+        // Result handling
 
 
 
@@ -81,6 +86,18 @@ public class ConfigurationController {
 
 
 
+
+    private ChangeMarionetteServiceBehaviourRequest mapToRequest(String serviceName,
+            ChangeBehaviourRequestDTO changeRequestDTO) {
+
+        return new ChangeMarionetteServiceBehaviourRequest(
+            serviceName, 
+            changeRequestDTO.className(),
+            changeRequestDTO.methodName(),
+            changeRequestDTO.newBehaviourId()
+        );
+
+    }
 
     private AllServiceConfigsDTO mapToDTO(ReadAllMarionetteConfigsResponse allConfigs) {
         List<ServiceConfigDTO> serviceDtos = new ArrayList<>();

@@ -37,7 +37,8 @@ public class ChangeMarionetteServiceBehaviourUseCaseImpl implements ChangeMarion
         MethodName methodName = new MethodName(request.methodName());
         BehaviourId newBehaviourId = new BehaviourId(request.newBehaviourId());
         
-        // Validation is incorporated in entity
+        // TODO: modify validation practice, validate before asking entity to change
+        
         globalRegistry.modifyCurrentBehaviourForMethod(serviceName, className, methodName, newBehaviourId);
 
         URI serviceEndpoint = globalRegistry.getEndpointOfService(serviceName);
