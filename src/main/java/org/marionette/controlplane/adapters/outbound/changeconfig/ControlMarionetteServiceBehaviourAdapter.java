@@ -1,4 +1,4 @@
-package org.marionette.controlplane.adapters.inbound.changeconfig;
+package org.marionette.controlplane.adapters.outbound.changeconfig;
 
 import org.marionette.controlplane.usecases.outbound.servicemanipulation.ChangeBehaviourData;
 import org.marionette.controlplane.usecases.outbound.servicemanipulation.ControlMarionetteServiceBehaviourGateway;

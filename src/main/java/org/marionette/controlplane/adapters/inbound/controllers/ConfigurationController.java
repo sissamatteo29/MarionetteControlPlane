@@ -9,10 +9,13 @@ import org.marionette.controlplane.usecases.domain.ServiceConfigData;
 import org.marionette.controlplane.usecases.inbound.ChangeMarionetteServiceBehaviourUseCase;
 import org.marionette.controlplane.usecases.inbound.ReadAllMarionetteConfigsUseCase;
 import org.marionette.controlplane.usecases.inbound.readconfigs.ReadAllMarionetteConfigsResponse;
-import org.marionette.controlplane.adapters.inbound.changeconfig.ChangeConfigService;
 import org.marionette.controlplane.adapters.inbound.dto.*;
+import org.marionette.controlplane.adapters.outbound.changeconfig.ChangeBehaviourRequestDTO;
+import org.marionette.controlplane.adapters.outbound.changeconfig.ChangeConfigService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static java.util.Objects.requireNonNull;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -50,6 +53,34 @@ public class ConfigurationController {
         return ResponseEntity.ok(response);
 
     }
+
+
+    @PostMapping("service/{serviceName}/changeBehaviour")
+    public ResponseEntity<?> changeBehaviour(
+        @PathVariable String serviceName,
+        @RequestBody ChangeBehaviourRequestDTO changeRequestDTO
+    ) {
+        // Required by API contract
+        requireNonNull(serviceName, "The name of the service in the request to change behaviour was absent");
+
+        
+        
+
+
+
+
+
+        return ResponseEntity.ok("success");
+    }
+
+
+
+
+
+
+
+
+
 
     private AllServiceConfigsDTO mapToDTO(ReadAllMarionetteConfigsResponse allConfigs) {
         List<ServiceConfigDTO> serviceDtos = new ArrayList<>();

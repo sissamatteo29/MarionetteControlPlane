@@ -1,7 +1,7 @@
 package org.marionette.controlplane.di;
 
-import org.marionette.controlplane.adapters.inbound.changeconfig.ControlMarionetteServiceBehaviourAdapter;
 import org.marionette.controlplane.adapters.inbound.controllers.ConfigurationController;
+import org.marionette.controlplane.adapters.outbound.changeconfig.ControlMarionetteServiceBehaviourAdapter;
 import org.marionette.controlplane.adapters.outbound.fetchconfig.HttpFetchMarionetteConfigAdapter;
 import org.marionette.controlplane.adapters.outbound.servicediscovery.HttpValidateMarionetteServiceAdapter;
 import org.marionette.controlplane.adapters.outbound.servicediscovery.KubernetesFindServicesAdapter;

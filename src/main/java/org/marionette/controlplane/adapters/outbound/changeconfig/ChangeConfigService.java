@@ -1,4 +1,4 @@
-package org.marionette.controlplane.adapters.inbound.changeconfig;
+package org.marionette.controlplane.adapters.outbound.changeconfig;
 
 import java.util.List;
 import java.util.Map;
@@ -119,14 +119,14 @@ public class ChangeConfigService {
     }
 
     private void notifyPods(List<V1Pod> pods, String className, String methodName, BehaviourId newBehavior) {
-        BehaviourChangeRequestDTO request = new BehaviourChangeRequestDTO();
+        ChangeBehaviourRequestDTO request = new ChangeBehaviourRequestDTO();
         request.setClassName(className);
         request.setMethodName(methodName);
         request.setBehaviourId(newBehavior.getBehaviourId());
         
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<BehaviourChangeRequestDTO> entity = new HttpEntity<>(request, headers);
+        HttpEntity<ChangeBehaviourRequestDTO> entity = new HttpEntity<>(request, headers);
         
         // Notify all pods in parallel
         List<CompletableFuture<String>> futures = pods.stream()
@@ -142,7 +142,7 @@ public class ChangeConfigService {
         System.out.println("Notification complete: " + successCount + "/" + results.size() + " pods updated");
     }
 
-    private String notifySinglePod(V1Pod pod, HttpEntity<BehaviourChangeRequestDTO> request) {
+    private String notifySinglePod(V1Pod pod, HttpEntity<ChangeBehaviourRequestDTO> request) {
         String podIP = pod.getStatus().getPodIP();
         String podName = pod.getMetadata().getName();
         
