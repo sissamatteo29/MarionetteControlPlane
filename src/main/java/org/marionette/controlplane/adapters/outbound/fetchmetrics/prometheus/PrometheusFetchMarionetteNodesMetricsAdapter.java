@@ -73,6 +73,8 @@ public class PrometheusFetchMarionetteNodesMetricsAdapter implements FetchMarion
                     PrometheusApiResponse<PrometheusQueryData> apiResponse = objectMapper.readValue(response.body(),
                             typeRef);
 
+                    logPrometheusResponse(apiResponse);
+
                     if ("success".equals(apiResponse.getStatus())) {
                         // Convert Prometheus data to your domain objects
                         AggregateMetric metric = convertToAggregateMetric(
@@ -94,6 +96,8 @@ public class PrometheusFetchMarionetteNodesMetricsAdapter implements FetchMarion
 
         }
 
+        logResult(metrics);
+
         return metrics;
 
     }
@@ -108,10 +112,10 @@ public class PrometheusFetchMarionetteNodesMetricsAdapter implements FetchMarion
         }
 
         // Example conversion logic
-        PrometheusResult firstResult = data.getResult().get(0);   // Take first instance
+        PrometheusResult firstResult = data.getResult().get(0); // Take first instance
 
-        // Log if multiple 
-        if(data.getResult().size() > 1) {
+        // Log if multiple
+        if (data.getResult().size() > 1) {
             System.err.println("The response from prometheus has multiple value");
         }
 
@@ -119,7 +123,7 @@ public class PrometheusFetchMarionetteNodesMetricsAdapter implements FetchMarion
         if ("vector".equals(data.getResultType()) && firstResult.getValue() != null) {
             Object[] valueArray = firstResult.getValue();
             double timestamp = ((Number) valueArray[0]).doubleValue();
-            String value = (String) valueArray[1];      
+            String value = (String) valueArray[1];
 
             // Create your AggregateMetric object
             return new AggregateMetric(
@@ -135,6 +139,77 @@ public class PrometheusFetchMarionetteNodesMetricsAdapter implements FetchMarion
         }
 
         return null;
+    }
+
+    private void logPrometheusResponse(PrometheusApiResponse<PrometheusQueryData> apiResponse) {
+        System.out.println("=== Prometheus API Response ===");
+        System.out.println("Status: " + apiResponse.getStatus());
+
+        if (apiResponse.getData() != null) {
+            PrometheusQueryData data = apiResponse.getData();
+            System.out.println("Result Type: " + data.getResultType());
+            System.out.println("Number of Results: " + (data.getResult() != null ? data.getResult().size() : 0));
+
+            if (data.getResult() != null && !data.getResult().isEmpty()) {
+                System.out.println("Sample Result:");
+                PrometheusResult firstResult = data.getResult().get(0);
+
+                // Print metric labels
+                if (firstResult.getMetric() != null) {
+                    System.out.print("  Metric Labels: {");
+                    firstResult.getMetric().forEach((key, value) -> System.out.print(key + "=" + value + " "));
+                    System.out.println("}");
+                }
+
+                // Print value/values
+                if (firstResult.getValue() != null) {
+                    Object[] valueArray = firstResult.getValue();
+                    System.out.println("  Value: [" + valueArray[0] + ", " + valueArray[1] + "]");
+                }
+
+                if (firstResult.getValues() != null) {
+                    System.out.println("  Values count: " + firstResult.getValues().size());
+                    if (!firstResult.getValues().isEmpty()) {
+                        Object[] firstValue = firstResult.getValues().get(0);
+                        System.out.println("  First value: [" + firstValue[0] + ", " + firstValue[1] + "]");
+                    }
+                }
+            }
+        }
+
+        // Print warnings and errors if present
+        if (apiResponse.getWarnings() != null && !apiResponse.getWarnings().isEmpty()) {
+            System.out.println("Warnings: " + apiResponse.getWarnings());
+        }
+
+        if (apiResponse.getError() != null) {
+            System.out.println("Error: " + apiResponse.getError());
+            System.out.println("Error Type: " + apiResponse.getErrorType());
+        }
+
+        System.out.println("================================\n");
+    }
+
+    private void logResult(List<AggregateMetric> metrics) {
+        System.out.println("=== Final Aggregate Metrics ===");
+        System.out.println("Total metrics collected: " + metrics.size());
+
+        if (metrics.isEmpty()) {
+            System.out.println("No metrics were successfully converted.");
+        } else {
+            System.out.println("Metrics Summary:");
+            for (int i = 0; i < metrics.size(); i++) {
+                AggregateMetric metric = metrics.get(i);
+                System.out.printf("  [%d] %s: %.2f %s (at %s)%n",
+                        i + 1,
+                        metric.name(),
+                        metric.value(),
+                        metric.unit() != null ? metric.unit() : "units",
+                        metric.timestamp().toString());
+            }
+        }
+
+        System.out.println("===============================\n");
     }
 
 }
