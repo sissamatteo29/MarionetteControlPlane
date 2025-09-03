@@ -68,6 +68,11 @@ public class ControlMarionetteServiceBehaviourAdapter implements ControlMarionet
 
         if (k8sInfo.isPresent()) {
             KubernetesServiceInfo info = k8sInfo.get();
+
+            System.out.println("Extracted the following data from the service endpoint \n"
+                + "     namespace: " + info.namespace());
+
+
             notifyAllServiceInstances(
                     info.namespace(),
                     changeBehaviourData.serviceName(),

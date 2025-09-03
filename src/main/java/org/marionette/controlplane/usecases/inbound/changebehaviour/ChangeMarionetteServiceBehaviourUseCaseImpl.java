@@ -41,7 +41,14 @@ public class ChangeMarionetteServiceBehaviourUseCaseImpl implements ChangeMarion
         
         globalRegistry.modifyCurrentBehaviourForMethod(serviceName, className, methodName, newBehaviourId);
 
+        System.out.println("Updated the global configuration registry with the change of behaviour: \n"
+            + "     serviceName: " + serviceName + "\n"
+            + "     className: " + className + "\n"
+            + "     beahviour: " + newBehaviourId);
+
         URI serviceEndpoint = globalRegistry.getEndpointOfService(serviceName);
+
+        System.out.println("Sending request out to service at " + serviceEndpoint);
 
         controlMarionetteBehaviourGateway.changeMarionetteServiceBehaviour(
             serviceEndpoint.toString(),

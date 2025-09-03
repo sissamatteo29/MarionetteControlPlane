@@ -387,45 +387,42 @@ const MarionetteControlPanel = () => {
     setSelectedService(null);
   };
 
-  const handleBehaviorChange = async (serviceName, className, methodName, newBehavior) => {
-    try {
-      // Optimistically update the UI
-      setServicesData(prev => ({
-        ...prev,
-        services: {
-          ...prev.services,
-          [serviceName]: {
-            ...prev.services[serviceName],
-            classes: {
-              ...prev.services[serviceName].classes,
-              [className]: {
-                ...prev.services[serviceName].classes[className],
-                methods: {
-                  ...prev.services[serviceName].classes[className].methods,
-                  [methodName]: {
-                    ...prev.services[serviceName].classes[className].methods[methodName],
-                    currentBehaviourId: newBehavior
-                  }
-                }
-              }
+const handleBehaviorChange = async (serviceName, className, methodName, newBehavior) => {
+  try {
+    // Optimistically update the UI with CORRECT structure
+    setServicesData(prev => ({
+      ...prev,
+      serviceConfigs: prev.serviceConfigs.map(service => 
+        service.serviceName === serviceName
+          ? {
+              ...service,
+              classConfigs: service.classConfigs.map(classConfig =>
+                classConfig.className === className
+                  ? {
+                      ...classConfig,
+                      methodConfigs: classConfig.methodConfigs.map(method =>
+                        method.methodName === methodName
+                          ? { ...method, currentBehaviourId: newBehavior }
+                          : method
+                      )
+                    }
+                  : classConfig
+              )
             }
-          }
-        }
-      }));
+          : service
+      )
+    }));
 
-      // Send the change to your Java backend
-      await updateMethodBehavior(serviceName, className, methodName, newBehavior);
-
-      console.log(`Successfully updated ${serviceName}.${className}.${methodName} to ${newBehavior}`);
-    } catch (err) {
-      console.error('Failed to update behavior:', err);
-      // You might want to revert the UI change here or show an error message
-      alert('Failed to update behavior: ' + err.message);
-      // Refresh to get the correct state
-      const data = await fetchAllServices();
-      setServicesData(data);
-    }
-  };
+    await updateMethodBehavior(serviceName, className, methodName, newBehavior);
+    console.log(`Successfully updated ${serviceName}.${className}.${methodName} to ${newBehavior}`);
+  } catch (err) {
+    console.error('Failed to update behavior:', err);
+    alert('Failed to update behavior: ' + err.message);
+    // Refresh to get the correct state
+    const data = await fetchAllServices();
+    setServicesData(data);
+  }
+};
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return 'Never';

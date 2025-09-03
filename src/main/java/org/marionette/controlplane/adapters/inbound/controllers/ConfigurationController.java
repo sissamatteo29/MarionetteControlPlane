@@ -55,7 +55,7 @@ public class ConfigurationController {
     }
 
 
-    @PutMapping("services/{serviceName}/changeBehaviour")
+    @PutMapping("/services/{serviceName}/changeBehaviour")
     public ResponseEntity<?> changeBehaviour(
         @PathVariable String serviceName,
         @RequestBody InboundChangeBehaviourRequestDTO changeRequestDTO
@@ -63,6 +63,7 @@ public class ConfigurationController {
         // Required by API contract
         requireNonNull(serviceName, "The name of the service in the request to change behaviour was absent");
 
+        logChangeBehaviourRequest(serviceName, changeRequestDTO);
         ChangeMarionetteServiceBehaviourRequest request = mapToRequest(serviceName, changeRequestDTO);
         
         // Use case
@@ -85,6 +86,10 @@ public class ConfigurationController {
 
 
 
+    private void logChangeBehaviourRequest(String serviceName, InboundChangeBehaviourRequestDTO changeRequestDTO) {
+        System.out.println("Received request to change beahviour for service " + serviceName + ", class " + changeRequestDTO.className() + ", method " + changeRequestDTO.methodName() + ", new behaviour " + changeRequestDTO.methodName());
+    }
+
     private ChangeMarionetteServiceBehaviourRequest mapToRequest(String serviceName,
             InboundChangeBehaviourRequestDTO changeRequestDTO) {
 
@@ -92,7 +97,7 @@ public class ConfigurationController {
             serviceName, 
             changeRequestDTO.className(),
             changeRequestDTO.methodName(),
-            changeRequestDTO.newBehaviourId()
+            changeRequestDTO.behaviourId()
         );
 
     }

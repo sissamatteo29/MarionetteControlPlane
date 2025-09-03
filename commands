@@ -32,3 +32,6 @@ kubectl port-forward -n <namespace> svc/prometheus-server 9090:80
 
 # DIAGNOSE CRASH (SERVICE NOT DEPLOYED IN KUBERNETES)
 simply use logs from that pod or service.
+
+# Clean up build cache in minikube
+docker builder prune -a
