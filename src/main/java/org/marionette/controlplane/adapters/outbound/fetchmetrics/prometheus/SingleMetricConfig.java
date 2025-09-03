@@ -2,15 +2,19 @@ package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus;
 
 public class SingleMetricConfig {
 
-    private final String query;
-    private final TimeAggregator timeAggregator;
-    private final ServiceAggregator serviceAggregator;
+    private String query;
+    private TimeAggregator timeAggregator;
+    private ServiceAggregator serviceAggregator;
 
 
     // UI and visual
-    private final String displayName;
-    private final String unit;
-    private final String description;
+    private String displayName;   // unique
+    private String unit;
+    private String description;
+
+
+    public SingleMetricConfig() {
+    }
 
 
     public SingleMetricConfig(String query, TimeAggregator timeAggregator, ServiceAggregator serviceAggregator,
@@ -69,6 +73,36 @@ public class SingleMetricConfig {
 
     public String getDescription() {
         return description;
+    }
+
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+
+    public void setTimeAggregator(TimeAggregator timeAggregator) {
+        this.timeAggregator = timeAggregator;
+    }
+
+
+    public void setServiceAggregator(ServiceAggregator serviceAggregator) {
+        this.serviceAggregator = serviceAggregator;
+    }
+
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     

@@ -26,7 +26,7 @@ public enum ServiceAggregator {
                 return t;
             }
         }
-        throw new IllegalArgumentException("There is no time aggregator called " + serviceAggregator);
+        throw new IllegalArgumentException("There is no service aggregator called " + serviceAggregator);
     }
 
     @Override
