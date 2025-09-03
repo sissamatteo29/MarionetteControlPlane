@@ -2,6 +2,8 @@ package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus;
 
 import java.util.List;
 
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.SingleMetricConfig;
+
 public class PrometheusConfiguration {
 
     private final String url;
