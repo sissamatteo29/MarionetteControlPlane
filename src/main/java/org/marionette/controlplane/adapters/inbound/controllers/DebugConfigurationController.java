@@ -2,8 +2,11 @@ package org.marionette.controlplane.adapters.inbound.controllers;
 
 import org.springframework.web.bind.annotation.*;
 import org.marionette.controlplane.adapters.inbound.metrics.MetricsConfiguration;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.FetchMarionetteNodesMetricsGateway;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.AggregateMetric;
 import org.springframework.http.ResponseEntity;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -13,8 +16,10 @@ import java.util.stream.Collectors;
 public class DebugConfigurationController {
 
     private final MetricsConfiguration metricsConfig;
+    private final FetchMarionetteNodesMetricsGateway gateway;
 
-    public DebugConfigurationController(MetricsConfiguration metricsConfig) {
+    public DebugConfigurationController(MetricsConfiguration metricsConfig, FetchMarionetteNodesMetricsGateway gateway) {
+        this.gateway = gateway;
         this.metricsConfig = metricsConfig;
     }
 
@@ -99,4 +104,42 @@ public class DebugConfigurationController {
         
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping("/fetch-metrics/{serviceName}/{duration}")
+    public ResponseEntity<List<AggregateMetric>> tryAdapterToPrometheus(
+        @PathVariable("serviceName") String serviceName,
+        @PathVariable("duration") String duration
+    ) {
+        
+        Duration javaDuration = Duration.parse(duration);
+        return ResponseEntity.ok(gateway.fetchMetricsForService(serviceName, javaDuration));
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
