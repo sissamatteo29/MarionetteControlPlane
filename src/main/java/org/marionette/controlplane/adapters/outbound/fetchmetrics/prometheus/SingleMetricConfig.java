@@ -5,6 +5,7 @@ public class SingleMetricConfig {
     private String query;
     private TimeAggregator timeAggregator;
     private ServiceAggregator serviceAggregator;
+    private OptimizationDirection direction;
 
 
     // UI and visual
@@ -103,6 +104,16 @@ public class SingleMetricConfig {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+
+    public OptimizationDirection getDirection() {
+        return direction;
+    }
+
+
+    public void setDirection(OptimizationDirection direction) {
+        this.direction = direction;
     }
 
     

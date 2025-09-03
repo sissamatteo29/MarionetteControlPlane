@@ -38,7 +38,7 @@ public class PrometheusConfigurationLoader {
 
         // Pattern to match: MARIONETTE_METRICS_QUERIES_<KEY>_<PROPERTY>
         Pattern pattern = Pattern.compile(
-                "^MARIONETTE_METRICS_QUERIES_([A-Z_]+)_(QUERY|TIMEAGGREGATOR|SERVICEAGGREGATOR|DISPLAYNAME|UNIT|DESCRIPTION)$");
+                "^MARIONETTE_METRICS_CONFIG_([A-Z_]+)_(QUERY|TIMEAGGREGATOR|SERVICEAGGREGATOR|DIRECTION|DISPLAYNAME|UNIT|DESCRIPTION)$");
 
         Map<String, SingleMetricConfig> metrics = new LinkedHashMap<>();    // Maintains order of insertion!
 
@@ -54,17 +54,20 @@ public class PrometheusConfigurationLoader {
 
                 // Set the appropriate property
                 switch (property) {
+                    case "query":
+                        config.setQuery(value);
+                        break;
                     case "timeaggregator":
                         config.setTimeAggregator(TimeAggregator.fromString(property));
                         break;
                     case "serviceaggregator":
                         config.setServiceAggregator(ServiceAggregator.fromString(property));
                         break;
+                    case "direction":
+                        config.setDirection(OptimizationDirection.fromString(property));
+                        break;
                     case "displayname":
                         config.setDisplayName(value);
-                        break;
-                    case "query":
-                        config.setQuery(value);
                         break;
                     case "unit":
                         config.setUnit(value);
