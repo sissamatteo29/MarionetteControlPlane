@@ -2,14 +2,14 @@ package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus;
 
 import java.time.Duration;
 
-import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.ServiceAggregator;
-import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.SingleMetricConfig;
-import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.TimeAggregator;
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.PrometheusMetricConfig;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.ServiceAggregator;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.TimeAggregator;
 
 public class PrometheusQueryBuilder {
 
     public static String buildAggregationQuery(
-            String prometheusUrl, String internalPath, String serviceName, SingleMetricConfig metricConfig,
+            String prometheusUrl, String internalPath, String serviceName, PrometheusMetricConfig metricConfig,
             Duration timeSpan) {
 
         StringBuilder buildQueryUrl = new StringBuilder(prometheusUrl)
@@ -62,7 +62,7 @@ public class PrometheusQueryBuilder {
 
     public static void main(String[] args) {
         // Build a sample metric config
-        SingleMetricConfig config = new SingleMetricConfig();
+        PrometheusMetricConfig config = new PrometheusMetricConfig();
         config.setQuery("http_server_requests_seconds_count");
         config.setTimeAggregator(TimeAggregator.AVERAGE);
         config.setServiceAggregator(ServiceAggregator.SUM);
@@ -79,7 +79,7 @@ public class PrometheusQueryBuilder {
 
 
 
-        SingleMetricConfig config2 = new SingleMetricConfig();
+        PrometheusMetricConfig config2 = new PrometheusMetricConfig();
         config2.setQuery("cpu_usage_seconds_total");
         config2.setTimeAggregator(TimeAggregator.MAX);
         config2.setServiceAggregator(ServiceAggregator.AVERAGE);

@@ -1,4 +1,4 @@
-package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain;
+package org.marionette.controlplane.usecases.outbound.fetchmetrics.domain;
 
 public enum TimeAggregator {
     SUM("sum"),

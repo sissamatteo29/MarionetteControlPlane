@@ -1,4 +1,4 @@
-package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain;
+package org.marionette.controlplane.usecases.outbound.fetchmetrics.domain;
 
 /*
  * Specifies aggregation at the level of service, so for multiple instant points returned for the same service

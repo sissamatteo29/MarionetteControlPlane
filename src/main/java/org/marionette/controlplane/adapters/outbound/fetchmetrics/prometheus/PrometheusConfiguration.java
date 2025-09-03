@@ -2,15 +2,15 @@ package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus;
 
 import java.util.List;
 
-import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.SingleMetricConfig;
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.PrometheusMetricConfig;
 
 public class PrometheusConfiguration {
 
     private final String url;
     private final String apiPath = "/api/v1/query";
-    private final List<SingleMetricConfig> metrics;
+    private final List<PrometheusMetricConfig> metrics;
     
-    public PrometheusConfiguration(String url, List<SingleMetricConfig> metrics) {
+    public PrometheusConfiguration(String url, List<PrometheusMetricConfig> metrics) {
         this.url = url;
         this.metrics = metrics;
     }
@@ -23,7 +23,7 @@ public class PrometheusConfiguration {
         return apiPath;
     }
 
-    public List<SingleMetricConfig> getMetrics() {
+    public List<PrometheusMetricConfig> getMetrics() {
         return metrics;
     }
 
@@ -45,7 +45,7 @@ public class PrometheusConfiguration {
         sb.append(String.format("  metrics: (%d configured) [\n", metrics.size()));
 
         for (int i = 0; i < metrics.size(); i++) {
-            SingleMetricConfig metric = metrics.get(i);
+            PrometheusMetricConfig metric = metrics.get(i);
             sb.append(String.format("    [%d] %s", i + 1, metric.toString()));
             if (i < metrics.size() - 1) {
                 sb.append(",");

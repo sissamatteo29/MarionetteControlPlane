@@ -1,6 +1,10 @@
 package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain;
 
-public class SingleMetricConfig {
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.OptimizationDirection;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.ServiceAggregator;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.TimeAggregator;
+
+public class PrometheusMetricConfig {
 
     private String query;
     private TimeAggregator timeAggregator;
@@ -14,11 +18,11 @@ public class SingleMetricConfig {
     private String description;
 
 
-    public SingleMetricConfig() {
+    public PrometheusMetricConfig() {
     }
 
 
-    public SingleMetricConfig(String query, TimeAggregator timeAggregator, ServiceAggregator serviceAggregator,
+    public PrometheusMetricConfig(String query, TimeAggregator timeAggregator, ServiceAggregator serviceAggregator,
             String displayName, String unit, String description) {
         this.query = query;
         this.timeAggregator = timeAggregator;

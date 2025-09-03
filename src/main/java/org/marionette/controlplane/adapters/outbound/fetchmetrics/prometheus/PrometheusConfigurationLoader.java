@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.OptimizationDirection;
-import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.ServiceAggregator;
-import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.SingleMetricConfig;
-import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.TimeAggregator;
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.PrometheusMetricConfig;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.OptimizationDirection;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.ServiceAggregator;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.TimeAggregator;
 
 
 public class PrometheusConfigurationLoader {
@@ -45,7 +45,7 @@ public class PrometheusConfigurationLoader {
         Pattern pattern = Pattern.compile(
                 "^MARIONETTE_METRICS_CONFIG_([A-Z_]+)_(QUERY|TIMEAGGREGATOR|SERVICEAGGREGATOR|DIRECTION|DISPLAYNAME|UNIT|DESCRIPTION)$");
 
-        Map<String, SingleMetricConfig> metrics = new LinkedHashMap<>();    // Maintains order of insertion!
+        Map<String, PrometheusMetricConfig> metrics = new LinkedHashMap<>();    // Maintains order of insertion!
 
         // Iterate through all environment variables
         System.getenv().forEach((key, value) -> {
@@ -55,7 +55,7 @@ public class PrometheusConfigurationLoader {
                 String property = matcher.group(2).toLowerCase();
 
                 // Get or create MetricQueryConfig for this queryKey
-                SingleMetricConfig config = metrics.computeIfAbsent(queryKey, k -> new SingleMetricConfig());
+                PrometheusMetricConfig config = metrics.computeIfAbsent(queryKey, k -> new PrometheusMetricConfig());
 
                 // Set the appropriate property
                 switch (property) {
@@ -84,7 +84,7 @@ public class PrometheusConfigurationLoader {
             }
         });
 
-        List<SingleMetricConfig> resultingConfigs = new ArrayList<>(metrics.values());
+        List<PrometheusMetricConfig> resultingConfigs = new ArrayList<>(metrics.values());
 
         System.out.println("== FINISHED LOAD OF PROMETHEUS CONFIGS ==");
         PrometheusConfiguration prometheusConfiguration = new PrometheusConfiguration(
