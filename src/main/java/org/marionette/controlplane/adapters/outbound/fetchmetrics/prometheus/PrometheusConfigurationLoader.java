@@ -8,6 +8,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.OptimizationDirection;
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.ServiceAggregator;
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.SingleMetricConfig;
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.TimeAggregator;
+
 
 public class PrometheusConfigurationLoader {
 

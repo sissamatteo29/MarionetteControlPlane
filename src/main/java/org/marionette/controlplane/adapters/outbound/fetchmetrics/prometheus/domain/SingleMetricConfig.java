@@ -1,4 +1,4 @@
-package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus;
+package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain;
 
 public class SingleMetricConfig {
 
