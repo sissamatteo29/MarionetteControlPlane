@@ -15,6 +15,7 @@ public class ABTestingConfiguration {
         return PrometheusConfigurationLoader.loadFromEnv();
     }
 
+    @Bean
     public FetchMarionetteNodesMetricsGateway fetchMarionetteNodesMetricsAdapter(PrometheusConfiguration config) {
         return new PrometheusFetchMarionetteNodesMetricsAdapter(config);
     }

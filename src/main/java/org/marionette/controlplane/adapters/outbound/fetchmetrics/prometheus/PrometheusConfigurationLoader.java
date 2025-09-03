@@ -32,8 +32,8 @@ public class PrometheusConfigurationLoader {
         for (String envVar : envVarNames) {
             String url = System.getenv(envVar);
             if (url != null && !url.trim().isEmpty()) {
-                System.out.println("Found Prometheus URL in environment variable: " + envVar);
-                prometheusUrl = envVar.trim();
+                System.out.println("Found Prometheus URL in environment variable: " + url);
+                prometheusUrl = url.trim();
             }
         }
 

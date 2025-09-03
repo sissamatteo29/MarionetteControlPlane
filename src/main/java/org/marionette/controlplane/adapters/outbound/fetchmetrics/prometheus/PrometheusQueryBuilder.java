@@ -1,5 +1,7 @@
 package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.PrometheusMetricConfig;
@@ -12,34 +14,38 @@ public class PrometheusQueryBuilder {
             String prometheusUrl, String internalPath, String serviceName, PrometheusMetricConfig metricConfig,
             Duration timeSpan) {
 
-        StringBuilder buildQueryUrl = new StringBuilder(prometheusUrl)
-                .append(internalPath)
-                .append("?query=")
-                .append(metricConfig.getServiceAggregator())
+        // Build the PromQL query first
+        StringBuilder promqlQuery = new StringBuilder();
+
+        promqlQuery.append(metricConfig.getServiceAggregator())
                 .append(" by (service) ")
                 .append("(");
 
         switch (metricConfig.getTimeAggregator()) {
             case MAX, MIN, SUM, AVERAGE:
-                buildQueryUrl.append(metricConfig.getTimeAggregator() + "_over_time");
+                promqlQuery.append(metricConfig.getTimeAggregator().toString().toLowerCase())
+                        .append("_over_time");
                 break;
             case RATE, INCREASE:
-                buildQueryUrl.append(metricConfig.getTimeAggregator());
+                promqlQuery.append(metricConfig.getTimeAggregator().toString().toLowerCase());
                 break;
-
         }
 
-        buildQueryUrl.append("(")
-                .append(metricConfig.getQuery());
+        promqlQuery.append("(")
+                .append(metricConfig.getQuery())
+                .append(String.format("{service=\"%s\"}", serviceName))
+                .append(String.format("[%s:15s]", toPrometheus(timeSpan)))
+                .append("))");
 
-        buildQueryUrl.append(String.format("{service=\"%s\"}", serviceName));
+        // Now URL-encode the entire query
+        String encodedQuery = URLEncoder.encode(promqlQuery.toString(), StandardCharsets.UTF_8);
 
-        buildQueryUrl.append(String.format("[%s:15s]", toPrometheus(timeSpan)));
+        // Build the final URL
+        String finalUrl =  prometheusUrl + internalPath + "?query=" + encodedQuery;
 
-        buildQueryUrl.append("))");
+        System.out.println("Built a new url " + finalUrl);
 
-        return buildQueryUrl.toString();
-
+        return finalUrl;
     }
 
     public static String toPrometheus(Duration duration) {
@@ -76,8 +82,6 @@ public class PrometheusQueryBuilder {
                 Duration.ofMinutes(5));
 
         System.out.println("Generated query:\n" + query);
-
-
 
         PrometheusMetricConfig config2 = new PrometheusMetricConfig();
         config2.setQuery("cpu_usage_seconds_total");
