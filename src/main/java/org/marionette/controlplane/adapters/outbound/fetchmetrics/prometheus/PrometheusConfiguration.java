@@ -7,7 +7,7 @@ import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.dom
 public class PrometheusConfiguration {
 
     private final String url;
-    private final String apiPath = "/api/v1";
+    private final String apiPath = "/api/v1/query";
     private final List<SingleMetricConfig> metrics;
     
     public PrometheusConfiguration(String url, List<SingleMetricConfig> metrics) {

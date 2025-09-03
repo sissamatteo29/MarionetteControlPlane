@@ -16,7 +16,7 @@ import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.dom
 
 public class PrometheusConfigurationLoader {
 
-    public PrometheusConfiguration loadFromEnv() {
+    public static PrometheusConfiguration loadFromEnv() {
         
         System.out.println("== INITIATING LOAD OF PROMETHEUS CONFIGS ==");
 
@@ -63,13 +63,13 @@ public class PrometheusConfigurationLoader {
                         config.setQuery(value);
                         break;
                     case "timeaggregator":
-                        config.setTimeAggregator(TimeAggregator.fromString(property));
+                        config.setTimeAggregator(TimeAggregator.fromString(value));
                         break;
                     case "serviceaggregator":
-                        config.setServiceAggregator(ServiceAggregator.fromString(property));
+                        config.setServiceAggregator(ServiceAggregator.fromString(value));
                         break;
                     case "direction":
-                        config.setDirection(OptimizationDirection.fromString(property));
+                        config.setDirection(OptimizationDirection.fromString(value));
                         break;
                     case "displayname":
                         config.setDisplayName(value);
