@@ -100,6 +100,10 @@ public class ServiceConfig {
         return classConfigs.get(className).getMethodConfigsList();
     }
 
+    public BehaviourId getCurrentBehaviourIdForMethod(ClassName className, MethodName methodName) {
+        return classConfigs.get(className).getCurrentBehaviourIdForMethod(methodName);
+    }
+
 
 
     private void ensureMapContainsKey(ClassName className) {

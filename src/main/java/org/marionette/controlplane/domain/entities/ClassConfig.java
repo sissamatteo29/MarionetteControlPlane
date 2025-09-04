@@ -98,6 +98,10 @@ public class ClassConfig {
         return methodConfigs.values().stream().toList();
     }
 
+    public BehaviourId getCurrentBehaviourIdForMethod(MethodName methodName) {
+        return methodConfigs.get(methodName).getCurrentBehaviourId();
+    }
+
     private ClassConfig initialiseCopy() {
         ClassConfig copy = new ClassConfig(getClassName());
         copy.methodConfigs.putAll(getMethodsConfigurations());

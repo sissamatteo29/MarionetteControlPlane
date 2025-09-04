@@ -201,4 +201,8 @@ public class ConfigRegistry {
         return runtimeConfigurations.get(serviceName).getMethodConfigsForClass(className);
     }
 
+    public BehaviourId getCurrentBehaviourIdForMethod(ServiceName serviceName, ClassName className, MethodName methodName) {
+        return runtimeConfigurations.get(serviceName).getCurrentBehaviourIdForMethod(className, methodName);
+    }
+
 }
