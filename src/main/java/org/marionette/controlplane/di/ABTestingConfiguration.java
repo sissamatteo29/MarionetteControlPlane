@@ -6,6 +6,7 @@ import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.Pro
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
 import org.marionette.controlplane.usecases.inbound.abntest.AbnTestAllSystemConfigurationsUseCaseImpl;
+import org.marionette.controlplane.usecases.inbound.abntest.engine.SystemConfigurationsGenerator;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.FetchMarionetteNodesMetricsGateway;
 import org.springframework.context.annotation.Bean;
@@ -29,8 +30,13 @@ public class ABTestingConfiguration {
         return new VariationPointsExtractor(globalRegistry);
     }
 
+    @Bean
+    public SystemConfigurationsGenerator systemConfigurationsGenerator() {
+        return new SystemConfigurationsGenerator();
+    }
+
     @Bean 
-    public AbnTestAllSystemConfigurationsUseCase abntestUseCase(VariationPointsExtractor variationPointsExtractor) {
-        return new AbnTestAllSystemConfigurationsUseCaseImpl(variationPointsExtractor);
+    public AbnTestAllSystemConfigurationsUseCase abntestUseCase(VariationPointsExtractor variationPointsExtractor, SystemConfigurationsGenerator systemConfigurationsGenerator) {
+        return new AbnTestAllSystemConfigurationsUseCaseImpl(variationPointsExtractor, systemConfigurationsGenerator);
     }
 }
