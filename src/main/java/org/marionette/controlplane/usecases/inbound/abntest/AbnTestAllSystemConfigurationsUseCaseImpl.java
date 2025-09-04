@@ -5,11 +5,13 @@ import java.util.List;
 
 import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
 import org.marionette.controlplane.usecases.inbound.AbnTestResult;
+import org.marionette.controlplane.usecases.inbound.abntest.domain.GlobalMetricsRegistry;
 import org.marionette.controlplane.usecases.inbound.abntest.domain.SystemBehaviourConfiguration;
 import org.marionette.controlplane.usecases.inbound.abntest.domain.VariationPoint;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.AbnTestExecutor;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.SystemConfigurationsGenerator;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
+import org.marionette.controlplane.usecases.inbound.abntest.ranking.SimpleConfigurationRanking;
 import org.marionette.controlplane.usecases.inbound.abntest.ranking.SystemConfigurationsRanker;
 
 public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSystemConfigurationsUseCase {
@@ -35,7 +37,9 @@ public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSyst
         List<VariationPoint> variationPoints = variationPointsExtractor.extractAllVariationPoints();
         List<SystemBehaviourConfiguration> systemConfigs =  systemConfigurationsGenerator.generateAllSystemConfigurations(variationPoints);
 
-        executor.executeAbnTest(systemConfigs, Duration.ofSeconds(720));
+        GlobalMetricsRegistry globalMetricsRegistry = executor.executeAbnTest(systemConfigs, Duration.ofSeconds(200));
+
+        List<SimpleConfigurationRanking> systemConfigRanking = ranker.rankConfigurations(globalMetricsRegistry.getAllMetrics());
 
         return new AbnTestResult();
     }

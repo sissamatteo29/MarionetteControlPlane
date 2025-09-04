@@ -29,6 +29,10 @@ public class GlobalMetricsRegistry {
     public SystemConfigurationSnapshot getSystemConfig(int index) {
         return globalConfigs.get(keyPattern + index);
     }
+
+    public Map<String, SystemMetricsDataPoint> getAllMetrics() {
+        return globalMetrics;
+    }
     
     
 }

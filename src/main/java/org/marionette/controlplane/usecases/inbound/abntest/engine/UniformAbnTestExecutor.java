@@ -61,6 +61,7 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
             for (int i = 0; i < systemConfigurations.size(); i++) {
                 SystemBehaviourConfiguration config = systemConfigurations.get(i);
                 int configIndex = i + 1;
+                Instant configStart = Instant.now();
 
                 try {
                     // Log configuration start
@@ -77,12 +78,12 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
                     SystemMetricsDataPoint metrics = collectMetrics(appliedSnapshot, timeSlice, samplingPeriod);
                     logger.logMetricsCollection(configIndex, metrics);
 
-                    // // Store results
-                    // results.putSystemMetrics(appliedSnapshot, metrics);
+                    // Store results
+                    globalMetricsRegistry.putSystemMetrics(appliedSnapshot, metrics);
 
-                    // // Log completion
-                    // Duration actualDuration = Duration.between(configStart, Instant.now());
-                    // logger.logConfigurationComplete(configIndex, actualDuration, true);
+                    // Log completion
+                    Duration actualDuration = Duration.between(configStart, Instant.now());
+                    logger.logConfigurationComplete(configIndex, actualDuration, true);
 
                 } catch (Exception e) {
                     logger.logConfigurationFailure(configIndex, config, e);
