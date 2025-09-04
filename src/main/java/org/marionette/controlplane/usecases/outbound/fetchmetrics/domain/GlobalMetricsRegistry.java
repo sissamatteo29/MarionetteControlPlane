@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.marionette.controlplane.usecases.domain.ConfigRegistrySnapshot;
+import org.marionette.controlplane.usecases.domain.configsnapshot.ConfigRegistrySnapshot;
 
 public class GlobalMetricsRegistry {
 
