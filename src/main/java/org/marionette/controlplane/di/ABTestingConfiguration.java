@@ -6,9 +6,12 @@ import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.Pro
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
 import org.marionette.controlplane.usecases.inbound.abntest.AbnTestAllSystemConfigurationsUseCaseImpl;
+import org.marionette.controlplane.usecases.inbound.abntest.engine.AbnTestExecutor;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.SystemConfigurationsGenerator;
+import org.marionette.controlplane.usecases.inbound.abntest.engine.UniformAbnTestExecutor;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.FetchMarionetteNodesMetricsGateway;
+import org.marionette.controlplane.usecases.outbound.servicemanipulation.ControlMarionetteServiceBehaviourGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,8 +38,19 @@ public class ABTestingConfiguration {
         return new SystemConfigurationsGenerator();
     }
 
+    @Bean
+    public AbnTestExecutor abnTestExecutor(
+        ConfigRegistry globalRegistry, 
+        ControlMarionetteServiceBehaviourGateway controlMarionetteGateway,
+        FetchMarionetteNodesMetricsGateway fetchMarionetteMetricsGateway) {
+        return new UniformAbnTestExecutor(globalRegistry, controlMarionetteGateway, fetchMarionetteMetricsGateway);
+    }
+
     @Bean 
-    public AbnTestAllSystemConfigurationsUseCase abntestUseCase(VariationPointsExtractor variationPointsExtractor, SystemConfigurationsGenerator systemConfigurationsGenerator) {
-        return new AbnTestAllSystemConfigurationsUseCaseImpl(variationPointsExtractor, systemConfigurationsGenerator);
+    public AbnTestAllSystemConfigurationsUseCase abntestUseCase(
+        VariationPointsExtractor variationPointsExtractor, 
+        SystemConfigurationsGenerator systemConfigurationsGenerator, 
+        AbnTestExecutor executor) {
+        return new AbnTestAllSystemConfigurationsUseCaseImpl(variationPointsExtractor, systemConfigurationsGenerator, executor);
     }
 }

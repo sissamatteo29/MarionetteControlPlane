@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 
 public record SystemConfigurationSnapshot(
-    Map<String, ServiceSnapshot> services,
+    Map<String, ServiceSnapshot> services,  // service name to service snapshot
     Instant capturedAt
 ) {
     public SystemConfigurationSnapshot {

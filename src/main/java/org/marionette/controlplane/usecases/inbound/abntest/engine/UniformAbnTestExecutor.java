@@ -1,7 +1,11 @@
 package org.marionette.controlplane.usecases.inbound.abntest.engine;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.domain.values.BehaviourId;
@@ -12,69 +16,189 @@ import org.marionette.controlplane.usecases.domain.configsnapshot.SystemConfigur
 import org.marionette.controlplane.usecases.inbound.abntest.domain.GlobalMetricsRegistry;
 import org.marionette.controlplane.usecases.inbound.abntest.domain.SingleBehaviourSelection;
 import org.marionette.controlplane.usecases.inbound.abntest.domain.SystemBehaviourConfiguration;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.FetchMarionetteNodesMetricsGateway;
+import org.marionette.controlplane.usecases.outbound.servicemanipulation.ChangeBehaviourData;
 import org.marionette.controlplane.usecases.outbound.servicemanipulation.ControlMarionetteServiceBehaviourGateway;
 
 public class UniformAbnTestExecutor implements AbnTestExecutor {
 
     private final ConfigRegistry globalRegistry;
     private final ControlMarionetteServiceBehaviourGateway controlMarionetteGateway;
+    private final FetchMarionetteNodesMetricsGateway fetchMarionetteMetricsGateway;
+    private final AbnTestExecutorLogger logger = new AbnTestExecutorLogger();
 
     public UniformAbnTestExecutor(ConfigRegistry globalRegistry,
-            ControlMarionetteServiceBehaviourGateway controlMarionetteGateway) {
+            ControlMarionetteServiceBehaviourGateway controlMarionetteGateway, 
+            FetchMarionetteNodesMetricsGateway fetchMarionetteMetricsGateway) {
         this.globalRegistry = globalRegistry;
         this.controlMarionetteGateway = controlMarionetteGateway;
+        this.fetchMarionetteMetricsGateway = fetchMarionetteMetricsGateway;
     }
 
     @Override
     public GlobalMetricsRegistry executeAbnTest(List<SystemBehaviourConfiguration> systemConfigurations,
             Duration totalTime) {
-        GlobalMetricsRegistry globalMetricsRegistry = new GlobalMetricsRegistry();
 
+        Instant testStart = Instant.now();
+
+        // Log test start
+        logger.logTestExecutionStart(systemConfigurations, totalTime);
+
+        GlobalMetricsRegistry globalMetricsRegistry = new GlobalMetricsRegistry();
         // Compute time slice for each configuration
         Duration timeSlice = computeTimeSlice(totalTime, systemConfigurations.size());
 
+        // Capture original state
+        SystemConfigurationSnapshot originalState = SystemConfigurationSnapshot.fromConfigRegistry(globalRegistry);
+
         // MAIN LOOP
-        for (SystemBehaviourConfiguration systemBehaviourConfiguration : systemConfigurations) {
+        try {
+            for (int i = 0; i < systemConfigurations.size(); i++) {
+                SystemBehaviourConfiguration config = systemConfigurations.get(i);
+                int configIndex = i + 1;
 
-            // Apply configuration to globalregistry, TODO: send modificaitons through
-            // adapter
-            applyConfigurationToSystem(systemBehaviourConfiguration, globalRegistry, controlMarionetteGateway);
+                try {
+                    // Log configuration start
+                    logger.logConfigurationStart(configIndex, systemConfigurations.size(), config, timeSlice);
 
-            // Acquire snapshot of the current configuration
-            SystemConfigurationSnapshot systemConfigurationSnapshot = SystemConfigurationSnapshot.fromConfigRegistry(globalRegistry);
+                    // Apply configuration
+                    SystemConfigurationSnapshot appliedSnapshot = applyConfigurationToSystem(config);
+                    logger.logConfigurationApplied(configIndex, appliedSnapshot);
 
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                    // Wait for time slice
+                    Thread.sleep(timeSlice.toMillis());
+
+                    // Collect metrics
+                    SystemMetricsDataPoint metrics = collectMetrics();
+                    // logger.logMetricsCollection(configIndex, metrics);
+
+                    // // Store results
+                    // results.putSystemMetrics(appliedSnapshot, metrics);
+
+                    // // Log completion
+                    // Duration actualDuration = Duration.between(configStart, Instant.now());
+                    // logger.logConfigurationComplete(configIndex, actualDuration, true);
+
+                } catch (Exception e) {
+                    logger.logConfigurationFailure(configIndex, config, e);
+                }
             }
 
-            // TODO: fetch metrics stuff
-            System.out.println("Fetching metrics...");
-
+        } finally {
+            System.out.println("Restoring original state...");
         }
 
         return globalMetricsRegistry;
     }
 
-    private void applyConfigurationToSystem(SystemBehaviourConfiguration systemBehaviourConfiguration,
-            ConfigRegistry globalRegistry, ControlMarionetteServiceBehaviourGateway controlMarionetteGateway) {
-        
-        for(SingleBehaviourSelection behaviourSelection : systemBehaviourConfiguration) {
-            // Verify if already applied
-            ServiceName serviceName = behaviourSelection.getServiceName();
-            ClassName className = behaviourSelection.getClassName();
-            MethodName methodName = behaviourSelection.getMethodName();
-            BehaviourId selectedBehaviour = behaviourSelection.selectedBehaviour();
-            if(!isBehaviourAlreadyApplied(globalRegistry, behaviourSelection)) {
-                System.out.println("Applying modification to the method [" + serviceName + ":" + className + ":" + methodName + "] " + "changing to " + selectedBehaviour );
-                globalRegistry.modifyCurrentBehaviourForMethod(serviceName, className, methodName, selectedBehaviour);
+    private SystemConfigurationSnapshot applyConfigurationToSystem(
+            SystemBehaviourConfiguration systemBehaviourConfiguration) {
 
-                // TODO: apply configurations to remote marionette node 
-            } else {
-                System.out.println("The behaviourId [" + selectedBehaviour + "] was already applied for the method: " + serviceName + ":" + className + ":" + methodName);
+        System.out.println("\n" + "-".repeat(60));
+        System.out.println("⚙️  APPLYING SYSTEM CONFIGURATION");
+        System.out.println("-".repeat(60));
+
+        // Count total selections and group by service for summary
+        Map<String, List<SingleBehaviourSelection>> selectionsByService = groupSelectionsByService(
+                systemBehaviourConfiguration);
+        int totalSelections = systemBehaviourConfiguration.getBehaviourSelections().size();
+
+        System.out.printf("📊 Configuration Summary:%n");
+        System.out.printf("   • Total behavior changes: %d%n", totalSelections);
+        System.out.printf("   • Services affected: %d%n", selectionsByService.size());
+
+        // Show service breakdown
+        selectionsByService.forEach((serviceName, selections) -> System.out.printf("   • %s: %d changes%n", serviceName,
+                selections.size()));
+
+        System.out.println("\n🔄 Applying changes:");
+
+        int appliedCount = 0;
+        int skippedCount = 0;
+        List<String> errors = new ArrayList<>();
+
+        // Apply each selection
+        for (SingleBehaviourSelection behaviourSelection : systemBehaviourConfiguration) {
+            try {
+                boolean wasApplied = applySingleBehaviourSelection(behaviourSelection);
+                if (wasApplied) {
+                    appliedCount++;
+                } else {
+                    skippedCount++;
+                }
+            } catch (Exception e) {
+                errors.add(String.format("%s: %s",
+                        behaviourSelection.getFullMethodPath(),
+                        e.getMessage()));
             }
         }
+
+        // Summary
+        System.out.println("\n📋 Application Results:");
+        System.out.printf("   ✅ Applied: %d%n", appliedCount);
+        System.out.printf("   ⏭️  Skipped: %d%n", skippedCount);
+
+        if (!errors.isEmpty()) {
+            System.out.printf("   ❌ Errors: %d%n", errors.size());
+            errors.forEach(error -> System.out.printf("      • %s%n", error));
+        }
+
+        System.out.println("-".repeat(60));
+
+        return SystemConfigurationSnapshot.fromConfigRegistry(globalRegistry);
+    }
+
+    private boolean applySingleBehaviourSelection(SingleBehaviourSelection behaviourSelection) {
+        ServiceName serviceName = behaviourSelection.getServiceName();
+        ClassName className = behaviourSelection.getClassName();
+        MethodName methodName = behaviourSelection.getMethodName();
+        BehaviourId selectedBehaviour = behaviourSelection.selectedBehaviour();
+
+        String methodPath = behaviourSelection.getFullMethodPath();
+        String behaviourId = selectedBehaviour.getBehaviourId();
+
+        // Check if already applied
+        if (isBehaviourAlreadyApplied(globalRegistry, behaviourSelection)) {
+            System.out.printf("   ⏭️  %s -> %s (already applied)%n", methodPath, behaviourId);
+            return false;
+        }
+
+        try {
+            System.out.printf("   🔄 %s -> %s", methodPath, behaviourId);
+
+            // Apply to registry
+            globalRegistry.modifyCurrentBehaviourForMethod(serviceName, className, methodName, selectedBehaviour);
+
+            // Notify service via HTTP
+            String serviceEndpoint = globalRegistry.getEndpointOfService(serviceName).toString();
+            controlMarionetteGateway.changeMarionetteServiceBehaviour(
+                    serviceEndpoint,
+                    new ChangeBehaviourData(
+                            serviceName.getServiceName(),
+                            className.getClassName(),
+                            methodName.getMethodName(),
+                            selectedBehaviour.getBehaviourId()));
+
+            System.out.println(" ✅");
+            return true;
+
+        } catch (Exception e) {
+            System.out.printf(" ❌ (%s)%n", e.getMessage());
+            throw e; // Re-throw to be handled by caller
+        }
+    }
+
+    private Map<String, List<SingleBehaviourSelection>> groupSelectionsByService(
+            SystemBehaviourConfiguration systemBehaviourConfiguration) {
+
+        Map<String, List<SingleBehaviourSelection>> grouped = new HashMap<>();
+
+        for (SingleBehaviourSelection selection : systemBehaviourConfiguration) {
+            String serviceName = selection.getServiceName().getServiceName();
+            grouped.computeIfAbsent(serviceName, k -> new ArrayList<>()).add(selection);
+        }
+
+        return grouped;
     }
 
     private boolean isBehaviourAlreadyApplied(ConfigRegistry globalRegistry,

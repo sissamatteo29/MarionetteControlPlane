@@ -5,10 +5,11 @@ kubectl get pods -n outfit-app
 minikube service marionette-control-plane -n outfit-app
 minikube service ui-service -n outfit-app
 
-kubectl logs deployments/image-processor-service -n outfit-app
-kubectl logs deployments/marionette-control-plane -n outfit-app
-kubectl logs deployments/imagestore-service -n outfit-app
-kubectl logs deployments/ui-service -n outfit-app
+# -f flag works on deployments and does streaming
+kubectl logs -f deployments/image-processor-service -n outfit-app
+kubectl logs -f deployments/marionette-control-plane -n outfit-app
+kubectl logs -f deployments/imagestore-service -n outfit-app
+kubectl logs -f deployments/ui-service -n outfit-app
 
 kubectl port-forward deployment/your-microservice 8080:8080 -n outfit-app
 kubectl port-forward svc/your-microservice 8080:8080 -n outfit-app
