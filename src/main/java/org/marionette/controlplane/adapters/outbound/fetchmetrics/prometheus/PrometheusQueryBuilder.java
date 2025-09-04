@@ -104,7 +104,7 @@ public class PrometheusQueryBuilder {
                     config,
                     span);
 
-            System.out.printf("Span: %-8s -> %s%n", span, query);
+            System.out.printf("Span: %-8s -> %s%n", span, query2);
         }
     }
 

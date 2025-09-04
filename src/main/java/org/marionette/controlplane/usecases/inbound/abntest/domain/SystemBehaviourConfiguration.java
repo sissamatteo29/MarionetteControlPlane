@@ -1,6 +1,7 @@
 package org.marionette.controlplane.usecases.inbound.abntest.domain;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -9,7 +10,7 @@ import org.marionette.controlplane.domain.values.BehaviourId;
 /**
  * Represents the selection of behaviours for VarianionPoints
  */
-public class SystemBehaviourConfiguration {
+public class SystemBehaviourConfiguration implements Iterable<SingleBehaviourSelection> {
 
     private final Map<VariationPoint, BehaviourId> behaviourSelections = new HashMap<>();
 
@@ -36,6 +37,16 @@ public class SystemBehaviourConfiguration {
         }
         return copy;
     }
+
+    @Override
+    public Iterator<SingleBehaviourSelection> iterator() {
+        // Return unmodifiable iterator to preserve encapsulation
+        return behaviourSelections.entrySet().stream().map(
+            entry -> new SingleBehaviourSelection(entry.getKey(), entry.getValue())
+        ).iterator();
+    }
+
+
 
     @Override
     public String toString() {
