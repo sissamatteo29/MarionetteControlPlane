@@ -2,6 +2,7 @@ package org.marionette.controlplane.usecases.inbound.abntest.domain;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.marionette.controlplane.domain.values.BehaviourId;
 
@@ -23,5 +24,26 @@ public class VariationSelector {
     public BehaviourId getSelection(VariationPoint variation) {
         return selections.get(variation);
     }
-    
+
+    @Override
+    public String toString() {
+        if (selections.isEmpty()) {
+            return "VariationSelector [no selections]";
+        }
+
+        String selectionsStr = selections.entrySet().stream()
+                .map(entry -> {
+                    VariationPoint vp = entry.getKey();
+                    BehaviourId behaviour = entry.getValue();
+                    return String.format("    %s.%s.%s -> %s",
+                            vp.serviceName(),
+                            vp.className(),
+                            vp.methodName(),
+                            behaviour.getBehaviourId());
+                })
+                .collect(Collectors.joining("\n"));
+
+        return String.format("VariationSelector [\n%s\n]", selectionsStr);
+    }
+
 }

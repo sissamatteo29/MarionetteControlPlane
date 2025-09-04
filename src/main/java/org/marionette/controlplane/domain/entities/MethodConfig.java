@@ -102,6 +102,10 @@ public class MethodConfig {
         return availableBehaviourIds;
     }
 
+    public int getNumberOfVariations() {
+        return availableBehaviourIds.behaviourNumber();
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;

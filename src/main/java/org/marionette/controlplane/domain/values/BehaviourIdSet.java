@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BehaviourIdSet {
 
@@ -30,6 +31,10 @@ public class BehaviourIdSet {
 
     public boolean isEmpty() {
         return behaviours.isEmpty();
+    }
+
+    public int behaviourNumber() {
+        return behaviours.size();
     }
 
     public BehaviourIdSet add(BehaviourId newBehaviour) {
@@ -77,7 +82,9 @@ public class BehaviourIdSet {
 
     @Override
     public String toString() {
-        return "BehaviourIdSet [behaviours=" + behaviours + "]";
+        return "[ " + getBehaviours().stream()
+            .map(id -> id.getBehaviourId())
+            .collect(Collectors.joining(", ")) + " ]";
     }
 
     
