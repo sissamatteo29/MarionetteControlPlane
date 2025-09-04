@@ -113,7 +113,8 @@ public class DebugConfigurationController {
     ) {
         
         Duration javaDuration = Duration.parse(duration);
-        return ResponseEntity.ok(gateway.fetchMetricsForService(serviceName, javaDuration));
+        Duration samplingPeriod = Duration.ofSeconds(1);
+        return ResponseEntity.ok(gateway.fetchMetricsForService(serviceName, javaDuration, samplingPeriod));
 
     }
 

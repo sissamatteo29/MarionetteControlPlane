@@ -10,6 +10,7 @@ public class PrometheusMetricConfig {
     private TimeAggregator timeAggregator;
     private ServiceAggregator serviceAggregator;
     private OptimizationDirection direction;
+    private int order;
 
 
     // UI and visual
@@ -118,6 +119,16 @@ public class PrometheusMetricConfig {
 
     public void setDirection(OptimizationDirection direction) {
         this.direction = direction;
+    }
+
+
+    public int getOrder() {
+        return order;
+    }
+
+
+    public void setOrder(int order) {
+        this.order = order;
     }
 
     

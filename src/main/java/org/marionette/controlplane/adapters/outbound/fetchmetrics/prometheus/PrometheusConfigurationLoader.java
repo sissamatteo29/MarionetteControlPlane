@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.PrometheusMetricConfig;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.OptimizationDirection;
@@ -43,7 +44,7 @@ public class PrometheusConfigurationLoader {
 
         // Pattern to match: MARIONETTE_METRICS_QUERIES_<KEY>_<PROPERTY>
         Pattern pattern = Pattern.compile(
-                "^MARIONETTE_METRICS_CONFIG_([A-Z_]+)_(QUERY|TIMEAGGREGATOR|SERVICEAGGREGATOR|DIRECTION|DISPLAYNAME|UNIT|DESCRIPTION)$");
+                "^MARIONETTE_METRICS_CONFIG_([A-Z_]+)_(QUERY|TIMEAGGREGATOR|SERVICEAGGREGATOR|ORDER|DIRECTION|DISPLAYNAME|UNIT|DESCRIPTION)$");
 
         Map<String, PrometheusMetricConfig> metrics = new LinkedHashMap<>();    // Maintains order of insertion!
 
@@ -67,6 +68,9 @@ public class PrometheusConfigurationLoader {
                         break;
                     case "serviceaggregator":
                         config.setServiceAggregator(ServiceAggregator.fromString(value));
+                        break;                    
+                    case "order":
+                        config.setOrder(Integer.parseInt(value));
                         break;
                     case "direction":
                         config.setDirection(OptimizationDirection.fromString(value));
@@ -84,7 +88,14 @@ public class PrometheusConfigurationLoader {
             }
         });
 
-        List<PrometheusMetricConfig> resultingConfigs = new ArrayList<>(metrics.values());
+        List<PrometheusMetricConfig> resultingConfigs = metrics.entrySet().stream()
+            .sorted((a, b) -> {
+                int priorityA = a.getValue().getOrder();
+                int priorityB = b.getValue().getOrder();
+                return Integer.compare(priorityA, priorityB);
+            })
+            .map(entry -> entry.getValue())
+            .collect(Collectors.toList());
 
         System.out.println("== FINISHED LOAD OF PROMETHEUS CONFIGS ==");
         PrometheusConfiguration prometheusConfiguration = new PrometheusConfiguration(

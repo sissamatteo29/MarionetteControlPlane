@@ -111,7 +111,9 @@ spec:
         - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_TIMEAGGREGATOR
           value: "avg"        
         - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_SERVICEAGGREGATOR
-          value: "sum"        
+          value: "sum"            
+        - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_ORDER
+          value: "1"        
         - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_DIRECTION
           value: "lower"
         - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_DISPLAYNAME
@@ -128,6 +130,8 @@ spec:
           value: "rate"        
         - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_SERVICEAGGREGATOR
           value: "sum"
+        - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_ORDER
+          value: "2"   
         - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_DIRECTION
           value: "higher"  # Simulates UX
         - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_DISPLAYNAME

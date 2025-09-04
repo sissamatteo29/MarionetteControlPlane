@@ -7,6 +7,6 @@ import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.Aggrega
 
 public interface FetchMarionetteNodesMetricsGateway {
 
-    public List<AggregateMetric> fetchMetricsForService(String serviceName, Duration timeSpan);
+    public List<AggregateMetric> fetchMetricsForService(String serviceName, Duration timeSpan, Duration samplingPeriod);
     
 }

@@ -51,6 +51,8 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
         // Compute time slice for each configuration
         Duration timeSlice = computeTimeSlice(totalTime, systemConfigurations.size());
 
+        Duration samplingPeriod = Duration.ofSeconds(1);
+
         // Capture original state
         SystemConfigurationSnapshot originalState = SystemConfigurationSnapshot.fromConfigRegistry(globalRegistry);
 
@@ -72,7 +74,7 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
                     Thread.sleep(timeSlice.toMillis());
 
                     // Collect metrics
-                    SystemMetricsDataPoint metrics = collectMetrics(appliedSnapshot, timeSlice);
+                    SystemMetricsDataPoint metrics = collectMetrics(appliedSnapshot, timeSlice, samplingPeriod);
                     logger.logMetricsCollection(configIndex, metrics);
 
                     // // Store results
@@ -94,12 +96,12 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
         return globalMetricsRegistry;
     }
 
-    private SystemMetricsDataPoint collectMetrics(SystemConfigurationSnapshot appliedSnapshot, Duration timeSlice) {
+    private SystemMetricsDataPoint collectMetrics(SystemConfigurationSnapshot appliedSnapshot, Duration timeSlice, Duration samplingPeriod) {
         
         List<ServiceMetricsDataPoint> collectedServiceDataPoints = new ArrayList<>();
 
         for(String serviceName : appliedSnapshot.getServiceNamesList()) {
-            List<AggregateMetric> metricsForService = fetchMarionetteMetricsGateway.fetchMetricsForService(serviceName, timeSlice);
+            List<AggregateMetric> metricsForService = fetchMarionetteMetricsGateway.fetchMetricsForService(serviceName, timeSlice, samplingPeriod);
             ServiceMetricsDataPoint serviceDataPoint = new ServiceMetricsDataPoint(appliedSnapshot.getServiceSnapshotByName(serviceName), metricsForService);
             collectedServiceDataPoints.add(serviceDataPoint);
         }

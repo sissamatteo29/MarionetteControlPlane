@@ -12,7 +12,7 @@ public class PrometheusQueryBuilder {
 
     public static String buildAggregationQuery(
             String prometheusUrl, String internalPath, String serviceName, PrometheusMetricConfig metricConfig,
-            Duration timeSpan) {
+            Duration timeSpan, Duration samplingPeriod) {
 
         // Build the PromQL query first
         StringBuilder promqlQuery = new StringBuilder();
@@ -34,7 +34,7 @@ public class PrometheusQueryBuilder {
         promqlQuery.append("(")
                 .append(metricConfig.getQuery())
                 .append(String.format("{service=\"%s\"}", serviceName))
-                .append(String.format("[%s:15s]", toPrometheus(timeSpan)))
+                .append(String.format("[%s:%s]", toPrometheus(timeSpan), toPrometheus(samplingPeriod)))
                 .append("))");
 
         // Now URL-encode the entire query
@@ -79,7 +79,8 @@ public class PrometheusQueryBuilder {
                 "/api/v1/query",
                 "image-processor-service",
                 config,
-                Duration.ofMinutes(5));
+                Duration.ofMinutes(5),
+                Duration.ofSeconds(13));
 
         System.out.println("Generated query:\n" + query);
 
@@ -102,7 +103,8 @@ public class PrometheusQueryBuilder {
                     "/api/v1/query",
                     "ui-service",
                     config,
-                    span);
+                    span,
+                    Duration.ofSeconds(13));
 
             System.out.printf("Span: %-8s -> %s%n", span, query2);
         }
