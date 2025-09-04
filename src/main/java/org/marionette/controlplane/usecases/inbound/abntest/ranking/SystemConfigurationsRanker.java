@@ -5,9 +5,11 @@ import org.marionette.controlplane.usecases.outbound.fetchmetrics.OrderedMetrics
 public class SystemConfigurationsRanker {
 
     private final OrderedMetricsMetadataProvider metricsMetadataProvider;
+    private final SystemMetricsAggregator systemMetricsAggregator;
 
-    public SystemConfigurationsRanker(OrderedMetricsMetadataProvider metricsMetadataProvider) {
+    public SystemConfigurationsRanker(OrderedMetricsMetadataProvider metricsMetadataProvider, SystemMetricsAggregator systemMetricsAggregator) {
         this.metricsMetadataProvider = metricsMetadataProvider;
+        this.systemMetricsAggregator = systemMetricsAggregator;
     }
     
 }

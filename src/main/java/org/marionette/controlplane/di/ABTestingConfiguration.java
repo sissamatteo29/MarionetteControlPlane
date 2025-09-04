@@ -12,6 +12,7 @@ import org.marionette.controlplane.usecases.inbound.abntest.engine.SystemConfigu
 import org.marionette.controlplane.usecases.inbound.abntest.engine.UniformAbnTestExecutor;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
 import org.marionette.controlplane.usecases.inbound.abntest.ranking.SystemConfigurationsRanker;
+import org.marionette.controlplane.usecases.inbound.abntest.ranking.SystemMetricsAggregator;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.FetchMarionetteNodesMetricsGateway;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.OrderedMetricsMetadataProvider;
 import org.marionette.controlplane.usecases.outbound.servicemanipulation.ControlMarionetteServiceBehaviourGateway;
@@ -55,8 +56,12 @@ public class ABTestingConfiguration {
     }
 
     @Bean
-    public SystemConfigurationsRanker ranker(OrderedMetricsMetadataProvider orderedMetricsProvider) {
-        return new SystemConfigurationsRanker(orderedMetricsProvider);
+    public SystemConfigurationsRanker ranker(OrderedMetricsMetadataProvider orderedMetricsProvider, SystemMetricsAggregator systemMetricsAggregator) {
+        return new SystemConfigurationsRanker(orderedMetricsProvider, systemMetricsAggregator);
+    }
+ 
+    @Bean SystemMetricsAggregator systemMetricsAggregator() {
+        return new SystemMetricsAggregator();
     }
 
     @Bean 
