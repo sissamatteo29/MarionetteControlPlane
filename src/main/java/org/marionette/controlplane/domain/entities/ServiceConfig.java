@@ -11,6 +11,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 public class ServiceConfig {
 
@@ -89,6 +90,14 @@ public class ServiceConfig {
 
     public Map<ClassName, ClassConfig> getClassConfigurations() {
         return Collections.unmodifiableMap(classConfigs);
+    }
+
+    public List<ClassConfig> getClassConfigsList() {
+        return classConfigs.values().stream().toList();
+    }
+
+    public List<MethodConfig> getMethodConfigsForClass(ClassName className) {
+        return classConfigs.get(className).getMethodConfigsList();
     }
 
 

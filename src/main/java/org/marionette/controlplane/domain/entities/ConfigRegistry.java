@@ -10,6 +10,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Set;
@@ -185,6 +186,19 @@ public class ConfigRegistry {
         if (current != null) {
             serviceMetadata.put(serviceName, current.withStatus(status).withLastSeen(Instant.now()));
         }
+    }
+
+
+    public List<ServiceConfig> getAllServiceConfigs() {
+        return runtimeConfigurations.values().stream().toList();
+    }
+
+    public List<ClassConfig> getClassConfigsForService(ServiceName serviceName) {
+        return runtimeConfigurations.get(serviceName).getClassConfigsList();
+    }
+
+    public List<MethodConfig> getMethodConfigsForServiceAndClass(ServiceName serviceName, ClassName className) {
+        return runtimeConfigurations.get(serviceName).getMethodConfigsForClass(className);
     }
 
 }

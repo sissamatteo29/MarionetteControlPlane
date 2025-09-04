@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.marionette.controlplane.domain.values.BehaviourId;
 import org.marionette.controlplane.domain.values.ClassName;
@@ -85,8 +86,16 @@ public class ClassConfig {
         return className.getClassName();
     }
 
+    public MethodConfig getMethodConfigByName(MethodName methodName) {
+        return methodConfigs.get(methodName);
+    }
+
     public Map<MethodName, MethodConfig> getMethodsConfigurations() {
         return Collections.unmodifiableMap(methodConfigs);       // Immutable view of the map, content of the map immutable by design
+    }
+
+    public List<MethodConfig> getMethodConfigsList() {
+        return methodConfigs.values().stream().toList();
     }
 
     private ClassConfig initialiseCopy() {
