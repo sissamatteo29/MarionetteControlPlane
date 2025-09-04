@@ -17,6 +17,9 @@ import org.marionette.controlplane.usecases.inbound.abntest.domain.GlobalMetrics
 import org.marionette.controlplane.usecases.inbound.abntest.domain.SingleBehaviourSelection;
 import org.marionette.controlplane.usecases.inbound.abntest.domain.SystemBehaviourConfiguration;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.FetchMarionetteNodesMetricsGateway;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.AggregateMetric;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.ServiceMetricsDataPoint;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.SystemMetricsDataPoint;
 import org.marionette.controlplane.usecases.outbound.servicemanipulation.ChangeBehaviourData;
 import org.marionette.controlplane.usecases.outbound.servicemanipulation.ControlMarionetteServiceBehaviourGateway;
 
@@ -69,8 +72,8 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
                     Thread.sleep(timeSlice.toMillis());
 
                     // Collect metrics
-                    SystemMetricsDataPoint metrics = collectMetrics();
-                    // logger.logMetricsCollection(configIndex, metrics);
+                    SystemMetricsDataPoint metrics = collectMetrics(appliedSnapshot, timeSlice);
+                    logger.logMetricsCollection(configIndex, metrics);
 
                     // // Store results
                     // results.putSystemMetrics(appliedSnapshot, metrics);
@@ -89,6 +92,19 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
         }
 
         return globalMetricsRegistry;
+    }
+
+    private SystemMetricsDataPoint collectMetrics(SystemConfigurationSnapshot appliedSnapshot, Duration timeSlice) {
+        
+        List<ServiceMetricsDataPoint> collectedServiceDataPoints = new ArrayList<>();
+
+        for(String serviceName : appliedSnapshot.getServiceNamesList()) {
+            List<AggregateMetric> metricsForService = fetchMarionetteMetricsGateway.fetchMetricsForService(serviceName, timeSlice);
+            ServiceMetricsDataPoint serviceDataPoint = new ServiceMetricsDataPoint(appliedSnapshot.getServiceSnapshotByName(serviceName), metricsForService);
+            collectedServiceDataPoints.add(serviceDataPoint);
+        }
+
+        return new SystemMetricsDataPoint(collectedServiceDataPoints);
     }
 
     private SystemConfigurationSnapshot applyConfigurationToSystem(
