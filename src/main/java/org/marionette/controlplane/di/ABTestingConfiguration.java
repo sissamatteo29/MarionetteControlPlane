@@ -11,6 +11,7 @@ import org.marionette.controlplane.usecases.inbound.abntest.engine.AbnTestExecut
 import org.marionette.controlplane.usecases.inbound.abntest.engine.SystemConfigurationsGenerator;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.UniformAbnTestExecutor;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
+import org.marionette.controlplane.usecases.inbound.abntest.ranking.SystemConfigurationsRanker;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.FetchMarionetteNodesMetricsGateway;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.OrderedMetricsMetadataProvider;
 import org.marionette.controlplane.usecases.outbound.servicemanipulation.ControlMarionetteServiceBehaviourGateway;
@@ -53,11 +54,21 @@ public class ABTestingConfiguration {
         return new PrometheusOrderedMetricsMetadataAdapter(config);
     }
 
+    @Bean
+    public SystemConfigurationsRanker ranker(OrderedMetricsMetadataProvider orderedMetricsProvider) {
+        return new SystemConfigurationsRanker(orderedMetricsProvider);
+    }
+
     @Bean 
     public AbnTestAllSystemConfigurationsUseCase abntestUseCase(
         VariationPointsExtractor variationPointsExtractor, 
         SystemConfigurationsGenerator systemConfigurationsGenerator, 
-        AbnTestExecutor executor) {
-        return new AbnTestAllSystemConfigurationsUseCaseImpl(variationPointsExtractor, systemConfigurationsGenerator, executor);
+        AbnTestExecutor executor,
+        SystemConfigurationsRanker ranker) {
+        return new AbnTestAllSystemConfigurationsUseCaseImpl(
+            variationPointsExtractor, 
+            systemConfigurationsGenerator, 
+            executor,
+            ranker);
     }
 }

@@ -10,17 +10,24 @@ import org.marionette.controlplane.usecases.inbound.abntest.domain.VariationPoin
 import org.marionette.controlplane.usecases.inbound.abntest.engine.AbnTestExecutor;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.SystemConfigurationsGenerator;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
+import org.marionette.controlplane.usecases.inbound.abntest.ranking.SystemConfigurationsRanker;
 
 public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSystemConfigurationsUseCase {
 
     private final VariationPointsExtractor variationPointsExtractor;
     private final SystemConfigurationsGenerator systemConfigurationsGenerator;
     private final AbnTestExecutor executor;
+    private final SystemConfigurationsRanker ranker;
 
-    public AbnTestAllSystemConfigurationsUseCaseImpl(VariationPointsExtractor variationPointsExtractor, SystemConfigurationsGenerator systemConfigurationsGenerator, AbnTestExecutor executor) {
+    public AbnTestAllSystemConfigurationsUseCaseImpl(
+        VariationPointsExtractor variationPointsExtractor, 
+        SystemConfigurationsGenerator systemConfigurationsGenerator, 
+        AbnTestExecutor executor,
+        SystemConfigurationsRanker ranker) {
         this.variationPointsExtractor = variationPointsExtractor;
         this.systemConfigurationsGenerator = systemConfigurationsGenerator;
         this.executor = executor;
+        this.ranker = ranker;
     }
 
     @Override
