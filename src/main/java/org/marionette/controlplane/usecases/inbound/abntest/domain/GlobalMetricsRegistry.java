@@ -1,10 +1,11 @@
-package org.marionette.controlplane.usecases.outbound.fetchmetrics.domain;
+package org.marionette.controlplane.usecases.inbound.abntest.domain;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.marionette.controlplane.usecases.domain.configsnapshot.SystemConfigurationSnapshot;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.SystemMetricsDataPoint;
 
 public class GlobalMetricsRegistry {
 
