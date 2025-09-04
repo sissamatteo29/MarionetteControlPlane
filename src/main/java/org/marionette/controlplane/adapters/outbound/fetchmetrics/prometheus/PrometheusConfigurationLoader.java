@@ -1,6 +1,5 @@
 package org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;

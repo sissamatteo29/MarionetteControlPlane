@@ -3,6 +3,7 @@ package org.marionette.controlplane.di;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusConfiguration;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusConfigurationLoader;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusFetchMarionetteNodesMetricsAdapter;
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusOrderedMetricsMetadataAdapter;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
 import org.marionette.controlplane.usecases.inbound.abntest.AbnTestAllSystemConfigurationsUseCaseImpl;
@@ -11,6 +12,7 @@ import org.marionette.controlplane.usecases.inbound.abntest.engine.SystemConfigu
 import org.marionette.controlplane.usecases.inbound.abntest.engine.UniformAbnTestExecutor;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.FetchMarionetteNodesMetricsGateway;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.OrderedMetricsMetadataProvider;
 import org.marionette.controlplane.usecases.outbound.servicemanipulation.ControlMarionetteServiceBehaviourGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +46,11 @@ public class ABTestingConfiguration {
         ControlMarionetteServiceBehaviourGateway controlMarionetteGateway,
         FetchMarionetteNodesMetricsGateway fetchMarionetteMetricsGateway) {
         return new UniformAbnTestExecutor(globalRegistry, controlMarionetteGateway, fetchMarionetteMetricsGateway);
+    }
+
+    @Bean
+    public OrderedMetricsMetadataProvider metricsMetadataProvider(PrometheusConfiguration config) {
+        return new PrometheusOrderedMetricsMetadataAdapter(config);
     }
 
     @Bean 
