@@ -1,4 +1,4 @@
-package org.marionette.controlplane.usecases.inbound.abntest.combinations;
+package org.marionette.controlplane.usecases.inbound.abntest.engine;
 
 import java.util.ArrayList;
 import java.util.List;

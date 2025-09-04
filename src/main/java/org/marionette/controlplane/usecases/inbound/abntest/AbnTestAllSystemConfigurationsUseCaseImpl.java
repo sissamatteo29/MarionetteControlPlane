@@ -2,7 +2,7 @@ package org.marionette.controlplane.usecases.inbound.abntest;
 
 import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
 import org.marionette.controlplane.usecases.inbound.AbnTestResult;
-import org.marionette.controlplane.usecases.inbound.abntest.combinations.VariationPointsExtractor;
+import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
 
 public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSystemConfigurationsUseCase {
 

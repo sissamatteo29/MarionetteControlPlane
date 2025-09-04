@@ -2,11 +2,12 @@ package org.marionette.controlplane.domain.values;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class BehaviourIdSet {
+public class BehaviourIdSet implements Iterable<BehaviourId>{
 
     private final Set<BehaviourId> behaviours;
 
@@ -85,6 +86,11 @@ public class BehaviourIdSet {
         return "[ " + getBehaviours().stream()
             .map(id -> id.getBehaviourId())
             .collect(Collectors.joining(", ")) + " ]";
+    }
+
+    @Override
+    public Iterator<BehaviourId> iterator() {
+        return behaviours.iterator();
     }
 
     

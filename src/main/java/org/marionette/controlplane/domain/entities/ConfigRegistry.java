@@ -158,7 +158,7 @@ public class ConfigRegistry {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("=== ConfigRegistry State ===\n");
+        sb.append("\n=== ConfigRegistry State ===\n");
         sb.append("Last discovery: ").append(lastDiscovery).append("\n");
         sb.append("Total services: ").append(runtimeConfigurations.size()).append("\n\n");
 
