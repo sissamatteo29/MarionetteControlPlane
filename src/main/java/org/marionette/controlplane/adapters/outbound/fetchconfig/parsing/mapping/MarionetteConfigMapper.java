@@ -6,9 +6,9 @@ import java.util.List;
 import org.marionette.controlplane.adapters.outbound.fetchconfig.parsing.dto.MarionetteClassConfigDTO;
 import org.marionette.controlplane.adapters.outbound.fetchconfig.parsing.dto.MarionetteMethodConfigDTO;
 import org.marionette.controlplane.adapters.outbound.fetchconfig.parsing.dto.MarionetteServiceConfigDTO;
-import org.marionette.controlplane.usecases.domain.ClassConfigData;
-import org.marionette.controlplane.usecases.domain.MethodConfigData;
-import org.marionette.controlplane.usecases.domain.ServiceConfigData;
+import org.marionette.controlplane.usecases.domain.dto.ClassConfigData;
+import org.marionette.controlplane.usecases.domain.dto.MethodConfigData;
+import org.marionette.controlplane.usecases.domain.dto.ServiceConfigData;
 
 public class MarionetteConfigMapper {
 

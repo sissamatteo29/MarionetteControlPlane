@@ -3,7 +3,7 @@ package org.marionette.controlplane.adapters.outbound.fetchconfig;
 import org.marionette.controlplane.adapters.outbound.fetchconfig.parsing.dto.MarionetteServiceConfigDTO;
 import org.marionette.controlplane.adapters.outbound.fetchconfig.parsing.mapping.MarionetteConfigMapper;
 import org.marionette.controlplane.exceptions.infrastructure.checked.FetchMarionetteConfigurationException;
-import org.marionette.controlplane.usecases.domain.ServiceConfigData;
+import org.marionette.controlplane.usecases.domain.dto.ServiceConfigData;
 import org.marionette.controlplane.usecases.outbound.fetchconfig.FetchMarionetteConfigurationGateway;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

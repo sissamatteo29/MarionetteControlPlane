@@ -1,7 +1,7 @@
 package org.marionette.controlplane.usecases.outbound.fetchconfig;
 
 import org.marionette.controlplane.exceptions.infrastructure.checked.FetchMarionetteConfigurationException;
-import org.marionette.controlplane.usecases.domain.ServiceConfigData;
+import org.marionette.controlplane.usecases.domain.dto.ServiceConfigData;
 
 public interface FetchMarionetteConfigurationGateway {
 

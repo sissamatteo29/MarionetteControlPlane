@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.marionette.controlplane.usecases.domain.DiscoveredServiceMetadata;
+import org.marionette.controlplane.usecases.domain.dto.DiscoveredServiceMetadata;
 import org.marionette.controlplane.usecases.outbound.servicediscovery.FindCandidateServicesPort;
 
 import io.kubernetes.client.openapi.ApiClient;

@@ -5,7 +5,7 @@ import org.marionette.controlplane.domain.entities.ClassConfig;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.domain.entities.MethodConfig;
 import org.marionette.controlplane.domain.values.*;
-import org.marionette.controlplane.usecases.domain.ServiceConfigData;
+import org.marionette.controlplane.usecases.domain.dto.ServiceConfigData;
 import org.marionette.controlplane.usecases.inbound.ChangeMarionetteServiceBehaviourUseCase;
 import org.marionette.controlplane.usecases.inbound.ReadAllMarionetteConfigsUseCase;
 import org.marionette.controlplane.usecases.inbound.changebehaviour.ChangeMarionetteServiceBehaviourRequest;

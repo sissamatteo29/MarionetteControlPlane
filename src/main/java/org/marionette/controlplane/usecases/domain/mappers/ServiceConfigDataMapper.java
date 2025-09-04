@@ -11,9 +11,9 @@ import org.marionette.controlplane.domain.entities.ServiceConfig;
 import org.marionette.controlplane.domain.values.ClassName;
 import org.marionette.controlplane.domain.values.MethodName;
 import org.marionette.controlplane.domain.values.ServiceName;
-import org.marionette.controlplane.usecases.domain.ClassConfigData;
-import org.marionette.controlplane.usecases.domain.MethodConfigData;
-import org.marionette.controlplane.usecases.domain.ServiceConfigData;
+import org.marionette.controlplane.usecases.domain.dto.ClassConfigData;
+import org.marionette.controlplane.usecases.domain.dto.MethodConfigData;
+import org.marionette.controlplane.usecases.domain.dto.ServiceConfigData;
 
 public class ServiceConfigDataMapper {
 

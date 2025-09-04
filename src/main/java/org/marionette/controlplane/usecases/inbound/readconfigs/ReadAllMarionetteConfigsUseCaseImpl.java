@@ -3,7 +3,7 @@ package org.marionette.controlplane.usecases.inbound.readconfigs;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.domain.entities.ServiceConfig;
 import org.marionette.controlplane.domain.values.ServiceName;
-import org.marionette.controlplane.usecases.domain.ServiceConfigData;
+import org.marionette.controlplane.usecases.domain.dto.ServiceConfigData;
 import org.marionette.controlplane.usecases.domain.mappers.ServiceConfigDataMapper;
 import org.marionette.controlplane.usecases.inbound.ReadAllMarionetteConfigsUseCase;
 

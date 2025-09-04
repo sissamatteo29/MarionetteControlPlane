@@ -5,7 +5,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import org.marionette.controlplane.usecases.domain.DiscoveredServiceMetadata;
+import org.marionette.controlplane.usecases.domain.dto.DiscoveredServiceMetadata;
 import org.marionette.controlplane.usecases.outbound.servicediscovery.ValidateMarionetteServicePort;
 
 import static java.util.Objects.requireNonNull;

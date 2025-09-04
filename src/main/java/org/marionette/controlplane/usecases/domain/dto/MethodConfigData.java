@@ -1,4 +1,4 @@
-package org.marionette.controlplane.usecases.domain;
+package org.marionette.controlplane.usecases.domain.dto;
 
 import java.util.List;
 
