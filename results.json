@@ -1,0 +1,613 @@
+{
+  "metricConfigs": [
+    {
+      "metricName": "JVM Heap Memory",
+      "order": 1,
+      "unit": "bytes",
+      "direction": "lower"
+    },
+    {
+      "metricName": "HTTP Request Rate",
+      "order": 2,
+      "unit": "req/s",
+      "direction": "higher"
+    }
+  ],
+  "ranking": [
+    {
+      "position": 1,
+      "systemConfig": [
+        {
+          "serviceName": "imagestore-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/imagestore/controllers/ImageStoreController.java",
+              "behaviours": [
+                {
+                  "methodName": "getFromCache",
+                  "behaviourId": "noCache"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "serviceName": "ui-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/ui/controllers/ImageCache.java",
+              "behaviours": [
+                {
+                  "methodName": "putImage",
+                  "behaviourId": "default"
+                },
+                {
+                  "methodName": "getImage",
+                  "behaviourId": "default"
+                }
+              ]
+            },
+            {
+              "className": "com/outfit/ui/controllers/UIConfig.java",
+              "behaviours": [
+                {
+                  "methodName": "decideUI",
+                  "behaviourId": "default"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "serviceName": "image-processor-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/processor/controllers/ImageProcessingController.java",
+              "behaviours": [
+                {
+                  "methodName": "processImageBytes",
+                  "behaviourId": "super_low_en"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "systemResults": [
+        {
+          "metricName": "HTTP Request Rate",
+          "value": 0.03,
+          "unit": "req/s"
+        },
+        {
+          "metricName": "JVM Heap Memory",
+          "value": 8266343,
+          "unit": "bytes"
+        }
+      ],
+      "serviceResults": [
+        {
+          "serviceName": "imagestore-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 83700880,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        },
+        {
+          "serviceName": "ui-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 87586520,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        },
+        {
+          "serviceName": "image-processor-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 76702904,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "position": 2,
+      "systemConfig": [
+        {
+          "serviceName": "imagestore-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/imagestore/controllers/ImageStoreController.java",
+              "behaviours": [
+                {
+                  "methodName": "getFromCache",
+                  "behaviourId": "useCache"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "serviceName": "ui-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/ui/controllers/ImageCache.java",
+              "behaviours": [
+                {
+                  "methodName": "putImage",
+                  "behaviourId": "default"
+                },
+                {
+                  "methodName": "getImage",
+                  "behaviourId": "default"
+                }
+              ]
+            },
+            {
+              "className": "com/outfit/ui/controllers/UIConfig.java",
+              "behaviours": [
+                {
+                  "methodName": "decideUI",
+                  "behaviourId": "beautiful"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "serviceName": "image-processor-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/processor/controllers/ImageProcessingController.java",
+              "behaviours": [
+                {
+                  "methodName": "processImageBytes",
+                  "behaviourId": "low_energy"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "systemResults": [
+        {
+          "metricName": "HTTP Request Rate",
+          "value": 0.0001,
+          "unit": "req/s"
+        },
+        {
+          "metricName": "JVM Heap Memory",
+          "value": 8266343,
+          "unit": "bytes"
+        }
+      ],
+      "serviceResults": [
+        {
+          "serviceName": "imagestore-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 83700880,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        },
+        {
+          "serviceName": "ui-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 87586520,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        },
+        {
+          "serviceName": "image-processor-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 76702904,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "position": 3,
+      "systemConfig": [
+        {
+          "serviceName": "imagestore-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/imagestore/controllers/ImageStoreController.java",
+              "behaviours": [
+                {
+                  "methodName": "getFromCache",
+                  "behaviourId": "useCache"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "serviceName": "ui-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/ui/controllers/ImageCache.java",
+              "behaviours": [
+                {
+                  "methodName": "putImage",
+                  "behaviourId": "default"
+                },
+                {
+                  "methodName": "getImage",
+                  "behaviourId": "default"
+                }
+              ]
+            },
+            {
+              "className": "com/outfit/ui/controllers/UIConfig.java",
+              "behaviours": [
+                {
+                  "methodName": "decideUI",
+                  "behaviourId": "beautiful"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "serviceName": "image-processor-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/processor/controllers/ImageProcessingController.java",
+              "behaviours": [
+                {
+                  "methodName": "processImageBytes",
+                  "behaviourId": "default"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "systemResults": [
+        {
+          "metricName": "HTTP Request Rate",
+          "value": 100,
+          "unit": "req/s"
+        },
+        {
+          "metricName": "JVM Heap Memory",
+          "value": 826634342.6666667,
+          "unit": "bytes"
+        }
+      ],
+      "serviceResults": [
+        {
+          "serviceName": "imagestore-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 83700880,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        },
+        {
+          "serviceName": "ui-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 87586520,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        },
+        {
+          "serviceName": "image-processor-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 76702904,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "position": 4,
+      "systemConfig": [
+        {
+          "serviceName": "imagestore-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/imagestore/controllers/ImageStoreController.java",
+              "behaviours": [
+                {
+                  "methodName": "getFromCache",
+                  "behaviourId": "useCache"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "serviceName": "ui-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/ui/controllers/ImageCache.java",
+              "behaviours": [
+                {
+                  "methodName": "putImage",
+                  "behaviourId": "default"
+                },
+                {
+                  "methodName": "getImage",
+                  "behaviourId": "default"
+                }
+              ]
+            },
+            {
+              "className": "com/outfit/ui/controllers/UIConfig.java",
+              "behaviours": [
+                {
+                  "methodName": "decideUI",
+                  "behaviourId": "beautiful"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "serviceName": "image-processor-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/processor/controllers/ImageProcessingController.java",
+              "behaviours": [
+                {
+                  "methodName": "processImageBytes",
+                  "behaviourId": "super_low_en"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "systemResults": [
+        {
+          "metricName": "HTTP Request Rate",
+          "value": 199,
+          "unit": "req/s"
+        },
+        {
+          "metricName": "JVM Heap Memory",
+          "value": 8266333434.6666667,
+          "unit": "bytes"
+        }
+      ],
+      "serviceResults": [
+        {
+          "serviceName": "imagestore-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 83700880,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        },
+        {
+          "serviceName": "ui-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 87586520,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        },
+        {
+          "serviceName": "image-processor-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 76702904,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "position": 5,
+      "systemConfig": [
+        {
+          "serviceName": "imagestore-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/imagestore/controllers/ImageStoreController.java",
+              "behaviours": [
+                {
+                  "methodName": "getFromCache",
+                  "behaviourId": "noCache"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "serviceName": "ui-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/ui/controllers/ImageCache.java",
+              "behaviours": [
+                {
+                  "methodName": "putImage",
+                  "behaviourId": "default"
+                },
+                {
+                  "methodName": "getImage",
+                  "behaviourId": "default"
+                }
+              ]
+            },
+            {
+              "className": "com/outfit/ui/controllers/UIConfig.java",
+              "behaviours": [
+                {
+                  "methodName": "decideUI",
+                  "behaviourId": "beautiful"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "serviceName": "image-processor-service",
+          "classConfigs": [
+            {
+              "className": "com/outfit/processor/controllers/ImageProcessingController.java",
+              "behaviours": [
+                {
+                  "methodName": "processImageBytes",
+                  "behaviourId": "low_energy"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "systemResults": [
+        {
+          "metricName": "HTTP Request Rate",
+          "value": 0,
+          "unit": "req/s"
+        },
+        {
+          "metricName": "JVM Heap Memory",
+          "value": 82663434.6666667,
+          "unit": "bytes"
+        }
+      ],
+      "serviceResults": [
+        {
+          "serviceName": "imagestore-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 83700880,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        },
+        {
+          "serviceName": "ui-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 87586520,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        },
+        {
+          "serviceName": "image-processor-service",
+          "results": [
+            {
+              "metricName": "JVM Heap Memory",
+              "value": 76702904,
+              "unit": "bytes"
+            },
+            {
+              "metricName": "HTTP Request Rate",
+              "value": 0,
+              "unit": "req/s"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

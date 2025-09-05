@@ -36,7 +36,9 @@ public class AbnTestResultsDownloadUseCaseImpl implements AbnTestResultsDownload
 
         // Extract first 5 positions in the ranking
         List<SystemConfigurationRankDTO> rankingDTO = new ArrayList<>();
-        for(int i = 0; i < 5; i++) {
+
+        int maxResults = Math.min(5, testResult.ranking().size());
+        for(int i = 0; i < maxResults; i++) {
 
             // Get the rank data
             SimpleConfigurationRanking rank = testResult.ranking().get(i);
