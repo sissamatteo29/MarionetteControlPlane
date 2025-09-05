@@ -34,11 +34,13 @@ public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSyst
 
     @Override
     public AbnTestResult execute() {
+        
         List<VariationPoint> variationPoints = variationPointsExtractor.extractAllVariationPoints();
+        
         List<SystemBehaviourConfiguration> systemConfigs =  systemConfigurationsGenerator.generateAllSystemConfigurations(variationPoints);
-
-        GlobalMetricsRegistry globalMetricsRegistry = executor.executeAbnTest(systemConfigs, Duration.ofSeconds(200));
-
+        
+        GlobalMetricsRegistry globalMetricsRegistry = executor.executeAbnTest(systemConfigs, Duration.ofSeconds(120));
+        
         List<SimpleConfigurationRanking> systemConfigRanking = ranker.rankConfigurations(globalMetricsRegistry.getAllMetrics());
 
         return new AbnTestResult();
