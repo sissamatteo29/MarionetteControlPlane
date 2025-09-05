@@ -14,6 +14,8 @@ import org.marionette.controlplane.usecases.inbound.abntest.engine.UniformAbnTes
 import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
 import org.marionette.controlplane.usecases.inbound.abntest.ranking.SystemConfigurationsRanker;
 import org.marionette.controlplane.usecases.inbound.abntest.ranking.SystemMetricsAggregator;
+import org.marionette.controlplane.usecases.inbound.downloadresult.AbnTestResultsDownloadUseCase;
+import org.marionette.controlplane.usecases.inbound.downloadresult.AbnTestResultsDownloadUseCaseImpl;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.FetchMarionetteNodesMetricsGateway;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.OrderedMetricsMetadataProvider;
 import org.marionette.controlplane.usecases.outbound.servicemanipulation.ControlMarionetteServiceBehaviourGateway;
@@ -62,8 +64,8 @@ public class ABTestingConfiguration {
     }
 
     @Bean
-    public SystemConfigurationsRanker ranker(OrderedMetricsMetadataProvider orderedMetricsProvider, SystemMetricsAggregator systemMetricsAggregator) {
-        return new SystemConfigurationsRanker(orderedMetricsProvider, systemMetricsAggregator);
+    public SystemConfigurationsRanker ranker(SystemMetricsAggregator systemMetricsAggregator) {
+        return new SystemConfigurationsRanker(systemMetricsAggregator);
     }
  
     @Bean SystemMetricsAggregator systemMetricsAggregator() {
@@ -76,12 +78,20 @@ public class ABTestingConfiguration {
         SystemConfigurationsGenerator systemConfigurationsGenerator, 
         AbnTestExecutor executor,
         SystemConfigurationsRanker ranker,
-        AbnTestResultsStorage resultsStorage) {
+        AbnTestResultsStorage resultsStorage,
+        OrderedMetricsMetadataProvider metricsMetadataProvider) {
         return new AbnTestAllSystemConfigurationsUseCaseImpl(
             variationPointsExtractor, 
             systemConfigurationsGenerator, 
             executor,
             ranker,
-            resultsStorage);
+            resultsStorage,
+            metricsMetadataProvider);
+    }
+
+
+    @Bean 
+    public AbnTestResultsDownloadUseCase testResultsDownloadUseCase(AbnTestResultsStorage storage) {
+        return new AbnTestResultsDownloadUseCaseImpl(storage);
     }
 }

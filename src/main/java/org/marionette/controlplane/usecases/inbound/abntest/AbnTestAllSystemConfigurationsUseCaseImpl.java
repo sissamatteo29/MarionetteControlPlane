@@ -15,6 +15,8 @@ import org.marionette.controlplane.usecases.inbound.abntest.engine.SystemConfigu
 import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
 import org.marionette.controlplane.usecases.inbound.abntest.ranking.SimpleConfigurationRanking;
 import org.marionette.controlplane.usecases.inbound.abntest.ranking.SystemConfigurationsRanker;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.OrderedMetricsMetadataProvider;
+import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.MetricsConfiguration;
 
 public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSystemConfigurationsUseCase {
 
@@ -23,18 +25,21 @@ public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSyst
     private final AbnTestExecutor executor;
     private final SystemConfigurationsRanker ranker;
     private final AbnTestResultsStorage resultsStorage;
+    private final OrderedMetricsMetadataProvider metricsMetadataProvider;
 
     public AbnTestAllSystemConfigurationsUseCaseImpl(
         VariationPointsExtractor variationPointsExtractor, 
         SystemConfigurationsGenerator systemConfigurationsGenerator, 
         AbnTestExecutor executor,
         SystemConfigurationsRanker ranker,
-        AbnTestResultsStorage resultsStorage) {
+        AbnTestResultsStorage resultsStorage,
+        OrderedMetricsMetadataProvider metricsMetadataProvider) {
         this.variationPointsExtractor = variationPointsExtractor;
         this.systemConfigurationsGenerator = systemConfigurationsGenerator;
         this.executor = executor;
         this.ranker = ranker;
         this.resultsStorage = resultsStorage;
+        this.metricsMetadataProvider = metricsMetadataProvider;
     }
 
     @Override
@@ -43,13 +48,16 @@ public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSyst
         List<VariationPoint> variationPoints = variationPointsExtractor.extractAllVariationPoints();
         
         List<SystemBehaviourConfiguration> systemConfigs =  systemConfigurationsGenerator.generateAllSystemConfigurations(variationPoints);
+
+        MetricsConfiguration metricsConfiguration = metricsMetadataProvider.loadMetrics();
         
         GlobalMetricsRegistry globalMetricsRegistry = executor.executeAbnTest(systemConfigs, Duration.ofSeconds(120));
         
-        List<SimpleConfigurationRanking> systemConfigRanking = ranker.rankConfigurations(globalMetricsRegistry.getAllMetrics());
+        List<SimpleConfigurationRanking> systemConfigRanking = ranker.rankConfigurations(globalMetricsRegistry.getAllMetrics(), metricsConfiguration);
 
         resultsStorage.putResults(
             new SingleAbnTestResult(
+                metricsConfiguration,
                 globalMetricsRegistry,
                 systemConfigRanking
             )

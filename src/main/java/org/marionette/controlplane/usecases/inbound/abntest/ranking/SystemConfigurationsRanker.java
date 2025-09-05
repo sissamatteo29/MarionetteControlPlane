@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.marionette.controlplane.usecases.outbound.fetchmetrics.OrderedMetricsMetadataProvider;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.AggregateMetric;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.MetricsConfiguration;
 import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.OrderedMetricMetadata;
@@ -15,25 +14,15 @@ import org.marionette.controlplane.usecases.outbound.fetchmetrics.domain.SystemM
 
 public class SystemConfigurationsRanker {
 
-    private final OrderedMetricsMetadataProvider metricsMetadataProvider;
     private final SystemMetricsAggregator systemMetricsAggregator;
-    private final MetricsConfiguration metricsConfiguration;
 
-    public SystemConfigurationsRanker(OrderedMetricsMetadataProvider metricsMetadataProvider,
-            SystemMetricsAggregator systemMetricsAggregator) {
-        this.metricsMetadataProvider = metricsMetadataProvider;
+    public SystemConfigurationsRanker(SystemMetricsAggregator systemMetricsAggregator) {
         this.systemMetricsAggregator = systemMetricsAggregator;
-
-        System.out.println("Initialized ranker with lexicographic priority order:");
-        this.metricsConfiguration = metricsMetadataProvider.loadMetrics();
-        for (OrderedMetricMetadata metric : metricsConfiguration) {
-            System.out.println("  " + metric.order() + ". " + metric.metricName() +
-                    " (" + metric.direction() + ")");
-        }
     }
 
     public List<SimpleConfigurationRanking> rankConfigurations(
-            Map<String, SystemMetricsDataPoint> configurations) {
+            Map<String, SystemMetricsDataPoint> configurations,
+            MetricsConfiguration metricsConfiguration) {
 
         if (configurations.isEmpty()) {
             return List.of();
@@ -69,12 +58,12 @@ public class SystemConfigurationsRanker {
         }
 
         // Log the ranking results
-        logRankingResults(rankings);
+        logRankingResults(rankings, metricsConfiguration);
 
         return rankings;
     }
 
-    private void logRankingResults(List<SimpleConfigurationRanking> rankings) {
+    private void logRankingResults(List<SimpleConfigurationRanking> rankings, MetricsConfiguration metricsConfiguration) {
         System.out.println("\n=== LEXICOGRAPHIC RANKING RESULTS ===");
 
         for (SimpleConfigurationRanking ranking : rankings) {
