@@ -1,10 +1,5 @@
 package org.marionette.controlplane.adapters.inbound.controllers;
 
-import org.marionette.controlplane.domain.entities.ServiceConfig;
-import org.marionette.controlplane.domain.entities.ClassConfig;
-import org.marionette.controlplane.domain.entities.ConfigRegistry;
-import org.marionette.controlplane.domain.entities.MethodConfig;
-import org.marionette.controlplane.domain.values.*;
 import org.marionette.controlplane.usecases.domain.dto.ServiceConfigData;
 import org.marionette.controlplane.usecases.inbound.ChangeMarionetteServiceBehaviourUseCase;
 import org.marionette.controlplane.usecases.inbound.ReadAllMarionetteConfigsUseCase;
@@ -17,12 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @RestController
