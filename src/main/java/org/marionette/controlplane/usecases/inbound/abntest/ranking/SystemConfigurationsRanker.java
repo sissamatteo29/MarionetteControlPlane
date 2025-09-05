@@ -52,7 +52,7 @@ public class SystemConfigurationsRanker {
             ComparableSystemConfiguration config = comparableConfigs.get(i);
 
             rankings.add(new SimpleConfigurationRanking(
-                    i + 1, // rank (1-based, 1 = best)
+                    i, // rank (0-based, 0 = best)
                     config.getConfigurationId(),
                     config.getSystemMetrics()));
         }

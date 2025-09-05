@@ -20,7 +20,7 @@ public class PrometheusOrderedMetricsMetadataAdapter implements OrderedMetricsMe
         
         List<OrderedMetricMetadata> domainMetricsModel = prometheusConfiguration.getMetrics()
             .stream()
-            .map(el -> new OrderedMetricMetadata(el.getDisplayName(), el.getOrder(), el.getDirection()))
+            .map(el -> new OrderedMetricMetadata(el.getDisplayName(), el.getOrder(), el.getDirection(), el.getUnit()))
             .collect(Collectors.toList());
 
         return new MetricsConfiguration(domainMetricsModel);

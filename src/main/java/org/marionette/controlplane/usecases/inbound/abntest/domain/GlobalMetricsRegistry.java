@@ -16,7 +16,8 @@ public class GlobalMetricsRegistry {
 
     private final AtomicInteger globalConfigCounter = new AtomicInteger(0);
 
-    public synchronized void putSystemMetrics(SystemConfigurationSnapshot systemConfigSnapshot, SystemMetricsDataPoint dataPoint) {
+    public synchronized void putSystemMetrics(SystemConfigurationSnapshot systemConfigSnapshot,
+            SystemMetricsDataPoint dataPoint) {
         String identifier = keyPattern + globalConfigCounter.getAndIncrement();
         globalConfigs.put(identifier, systemConfigSnapshot);
         globalMetrics.put(identifier, dataPoint);
@@ -25,14 +26,21 @@ public class GlobalMetricsRegistry {
     public SystemMetricsDataPoint getSystemDataPoint(int index) {
         return globalMetrics.get(keyPattern + index);
     }
-    
+
+    public SystemMetricsDataPoint getSystemDataPoint(String configId) {
+        return globalMetrics.get(configId);
+    }
+
     public SystemConfigurationSnapshot getSystemConfig(int index) {
         return globalConfigs.get(keyPattern + index);
+    }
+
+    public SystemConfigurationSnapshot getSystemConfig(String configId) {
+        return globalConfigs.get(configId);
     }
 
     public Map<String, SystemMetricsDataPoint> getAllMetrics() {
         return globalMetrics;
     }
-    
-    
+
 }
