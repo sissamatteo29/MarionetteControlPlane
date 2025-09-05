@@ -3,6 +3,8 @@ package org.marionette.controlplane.usecases.inbound.abntest;
 import java.time.Duration;
 import java.util.List;
 
+import org.marionette.controlplane.domain.entities.abntest.AbnTestResultsStorage;
+import org.marionette.controlplane.domain.entities.abntest.SingleAbnTestResult;
 import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
 import org.marionette.controlplane.usecases.inbound.AbnTestResult;
 import org.marionette.controlplane.usecases.inbound.abntest.domain.GlobalMetricsRegistry;
@@ -20,16 +22,19 @@ public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSyst
     private final SystemConfigurationsGenerator systemConfigurationsGenerator;
     private final AbnTestExecutor executor;
     private final SystemConfigurationsRanker ranker;
+    private final AbnTestResultsStorage resultsStorage;
 
     public AbnTestAllSystemConfigurationsUseCaseImpl(
         VariationPointsExtractor variationPointsExtractor, 
         SystemConfigurationsGenerator systemConfigurationsGenerator, 
         AbnTestExecutor executor,
-        SystemConfigurationsRanker ranker) {
+        SystemConfigurationsRanker ranker,
+        AbnTestResultsStorage resultsStorage) {
         this.variationPointsExtractor = variationPointsExtractor;
         this.systemConfigurationsGenerator = systemConfigurationsGenerator;
         this.executor = executor;
         this.ranker = ranker;
+        this.resultsStorage = resultsStorage;
     }
 
     @Override
@@ -42,6 +47,13 @@ public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSyst
         GlobalMetricsRegistry globalMetricsRegistry = executor.executeAbnTest(systemConfigs, Duration.ofSeconds(120));
         
         List<SimpleConfigurationRanking> systemConfigRanking = ranker.rankConfigurations(globalMetricsRegistry.getAllMetrics());
+
+        resultsStorage.putResults(
+            new SingleAbnTestResult(
+                globalMetricsRegistry,
+                systemConfigRanking
+            )
+        );
 
         return new AbnTestResult();
     }

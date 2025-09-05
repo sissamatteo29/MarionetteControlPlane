@@ -5,6 +5,7 @@ import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.Pro
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusFetchMarionetteNodesMetricsAdapter;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusOrderedMetricsMetadataAdapter;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
+import org.marionette.controlplane.domain.entities.abntest.AbnTestResultsStorage;
 import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
 import org.marionette.controlplane.usecases.inbound.abntest.AbnTestAllSystemConfigurationsUseCaseImpl;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.AbnTestExecutor;
@@ -21,6 +22,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ABTestingConfiguration {
+
+    @Bean
+    public AbnTestResultsStorage testResultsStorage() {
+        return new AbnTestResultsStorage();
+    }
     
     @Bean
     public PrometheusConfiguration loadConfiguration() {
@@ -69,11 +75,13 @@ public class ABTestingConfiguration {
         VariationPointsExtractor variationPointsExtractor, 
         SystemConfigurationsGenerator systemConfigurationsGenerator, 
         AbnTestExecutor executor,
-        SystemConfigurationsRanker ranker) {
+        SystemConfigurationsRanker ranker,
+        AbnTestResultsStorage resultsStorage) {
         return new AbnTestAllSystemConfigurationsUseCaseImpl(
             variationPointsExtractor, 
             systemConfigurationsGenerator, 
             executor,
-            ranker);
+            ranker,
+            resultsStorage);
     }
 }
