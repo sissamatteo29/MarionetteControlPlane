@@ -1,14 +1,16 @@
 package org.marionette.controlplane.di;
 
-import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusConfigurationLoader;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusFetchMarionetteNodesMetricsAdapter;
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusNonMarionetteNodesTracker;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusOrderedMetricsMetadataAdapter;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.configuration.PrometheusConfiguration;
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.configuration.PrometheusConfigurationLoader;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.domain.entities.abntest.AbnTestResultsStorage;
 import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
 import org.marionette.controlplane.usecases.inbound.abntest.AbnTestAllSystemConfigurationsUseCaseImpl;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.AbnTestExecutor;
+import org.marionette.controlplane.usecases.inbound.abntest.engine.NonMarionetteNodesTracker;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.SystemConfigurationsGenerator;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.UniformAbnTestExecutor;
 import org.marionette.controlplane.usecases.inbound.abntest.engine.VariationPointsExtractor;
@@ -54,8 +56,14 @@ public class ABTestingConfiguration {
     public AbnTestExecutor abnTestExecutor(
         ConfigRegistry globalRegistry, 
         ControlMarionetteServiceBehaviourGateway controlMarionetteGateway,
-        FetchMarionetteNodesMetricsGateway fetchMarionetteMetricsGateway) {
-        return new UniformAbnTestExecutor(globalRegistry, controlMarionetteGateway, fetchMarionetteMetricsGateway);
+        FetchMarionetteNodesMetricsGateway fetchMarionetteMetricsGateway,
+        NonMarionetteNodesTracker nonMarionetteNodesTracker) {
+        return new UniformAbnTestExecutor(globalRegistry, controlMarionetteGateway, fetchMarionetteMetricsGateway, nonMarionetteNodesTracker);
+    }
+
+    @Bean
+    public NonMarionetteNodesTracker nonMarionetteNodesTracker(PrometheusConfiguration config) {
+        return new PrometheusNonMarionetteNodesTracker(config);
     }
 
     @Bean

@@ -62,6 +62,8 @@ spec:
           value: "frontend,backend,payment-service,outfit-app"  # Comma-separated list
         - name: PROMETHEUS_URL
           value: "http://prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090"
+        - name: MARIONETTE_METRICS_INCLUDED_SERVICES
+          value: "image-processor-service, ui-service"
         
         - name: MARIONETTE_METRICS_ENABLED
           value: "true"

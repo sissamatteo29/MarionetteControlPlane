@@ -12,6 +12,7 @@ import org.marionette.controlplane.domain.values.BehaviourId;
 import org.marionette.controlplane.domain.values.ClassName;
 import org.marionette.controlplane.domain.values.MethodName;
 import org.marionette.controlplane.domain.values.ServiceName;
+import org.marionette.controlplane.usecases.domain.configsnapshot.ServiceSnapshot;
 import org.marionette.controlplane.usecases.domain.configsnapshot.SystemConfigurationSnapshot;
 import org.marionette.controlplane.usecases.inbound.abntest.domain.GlobalMetricsRegistry;
 import org.marionette.controlplane.usecases.inbound.abntest.domain.SingleBehaviourSelection;
@@ -114,7 +115,9 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
         // Metrics for the non marionette nodes
         for(String nonMarionetteService : nonMarionetteNodesTracker.retrieveNonMarionetteNodeNames()) {
             List<AggregateMetric> metricsForService = fetchMarionetteMetricsGateway.fetchMetricsForService(nonMarionetteService, timeSlice, samplingPeriod);
-            ServiceMetricsDataPoint serviceDataPoint = new ServiceMetricsDataPoint(null, metricsForService);
+            ServiceMetricsDataPoint serviceDataPoint = new ServiceMetricsDataPoint(
+                ServiceSnapshot.forNonMarionetteNode(nonMarionetteService), 
+                metricsForService);
             collectedServiceDataPoints.add(serviceDataPoint);
         }
 

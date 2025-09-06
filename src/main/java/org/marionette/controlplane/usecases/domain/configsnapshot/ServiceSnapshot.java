@@ -24,4 +24,12 @@ public record ServiceSnapshot(
             
         return new ServiceSnapshot(serviceConfig.serviceNameAsString(), classes);
     }
+    
+    /**
+     * Creates a placeholder ServiceSnapshot for non-marionette nodes that we collect metrics from
+     * but don't have marionette configuration for.
+     */
+    public static ServiceSnapshot forNonMarionetteNode(String serviceName) {
+        return new ServiceSnapshot(serviceName, Map.of());
+    }
 }
