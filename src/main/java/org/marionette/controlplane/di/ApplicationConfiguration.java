@@ -6,9 +6,11 @@ import org.marionette.controlplane.adapters.outbound.fetchconfig.HttpFetchMarion
 import org.marionette.controlplane.adapters.outbound.servicediscovery.HttpValidateMarionetteServiceAdapter;
 import org.marionette.controlplane.adapters.outbound.servicediscovery.KubernetesFindServicesAdapter;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
+import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
 import org.marionette.controlplane.usecases.inbound.ChangeMarionetteServiceBehaviourUseCase;
 import org.marionette.controlplane.usecases.inbound.FullMarionetteServiceConfigDiscoveryUseCase;
 import org.marionette.controlplane.usecases.inbound.ReadAllMarionetteConfigsUseCase;
+import org.marionette.controlplane.usecases.inbound.TriggerServiceRediscoveryUseCase;
 import org.marionette.controlplane.usecases.inbound.changebehaviour.ChangeMarionetteServiceBehaviourUseCaseImpl;
 import org.marionette.controlplane.usecases.inbound.fulldiscovery.FullMarionetteServiceConfigDiscoveryUseCaseImpl;
 import org.marionette.controlplane.usecases.inbound.readconfigs.ReadAllMarionetteConfigsUseCaseImpl;
@@ -35,8 +37,12 @@ public class ApplicationConfiguration {
     }
 
     @Bean 
-    public ConfigurationController configurationController(ReadAllMarionetteConfigsUseCase readAllMarionetteConfigsUseCase, ChangeMarionetteServiceBehaviourUseCase changeMarionetteServiceBehaviourUseCase) {
-        return new ConfigurationController(readAllMarionetteConfigsUseCase, changeMarionetteServiceBehaviourUseCase);
+    public ConfigurationController configurationController(
+            ReadAllMarionetteConfigsUseCase readAllMarionetteConfigsUseCase, 
+            ChangeMarionetteServiceBehaviourUseCase changeMarionetteServiceBehaviourUseCase,
+            TriggerServiceRediscoveryUseCase triggerServiceRediscoveryUseCase,
+            AbnTestAllSystemConfigurationsUseCase abnTestUseCase) {
+        return new ConfigurationController(readAllMarionetteConfigsUseCase, changeMarionetteServiceBehaviourUseCase, triggerServiceRediscoveryUseCase, abnTestUseCase);
     }
 
     @Bean

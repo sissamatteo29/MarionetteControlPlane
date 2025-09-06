@@ -44,6 +44,12 @@ public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSyst
 
     @Override
     public AbnTestResult execute() {
+        // Default duration of 100 seconds for backward compatibility
+        return execute(Duration.ofSeconds(100));
+    }
+    
+    @Override
+    public AbnTestResult execute(Duration totalDuration) {
         
         List<VariationPoint> variationPoints = variationPointsExtractor.extractAllVariationPoints();
         
@@ -51,7 +57,7 @@ public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSyst
 
         MetricsConfiguration metricsConfiguration = metricsMetadataProvider.loadMetrics();
         
-        GlobalMetricsRegistry globalMetricsRegistry = executor.executeAbnTest(systemConfigs, Duration.ofSeconds(100));
+        GlobalMetricsRegistry globalMetricsRegistry = executor.executeAbnTest(systemConfigs, totalDuration);
         
         List<SimpleConfigurationRanking> systemConfigRanking = ranker.rankConfigurations(globalMetricsRegistry.getAllMetrics(), metricsConfiguration);
 

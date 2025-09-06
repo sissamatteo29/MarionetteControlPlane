@@ -36,3 +36,6 @@ simply use logs from that pod or service.
 
 # Clean up build cache in minikube
 docker builder prune -a
+
+# Restart a pod
+kubectl rollout restart deployment/marionette-control-plane -n outfit-app

@@ -205,4 +205,16 @@ public class ConfigRegistry {
         return runtimeConfigurations.get(serviceName).getCurrentBehaviourIdForMethod(className, methodName);
     }
 
+    /**
+     * Flushes all configurations and metadata from the registry.
+     * This method is useful when you want to restart discovery from scratch.
+     */
+    public synchronized void flushAll() {
+        System.out.println("🧹 Flushing ConfigRegistry - clearing all configurations and metadata...");
+        templateConfigurations.clear();
+        runtimeConfigurations.clear();
+        serviceMetadata.clear();
+        lastDiscovery = Instant.now();
+        System.out.println("✅ ConfigRegistry flushed successfully");
+    }
 }

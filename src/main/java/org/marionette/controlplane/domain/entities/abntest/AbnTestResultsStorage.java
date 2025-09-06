@@ -1,18 +1,23 @@
 package org.marionette.controlplane.domain.entities.abntest;
 
-import java.util.LinkedList;
-import java.util.List;
+public class AbnTestResultsStorage {    // Single result storage -> for every new test, remove preceding one!
 
-public class AbnTestResultsStorage {
+    private SingleAbnTestResult testResults;
 
-    private final List<SingleAbnTestResult> testResults = new LinkedList<>();
+    public AbnTestResultsStorage() {
 
-    public SingleAbnTestResult getResults(int index) {
-        return testResults.get(index);
+    }
+
+    public AbnTestResultsStorage(SingleAbnTestResult testResults) {
+        this.testResults = testResults;
+    }
+
+    public SingleAbnTestResult getResults() {
+        return testResults;
     }
 
     public void putResults(SingleAbnTestResult result) {
-        testResults.add(result);
+        this.testResults = result;     
     }
 
 }

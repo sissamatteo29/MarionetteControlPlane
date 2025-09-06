@@ -1,8 +1,10 @@
 package org.marionette.controlplane.adapters.inbound.controllers;
 
 import org.marionette.controlplane.usecases.domain.dto.ServiceConfigData;
+import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
 import org.marionette.controlplane.usecases.inbound.ChangeMarionetteServiceBehaviourUseCase;
 import org.marionette.controlplane.usecases.inbound.ReadAllMarionetteConfigsUseCase;
+import org.marionette.controlplane.usecases.inbound.TriggerServiceRediscoveryUseCase;
 import org.marionette.controlplane.usecases.inbound.changebehaviour.ChangeMarionetteServiceBehaviourRequest;
 import org.marionette.controlplane.usecases.inbound.readconfigs.ReadAllMarionetteConfigsResponse;
 import org.marionette.controlplane.adapters.inbound.dto.*;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,11 +26,17 @@ public class ConfigurationController {
 
     private final ReadAllMarionetteConfigsUseCase readAllConfigsUseCase;
     private final ChangeMarionetteServiceBehaviourUseCase changeBehaviourUseCase;
+    private final TriggerServiceRediscoveryUseCase rediscoveryUseCase;
+    private final AbnTestAllSystemConfigurationsUseCase abnTestUseCase;
 
     public ConfigurationController(ReadAllMarionetteConfigsUseCase readAllConfigsUseCase,
-            ChangeMarionetteServiceBehaviourUseCase changeBehaviourUseCase) {
+            ChangeMarionetteServiceBehaviourUseCase changeBehaviourUseCase,
+            TriggerServiceRediscoveryUseCase rediscoveryUseCase,
+            AbnTestAllSystemConfigurationsUseCase abnTestUseCase) {
         this.readAllConfigsUseCase = readAllConfigsUseCase;
         this.changeBehaviourUseCase = changeBehaviourUseCase;
+        this.rediscoveryUseCase = rediscoveryUseCase;
+        this.abnTestUseCase = abnTestUseCase;
     }
 
     /**
@@ -120,6 +129,48 @@ public class ConfigurationController {
         return new AllServiceConfigsDTO(serviceDtos);
     }
 
-   
+    /**
+     * POST /api/services/discover - Trigger full service rediscovery
+     * This will flush the current configuration registry and restart the discovery process
+     */
+    @PostMapping("/services/discover")
+    public ResponseEntity<String> triggerServiceDiscovery(@RequestParam(defaultValue = "false") boolean fullRefresh) {
+        try {
+            if (fullRefresh) {
+                // Full rediscovery: flush registry and restart discovery
+                rediscoveryUseCase.execute();
+                return ResponseEntity.ok("Full service rediscovery completed successfully");
+            } else {
+                // For now, we'll treat non-full refresh the same as full refresh
+                // You could implement incremental discovery here if needed
+                rediscoveryUseCase.execute();
+                return ResponseEntity.ok("Service discovery completed successfully");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body("Service discovery failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * POST /api/services/start-ab-test - Start A/B testing with specified duration
+     */
+    @PostMapping("/services/start-ab-test")
+    public ResponseEntity<String> startAbTest(@RequestParam int durationSeconds) {
+        try {
+            if (durationSeconds <= 0) {
+                return ResponseEntity.badRequest()
+                    .body("Duration must be a positive number of seconds");
+            }
+            
+            Duration totalDuration = Duration.ofSeconds(durationSeconds);
+            abnTestUseCase.execute(totalDuration);
+            
+            return ResponseEntity.ok("A/B test started successfully with duration: " + durationSeconds + " seconds");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                .body("Failed to start A/B test: " + e.getMessage());
+        }
+    }
 
 }

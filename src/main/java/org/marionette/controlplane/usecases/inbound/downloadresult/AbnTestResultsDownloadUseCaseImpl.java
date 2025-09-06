@@ -30,7 +30,7 @@ public class AbnTestResultsDownloadUseCaseImpl implements AbnTestResultsDownload
     @Override
     public AbnTestDownloadResult execute() {
 
-        SingleAbnTestResult testResult = testResultsStorage.getResults(0);  // Get first result
+        SingleAbnTestResult testResult = testResultsStorage.getResults();  // Get first result
 
         List<MetricConfigurationDTO> metricConfigurationDTOs = metricsConfigToDto(testResult.metricsConfiguration());
 

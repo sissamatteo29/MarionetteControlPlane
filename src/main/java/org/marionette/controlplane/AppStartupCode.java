@@ -36,9 +36,9 @@ public class AppStartupCode implements CommandLineRunner {
         discoveryUseCase.execute();
         System.out.println("✅ Service discovery completed");
 
-        // Immediately start A/B testing after successful discovery
-        System.out.println("🧪 Starting A/B tests on system configurations...");
-        abnTestUseCase.execute();
-        System.out.println("✅ A/B testing completed");
+        // // Immediately start A/B testing after successful discovery
+        // System.out.println("🧪 Starting A/B tests on system configurations...");
+        // abnTestUseCase.execute();
+        // System.out.println("✅ A/B testing completed");
     }
 }

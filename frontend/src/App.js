@@ -273,7 +273,7 @@ const triggerServiceDiscovery = async (fullRefresh = false) => {
     }
   });
   if (!response.ok) throw new Error('Failed to trigger discovery');
-  return response.json();
+  return response.text(); // Changed from response.json() to response.text()
 };
 
 const resetServiceToTemplate = async (serviceName) => {
@@ -316,24 +316,42 @@ const MarionetteControlPanel = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDiscovering, setIsDiscovering] = useState(false);
+  const [showTestDialog, setShowTestDialog] = useState(false);
+  const [testDuration, setTestDuration] = useState({ hours: 0, minutes: 5, seconds: 0 });
+  const [isRunningTest, setIsRunningTest] = useState(false);
+  const [hasTestResults, setHasTestResults] = useState(false);
 
   // Load data from your Java API when component mounts
   useEffect(() => {
     const loadServices = async () => {
       try {
         setLoading(true);
+        setError(null); // Clear any previous errors
         const data = await fetchAllServices();
 
+        // Handle case where backend returns empty or null data
+        const safeData = data || { serviceConfigs: [] };
+        
         const transformedData = {
-          serviceConfigs: data.serviceConfigs || [],
-          totalServices: data.serviceConfigs ? data.serviceConfigs.length : 0,
+          serviceConfigs: safeData.serviceConfigs || [],
+          totalServices: safeData.serviceConfigs ? safeData.serviceConfigs.length : 0,
           unavailableServices: 0,
           lastDiscovery: new Date().toISOString()
         }
-        setServicesData(data);
+        setServicesData(transformedData);
+        
+        // Check for test results availability
+        checkResultsAvailability();
       } catch (err) {
         setError(err.message);
         console.error('Failed to load services:', err);
+        // Set empty data on error so UI doesn't break
+        setServicesData({
+          serviceConfigs: [],
+          totalServices: 0,
+          unavailableServices: 0,
+          lastDiscovery: new Date().toISOString()
+        });
       } finally {
         setLoading(false);
       }
@@ -345,20 +363,40 @@ const MarionetteControlPanel = () => {
   const handleRefreshServices = async (fullRefresh = false) => {
     try {
       setIsDiscovering(true);
+      setError(null); // Clear any previous errors
 
       if (fullRefresh) {
         // Trigger full discovery
         await triggerServiceDiscovery(true);
         // Wait a bit for discovery to complete, then refresh
         setTimeout(async () => {
-          const data = await fetchAllServices(true);
-          setServicesData(data);
-          setIsDiscovering(false);
+          try {
+            const data = await fetchAllServices();
+            const safeData = data || { serviceConfigs: [] };
+            const transformedData = {
+              serviceConfigs: safeData.serviceConfigs || [],
+              totalServices: safeData.serviceConfigs ? safeData.serviceConfigs.length : 0,
+              unavailableServices: 0,
+              lastDiscovery: new Date().toISOString()
+            };
+            setServicesData(transformedData);
+          } catch (refreshErr) {
+            setError(`Failed to refresh after discovery: ${refreshErr.message}`);
+          } finally {
+            setIsDiscovering(false);
+          }
         }, 3000);
       } else {
         // Quick refresh
-        const data = await fetchAllServices(true);
-        setServicesData(data);
+        const data = await fetchAllServices();
+        const safeData = data || { serviceConfigs: [] };
+        const transformedData = {
+          serviceConfigs: safeData.serviceConfigs || [],
+          totalServices: safeData.serviceConfigs ? safeData.serviceConfigs.length : 0,
+          unavailableServices: 0,
+          lastDiscovery: new Date().toISOString()
+        };
+        setServicesData(transformedData);
         setIsDiscovering(false);
       }
     } catch (err) {
@@ -422,12 +460,188 @@ const handleBehaviorChange = async (serviceName, className, methodName, newBehav
     const data = await fetchAllServices();
     setServicesData(data);
   }
+};  const handleStartAbTest = async () => {
+    const totalSeconds = testDuration.hours * 3600 + testDuration.minutes * 60 + testDuration.seconds;
+    
+    if (totalSeconds < 30) {
+      alert('Test duration must be at least 30 seconds');
+      return;
+    }
+
+    try {
+      setIsRunningTest(true);
+      setShowTestDialog(false);
+      setError(null);
+
+      const response = await fetch(`${API_BASE_URL}/services/start-ab-test?durationSeconds=${totalSeconds}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+
+      const successMessage = await response.text();
+      alert(successMessage);
+
+      // Wait for the test duration plus some buffer time before checking for results
+      setTimeout(() => {
+        checkResultsAvailability();
+      }, (totalSeconds + 10) * 1000); // Add 10 seconds buffer
+
+    } catch (err) {
+      setError(`Failed to start A/B test: ${err.message}`);
+      alert(`Failed to start A/B test: ${err.message}`);
+    } finally {
+      setIsRunningTest(false);
+    }
+  };
+
+const formatDurationDisplay = () => {
+  const totalSeconds = testDuration.hours * 3600 + testDuration.minutes * 60 + testDuration.seconds;
+  if (totalSeconds < 60) {
+    return `${totalSeconds} seconds`;
+  } else if (totalSeconds < 3600) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return seconds > 0 ? `${minutes} minutes, ${seconds} seconds` : `${minutes} minutes`;
+  } else {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    let result = `${hours} hour${hours > 1 ? 's' : ''}`;
+    if (minutes > 0) result += `, ${minutes} minute${minutes > 1 ? 's' : ''}`;
+    if (seconds > 0) result += `, ${seconds} second${seconds > 1 ? 's' : ''}`;
+    return result;
+  }
 };
 
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return 'Never';
     return new Date(timestamp).toLocaleString();
   };
+
+  // Test Duration Dialog Component
+  const TestDurationDialog = () => (
+    <div className="dialog-overlay" onClick={(e) => e.target.classList.contains('dialog-overlay') && setShowTestDialog(false)}>
+      <div className="dialog">
+        <div className="dialog-header">
+          <h3>Start System Test</h3>
+          <button onClick={() => setShowTestDialog(false)} className="close-button">×</button>
+        </div>
+        <div className="dialog-content">
+          <p>Configure the total duration for the A/B testing cycle:</p>
+          
+          <div className="duration-inputs">
+            <div className="duration-input">
+              <label>Hours</label>
+              <input
+                type="number"
+                min="0"
+                max="23"
+                value={testDuration.hours}
+                onChange={(e) => setTestDuration(prev => ({ ...prev, hours: Math.max(0, parseInt(e.target.value) || 0) }))}
+              />
+            </div>
+            <div className="duration-input">
+              <label>Minutes</label>
+              <input
+                type="number"
+                min="0"
+                max="59"
+                value={testDuration.minutes}
+                onChange={(e) => setTestDuration(prev => ({ ...prev, minutes: Math.max(0, parseInt(e.target.value) || 0) }))}
+              />
+            </div>
+            <div className="duration-input">
+              <label>Seconds</label>
+              <input
+                type="number"
+                min="0"
+                max="59"
+                value={testDuration.seconds}
+                onChange={(e) => setTestDuration(prev => ({ ...prev, seconds: Math.max(0, parseInt(e.target.value) || 0) }))}
+              />
+            </div>
+          </div>
+          
+          <div className="duration-summary">
+            <strong>Total Duration: {formatDurationDisplay()}</strong>
+          </div>
+          
+          <div className="dialog-actions">
+            <button onClick={() => setShowTestDialog(false)} className="cancel-button">
+              Cancel
+            </button>
+            <button 
+              onClick={handleStartAbTest} 
+              className="start-test-button"
+              disabled={testDuration.hours === 0 && testDuration.minutes === 0 && testDuration.seconds === 0}
+            >
+              Start Test
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const checkResultsAvailability = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/downloadresult/available`);
+      if (response.ok) {
+        const available = await response.json();
+        setHasTestResults(available);
+      }
+    } catch (err) {
+      console.log('Failed to check results availability:', err);
+      // Don't show error to user, just assume no results
+      setHasTestResults(false);
+    }
+  };
+
+  const downloadTestResults = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/downloadresult`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to download results');
+      }
+
+      const resultsData = await response.json();
+      
+      // Create and download file
+      const jsonString = JSON.stringify(resultsData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `marionette-test-results-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      URL.revokeObjectURL(url);
+      
+    } catch (err) {
+      alert(`Failed to download test results: ${err.message}`);
+    }
+  };
+
+  useEffect(() => {
+    // Check for test results availability every 10 seconds
+    const interval = setInterval(() => {
+      checkResultsAvailability();
+    }, 10000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(interval);
+  }, []);
 
   if (loading) {
     return (
@@ -489,21 +703,31 @@ const handleBehaviorChange = async (serviceName, className, methodName, newBehav
           </div>
           <div className="app-actions">
             <button
-              onClick={() => handleRefreshServices(false)}
-              className="refresh-button"
-              disabled={isDiscovering}
+              onClick={() => setShowTestDialog(true)}
+              className="action-button start-test-button"
+              disabled={isRunningTest || isDiscovering}
             >
               <Activity size={20} />
-              {isDiscovering ? 'Refreshing...' : 'Refresh'}
+              {isRunningTest ? 'Running Test...' : 'Start System Test'}
             </button>
             <button
               onClick={() => handleRefreshServices(true)}
-              className="discover-button"
-              disabled={isDiscovering}
+              className="action-button discover-button"
+              disabled={isDiscovering || isRunningTest}
             >
               <Search size={20} />
               {isDiscovering ? 'Discovering...' : 'Full Discovery'}
             </button>
+            {hasTestResults && (
+              <button
+                onClick={downloadTestResults}
+                className="action-button download-button"
+                disabled={isRunningTest || isDiscovering}
+              >
+                <BarChart3 size={20} />
+                Download Last Test Results
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -557,6 +781,8 @@ const handleBehaviorChange = async (serviceName, className, methodName, newBehav
           </div>
         )}
       </div>
+
+      {showTestDialog && <TestDurationDialog />}
     </div>
   );
 };
