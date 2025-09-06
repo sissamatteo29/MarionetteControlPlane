@@ -1,6 +1,5 @@
 """
-Main window and application logic for the Marionette Experiment Analyzer.
-Handles the primary GUI layout and coordination between components.
+Fixed main window with simple, reliable layout that doesn't squeeze content.
 """
 
 import tkinter as tk
@@ -11,15 +10,213 @@ import os
 
 from ..data.processor import DataProcessor
 from ..charts.generator import ChartGenerator
-from .styles import ModernStyles, InfoCardFactory, LayoutManager
-from .components import (
-    TitleBar, Sidebar, DataSummarySection, 
-    VisualizationSection, OverviewTab
-)
+from .styles import ModernStyles
+from .components import TitleBar, Sidebar
+
+
+class OverviewTab:
+    """Overview tab with simple, working layout."""
+    
+    def __init__(self, parent: tk.Widget, data_processor, chart_generator):
+        self.parent = parent
+        self.data_processor = data_processor
+        self.chart_generator = chart_generator
+    
+    def create_content(self):
+        """Create the overview tab content with simple layout."""
+        # Clear any existing content
+        for widget in self.parent.winfo_children():
+            widget.destroy()
+        
+        # Create main container with padding
+        main_container = tk.Frame(self.parent, bg='white')
+        main_container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        
+        # Info panel with fixed height
+        self.create_info_panel(main_container)
+        
+        # Chart section
+        self.create_chart_section(main_container)
+    
+    def create_info_panel(self, parent: tk.Widget):
+        """Create a properly sized information panel."""
+        stats = self.data_processor.get_summary_stats()
+        
+        # Info section with title
+        info_section = tk.Frame(parent, bg='white')
+        info_section.pack(fill=tk.X, pady=(0, 20))
+        
+        # Title
+        title_label = tk.Label(info_section, text="📊 Experiment Overview", 
+                              font=('Segoe UI', 16, 'bold'), 
+                              bg='white', fg='#2c3e50')
+        title_label.pack(pady=(0, 15))
+        
+        # Info cards container with fixed height
+        cards_container = tk.Frame(info_section, bg='#f8fafc', relief='solid', bd=1, height=90)
+        cards_container.pack(fill=tk.X, pady=(0, 0))
+        cards_container.pack_propagate(False)  # Force height
+        
+        # Cards frame inside container
+        cards_frame = tk.Frame(cards_container, bg='#f8fafc')
+        cards_frame.pack(fill=tk.BOTH, expand=True, padx=25, pady=15)
+        
+        # Info cards
+        cards_data = [
+            ("📊", "Configurations", str(stats.get('total_configurations', 0)), "Test scenarios"),
+            ("📏", "Metrics", str(stats.get('total_metrics', 0)), "Measurements"),
+            ("📈", "Processing", "Normalized", "Ready for analysis"),
+            ("📋", "Reading", "Higher = Better", "Optimized display"),
+        ]
+        
+        for i, (icon, title, value, subtitle) in enumerate(cards_data):
+            card = self.create_info_card(cards_frame, icon, title, value, subtitle)
+            card.pack(side=tk.LEFT, padx=(0, 20) if i < len(cards_data)-1 else (0, 0))
+    
+    def create_info_card(self, parent: tk.Widget, icon: str, title: str, value: str, subtitle: str) -> tk.Frame:
+        """Create a simple info card."""
+        card = tk.Frame(parent, bg='white', relief='solid', bd=1, width=180, height=60)
+        card.pack_propagate(False)
+        
+        # Content
+        content = tk.Frame(card, bg='white')
+        content.pack(fill=tk.BOTH, expand=True, padx=12, pady=10)
+        
+        # Header row
+        header = tk.Frame(content, bg='white')
+        header.pack(fill=tk.X)
+        
+        icon_label = tk.Label(header, text=icon, font=('Segoe UI Emoji', 16), bg='white')
+        icon_label.pack(side=tk.LEFT)
+        
+        title_label = tk.Label(header, text=title, font=('Segoe UI', 9, 'bold'), 
+                              bg='white', fg='#374151')
+        title_label.pack(side=tk.LEFT, padx=(8, 0))
+        
+        # Value
+        value_label = tk.Label(content, text=value, font=('Segoe UI', 12, 'bold'), 
+                              bg='white', fg='#3b82f6')
+        value_label.pack(anchor='w', pady=(3, 0))
+        
+        # Subtitle
+        subtitle_label = tk.Label(content, text=subtitle, font=('Segoe UI', 8), 
+                                 bg='white', fg='#6b7280')
+        subtitle_label.pack(anchor='w')
+        
+        return card
+    
+    def create_chart_section(self, parent: tk.Widget):
+        """Create the chart section."""
+        # Chart section with title
+        chart_section = tk.Frame(parent, bg='white')
+        chart_section.pack(fill=tk.BOTH, expand=True, pady=(20, 0))
+        
+        # Chart title
+        chart_title = tk.Label(chart_section, text="🔬 Parallel Coordinates Analysis", 
+                              font=('Segoe UI', 14, 'bold'), 
+                              bg='white', fg='#2c3e50')
+        chart_title.pack(pady=(0, 15))
+        
+        # Chart container
+        chart_container = tk.Frame(chart_section, bg='white')
+        chart_container.pack(fill=tk.BOTH, expand=True)
+        
+        self.create_parallel_coordinates_chart(chart_container)
+    
+    def create_parallel_coordinates_chart(self, parent: tk.Widget):
+        """Create parallel coordinates chart."""
+        parallel_data = self.data_processor.get_parallel_coordinates_data()
+        
+        if parallel_data.empty:
+            no_data_label = tk.Label(parent, text="📊\n\nNo data available\nLoad experiment data to view visualization",
+                                   font=('Segoe UI', 14), fg='#7f8c8d', bg='white', justify=tk.CENTER)
+            no_data_label.pack(expand=True)
+            return
+        
+        # Create figure
+        fig = Figure(figsize=(14, 7), dpi=100, facecolor='white')
+        ax = fig.add_subplot(111)
+        
+        # Get metric directions and order
+        metric_directions = {}
+        metric_order = {}
+        
+        for metric_config in self.data_processor.data['metricConfigs']:
+            metric_name = metric_config['metricName']
+            metric_directions[metric_name] = metric_config['direction']
+            metric_order[metric_name] = metric_config['order']
+        
+        # Create the chart
+        color_mapping = self.chart_generator.create_parallel_coordinates_chart(
+            ax, parallel_data, metric_directions, metric_order
+        )
+        
+        fig.tight_layout(pad=1.0)
+        
+        # Create canvas
+        canvas_widget = FigureCanvasTkAgg(fig, parent)
+        canvas_widget.draw()
+        
+        chart_widget = canvas_widget.get_tk_widget()
+        chart_widget.pack(fill=tk.BOTH, expand=True)
+        
+        # Add navigation toolbar
+        toolbar = NavigationToolbar2Tk(canvas_widget, parent)
+        toolbar.update()
+        
+        # Create legend
+        self.create_legend(parent, color_mapping)
+
+    def create_legend(self, parent: tk.Widget, color_mapping: list):
+        """Create a simple legend."""
+        if not color_mapping:
+            return
+        
+        # Legend container
+        legend_frame = tk.Frame(parent, bg='white', height=60)
+        legend_frame.pack(fill=tk.X, pady=(10, 0))
+        legend_frame.pack_propagate(False)
+        
+        # Title
+        title_label = tk.Label(legend_frame, 
+                              text=f"🏆 Top Configurations ({len(color_mapping)} total)",
+                              font=('Segoe UI', 11, 'bold'), bg='white', fg='#2c3e50')
+        title_label.pack(pady=(8, 5))
+        
+        # Configurations
+        configs_container = tk.Frame(legend_frame, bg='white')
+        configs_container.pack(fill=tk.X, padx=20)
+        
+        # Show top 3
+        top_configs = [c for c in color_mapping if c['priority'] == 'top']
+        for config in top_configs:
+            config_frame = tk.Frame(configs_container, bg='white')
+            config_frame.pack(side=tk.LEFT, padx=(0, 20))
+            
+            # Color indicator
+            color_canvas = tk.Canvas(config_frame, width=12, height=12, bg='white', highlightthickness=0)
+            color_canvas.pack(side=tk.LEFT, padx=(0, 5))
+            
+            import matplotlib.colors as mcolors
+            hex_color = mcolors.to_hex(config['color'])
+            color_canvas.create_oval(1, 1, 11, 11, fill=hex_color, outline='#ddd', width=1)
+            
+            # Label
+            label_text = f"{config['emoji']} {config['config']}"
+            config_label = tk.Label(config_frame, text=label_text, font=('Segoe UI', 9, 'bold'),
+                                   bg='white', fg='#2c3e50')
+            config_label.pack(side=tk.LEFT)
+        
+        # Remaining count
+        remaining_count = len(color_mapping) - len(top_configs)
+        if remaining_count > 0:
+            remaining_label = tk.Label(configs_container, text=f"... +{remaining_count} others",
+                                     font=('Segoe UI', 9), bg='white', fg='#7f8c8d')
+            remaining_label.pack(side=tk.LEFT, padx=(20, 0))
 
 
 class ModernExperimentAnalyzer:
-    """Main application class for the experiment analyzer."""
+    """Main application class with simple, reliable layout."""
     
     def __init__(self, root: tk.Tk):
         self.root = root
@@ -46,22 +243,26 @@ class ModernExperimentAnalyzer:
     def create_main_layout(self):
         """Create the main application layout."""
         # Main container
-        main_container = ttk.Frame(self.root, style='Modern.TFrame', padding="0")
-        main_container.pack(fill=tk.BOTH, expand=True)
+        main_container = ttk.Frame(self.root, style='Modern.TFrame')
+        main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        # Title bar
-        self.title_bar = TitleBar(main_container)
-        self.title_bar.pack(fill=tk.X, pady=(0, 10))
+        # Title bar with FORCED height
+        title_container = tk.Frame(main_container, bg='white', height=110)
+        title_container.pack(fill=tk.X, pady=(0, 15))
+        title_container.pack_propagate(False)  # FORCE the height
+        
+        self.title_bar = TitleBar(title_container)
+        self.title_bar.pack(fill=tk.BOTH, expand=True)
         
         # Content area with sidebar and main content
         content_frame = ttk.Frame(main_container, style='Modern.TFrame')
-        content_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=(0, 20))
+        content_frame.pack(fill=tk.BOTH, expand=True)
         
-        # Sidebar
+        # Sidebar (fixed width)
         self.sidebar = Sidebar(content_frame, self)
-        self.sidebar.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 20))
+        self.sidebar.pack(side=tk.LEFT, fill=tk.Y, padx=(0, 15))
         
-        # Main content area
+        # Main content area (expandable) - THIS IS KEY
         self.main_content = ttk.Frame(content_frame, style='Modern.TFrame')
         self.main_content.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
@@ -83,7 +284,7 @@ class ModernExperimentAnalyzer:
         
         # Create tab frames
         for tab_name, tab_id in tab_configs:
-            frame = ttk.Frame(self.notebook, style='Modern.TFrame', padding="10")
+            frame = ttk.Frame(self.notebook, style='Modern.TFrame')
             self.notebook.add(frame, text=tab_name)
             self.tabs[tab_id] = frame
         
@@ -92,24 +293,16 @@ class ModernExperimentAnalyzer:
     
     def load_data(self):
         """Load experiment data from file."""
-        # Try default file first (results.json in the same directory as main.py)
-        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))  # Go up from src/gui/
+        # Try default file first
+        project_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         default_file = os.path.join(project_dir, 'results.json')
         
-        print(f"Looking for default file at: {default_file}")
-        
         if os.path.exists(default_file):
-            print("Default file found, loading...")
             if self.data_processor.load_data_from_file(default_file):
                 self.on_data_loaded()
                 return
-            else:
-                print("Failed to load default file")
-        else:
-            print("Default file not found")
         
-        # If default doesn't exist or fails to load, open file dialog
-        print("Opening file dialog...")
+        # Open file dialog
         filepath = filedialog.askopenfilename(
             title="Select Experiment Results File",
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
@@ -117,14 +310,10 @@ class ModernExperimentAnalyzer:
         )
         
         if filepath:
-            print(f"User selected file: {filepath}")
             if self.data_processor.load_data_from_file(filepath):
                 self.on_data_loaded()
             else:
-                messagebox.showerror("Error", 
-                                   "Failed to load data. Please check the file format.")
-        else:
-            print("No file selected")
+                messagebox.showerror("Error", "Failed to load data. Please check the file format.")
     
     def on_data_loaded(self):
         """Handle successful data loading."""
@@ -144,7 +333,6 @@ class ModernExperimentAnalyzer:
         stats = self.data_processor.get_summary_stats()
         self.sidebar.update_summary(stats)
         
-        # Update metrics list
         if self.data_processor.data and 'metricConfigs' in self.data_processor.data:
             self.sidebar.update_metrics(self.data_processor.data['metricConfigs'])
     
@@ -156,7 +344,7 @@ class ModernExperimentAnalyzer:
             self.show_no_data_message(self.tabs['overview'])
             return
         
-        # Create overview tab
+        # Create simple overview tab
         overview_tab = OverviewTab(self.tabs['overview'], self.data_processor, self.chart_generator)
         overview_tab.create_content()
     
@@ -169,21 +357,19 @@ class ModernExperimentAnalyzer:
             return
         
         # Create rankings visualization
-        fig = Figure(figsize=(16, 10), dpi=100, facecolor='white')
+        fig = Figure(figsize=(12, 8), dpi=100, facecolor='white')
         ax = fig.add_subplot(111)
         
         self.chart_generator.create_rankings_chart(ax, self.data_processor.df_rankings)
+        fig.tight_layout()
         
         # Embed chart
-        chart_frame = ttk.Frame(self.tabs['rankings'], style='Modern.TFrame')
-        chart_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        
-        canvas_widget = FigureCanvasTkAgg(fig, chart_frame)
+        canvas_widget = FigureCanvasTkAgg(fig, self.tabs['rankings'])
         canvas_widget.draw()
-        canvas_widget.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+        canvas_widget.get_tk_widget().pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
         # Add navigation toolbar
-        toolbar = NavigationToolbar2Tk(canvas_widget, chart_frame)
+        toolbar = NavigationToolbar2Tk(canvas_widget, self.tabs['rankings'])
         toolbar.update()
     
     def create_trends(self):
@@ -196,7 +382,7 @@ class ModernExperimentAnalyzer:
         
         # Placeholder for trends analysis
         label = tk.Label(self.tabs['trends'], 
-                        text="Trends Analysis\\n(Feature coming soon)", 
+                        text="Trends Analysis\n(Feature coming soon)", 
                         font=('Segoe UI', 16), 
                         fg='#7f8c8d', bg='white')
         label.pack(expand=True)
@@ -231,7 +417,8 @@ class ModernExperimentAnalyzer:
     def clear_tab(self, tab_id: str):
         """Clear content from a specific tab."""
         if tab_id in self.tabs:
-            LayoutManager.clear_frame(self.tabs[tab_id])
+            for widget in self.tabs[tab_id].winfo_children():
+                widget.destroy()
     
     def show_no_data_message(self, parent: tk.Widget):
         """Show 'no data' message in a tab."""
@@ -244,7 +431,7 @@ class ModernExperimentAnalyzer:
         icon_label.pack(pady=(100, 20))
         
         message_label = tk.Label(message_frame, 
-                               text="No data loaded\\nClick 'Load Data' to begin analysis", 
+                               text="No data loaded\nClick 'Load Data' to begin analysis", 
                                font=('Segoe UI', 16), 
                                bg='white', fg='#7f8c8d',
                                justify=tk.CENTER)

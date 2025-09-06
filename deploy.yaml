@@ -105,15 +105,11 @@ spec:
 
 
         ########### NEW PROMETHEUS CONFIG FOR ABTESTING ############
-        # JVM Memory Metric
+        # JVM Memory Metric - Aggregated heap usage across all pods
         - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_QUERY
-          value: "jvm_memory_used_bytes"
-        - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_TIMEAGGREGATOR
-          value: "avg"        
-        - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_SERVICEAGGREGATOR
-          value: "sum"            
+          value: "sum(jvm_memory_used_bytes{area=\"heap\",job=~\".*{service}.*\"}) or vector(0)"
         - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_ORDER
-          value: "1"        
+          value: "2"
         - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_DIRECTION
           value: "lower"
         - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_DISPLAYNAME
@@ -121,26 +117,35 @@ spec:
         - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_UNIT
           value: "bytes"
         - name: MARIONETTE_METRICS_CONFIG_JVM_MEMORY_DESCRIPTION
-          value: "Amount of bytes used by the application over time (gauge)."
-        
-        # HTTP Requests
-        - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_QUERY
-          value: "http_server_requests_seconds_count"
-        - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_TIMEAGGREGATOR
-          value: "rate"        
-        - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_SERVICEAGGREGATOR
-          value: "sum"
-        - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_ORDER
-          value: "2"   
-        - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_DIRECTION
-          value: "higher"  # Simulates UX
-        - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_DISPLAYNAME
-          value: "HTTP Request Rate"
-        - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_UNIT
-          value: "req/s"
-        - name: MARIONETTE_METRICS_CONFIG_HTTP_REQUESTS_DESCRIPTION
-          value: "Amount of requests per second to the microservice"
+          value: "Total heap memory used across all service instances"
 
+        # Response Time - P95 response time averaged across all instances
+        - name: MARIONETTE_METRICS_CONFIG_RESPONSE_TIME_QUERY
+          value: "avg(histogram_quantile(0.95, sum by (instance, le) (rate(http_server_requests_seconds_bucket{job=~\".*{service}.*\"}[{timespan}])))) or vector(0)"
+        - name: MARIONETTE_METRICS_CONFIG_RESPONSE_TIME_ORDER
+          value: "1"
+        - name: MARIONETTE_METRICS_CONFIG_RESPONSE_TIME_DIRECTION
+          value: "lower"
+        - name: MARIONETTE_METRICS_CONFIG_RESPONSE_TIME_DISPLAYNAME
+          value: "P95 Response Time"
+        - name: MARIONETTE_METRICS_CONFIG_RESPONSE_TIME_UNIT
+          value: "s"
+        - name: MARIONETTE_METRICS_CONFIG_RESPONSE_TIME_DESCRIPTION
+          value: "95th percentile response time averaged across all service instances"
+
+        # CPU Usage - Average CPU usage across all instances
+        - name: MARIONETTE_METRICS_CONFIG_CPU_USAGE_QUERY
+          value: "avg(process_cpu_usage{job=~\".*{service}.*\"}) or vector(0)"
+        - name: MARIONETTE_METRICS_CONFIG_CPU_USAGE_ORDER
+          value: "3"
+        - name: MARIONETTE_METRICS_CONFIG_CPU_USAGE_DIRECTION
+          value: "lower"
+        - name: MARIONETTE_METRICS_CONFIG_CPU_USAGE_DISPLAYNAME
+          value: "Process CPU Usage"
+        - name: MARIONETTE_METRICS_CONFIG_CPU_USAGE_UNIT
+          value: "(ratio 0-1)"
+        - name: MARIONETTE_METRICS_CONFIG_CPU_USAGE_DESCRIPTION
+          value: "Average CPU usage ratio across all service instances (0.0 to 1.0)"
 ---
 # Service
 apiVersion: v1

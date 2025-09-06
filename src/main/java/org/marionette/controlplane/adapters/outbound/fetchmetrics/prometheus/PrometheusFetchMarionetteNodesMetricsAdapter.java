@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.configuration.PrometheusConfiguration;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.domain.PrometheusMetricConfig;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.dto.PrometheusApiResponse;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.dto.PrometheusQueryData;
@@ -49,11 +50,11 @@ public class PrometheusFetchMarionetteNodesMetricsAdapter implements FetchMarion
         for (PrometheusMetricConfig metricConfig : config.getMetrics()) {
             try {
                 // Build the API url
-                String query = PrometheusQueryBuilder.buildAggregationQuery(
-                        config.getUrl(),
-                        config.getApiPath(),
+                String query = PrometheusQueryBuilder.buildQuery(
+                        config.getPrometheusUrl(),
+                        config.getInternalPath(),
+                        metricConfig.getQuery(),
                         serviceName,
-                        metricConfig,
                         timeSpan,
                         samplingPeriod);
 

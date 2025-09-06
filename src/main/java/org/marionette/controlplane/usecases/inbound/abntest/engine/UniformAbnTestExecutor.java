@@ -29,13 +29,16 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
     private final ControlMarionetteServiceBehaviourGateway controlMarionetteGateway;
     private final FetchMarionetteNodesMetricsGateway fetchMarionetteMetricsGateway;
     private final AbnTestExecutorLogger logger = new AbnTestExecutorLogger();
+    private final NonMarionetteNodesTracker nonMarionetteNodesTracker;
 
     public UniformAbnTestExecutor(ConfigRegistry globalRegistry,
             ControlMarionetteServiceBehaviourGateway controlMarionetteGateway, 
-            FetchMarionetteNodesMetricsGateway fetchMarionetteMetricsGateway) {
+            FetchMarionetteNodesMetricsGateway fetchMarionetteMetricsGateway,
+            NonMarionetteNodesTracker nonMarionetteNodesTracker) {
         this.globalRegistry = globalRegistry;
         this.controlMarionetteGateway = controlMarionetteGateway;
         this.fetchMarionetteMetricsGateway = fetchMarionetteMetricsGateway;
+        this.nonMarionetteNodesTracker = nonMarionetteNodesTracker;
     }
 
     @Override
@@ -51,7 +54,7 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
         // Compute time slice for each configuration
         Duration timeSlice = computeTimeSlice(totalTime, systemConfigurations.size());
 
-        Duration samplingPeriod = Duration.ofSeconds(1);
+        Duration samplingPeriod = Duration.ofSeconds(20);
 
         // Capture original state
         SystemConfigurationSnapshot originalState = SystemConfigurationSnapshot.fromConfigRegistry(globalRegistry);
@@ -101,9 +104,17 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
         
         List<ServiceMetricsDataPoint> collectedServiceDataPoints = new ArrayList<>();
 
+
         for(String serviceName : appliedSnapshot.getServiceNamesList()) {
             List<AggregateMetric> metricsForService = fetchMarionetteMetricsGateway.fetchMetricsForService(serviceName, timeSlice, samplingPeriod);
             ServiceMetricsDataPoint serviceDataPoint = new ServiceMetricsDataPoint(appliedSnapshot.getServiceSnapshotByName(serviceName), metricsForService);
+            collectedServiceDataPoints.add(serviceDataPoint);
+        }
+
+        // Metrics for the non marionette nodes
+        for(String nonMarionetteService : nonMarionetteNodesTracker.retrieveNonMarionetteNodeNames()) {
+            List<AggregateMetric> metricsForService = fetchMarionetteMetricsGateway.fetchMetricsForService(nonMarionetteService, timeSlice, samplingPeriod);
+            ServiceMetricsDataPoint serviceDataPoint = new ServiceMetricsDataPoint(null, metricsForService);
             collectedServiceDataPoints.add(serviceDataPoint);
         }
 

@@ -51,7 +51,7 @@ public class AbnTestAllSystemConfigurationsUseCaseImpl implements AbnTestAllSyst
 
         MetricsConfiguration metricsConfiguration = metricsMetadataProvider.loadMetrics();
         
-        GlobalMetricsRegistry globalMetricsRegistry = executor.executeAbnTest(systemConfigs, Duration.ofSeconds(120));
+        GlobalMetricsRegistry globalMetricsRegistry = executor.executeAbnTest(systemConfigs, Duration.ofSeconds(300));
         
         List<SimpleConfigurationRanking> systemConfigRanking = ranker.rankConfigurations(globalMetricsRegistry.getAllMetrics(), metricsConfiguration);
 

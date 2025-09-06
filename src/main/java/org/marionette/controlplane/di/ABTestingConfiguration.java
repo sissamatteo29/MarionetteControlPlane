@@ -1,9 +1,9 @@
 package org.marionette.controlplane.di;
 
-import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusConfiguration;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusConfigurationLoader;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusFetchMarionetteNodesMetricsAdapter;
 import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.PrometheusOrderedMetricsMetadataAdapter;
+import org.marionette.controlplane.adapters.outbound.fetchmetrics.prometheus.configuration.PrometheusConfiguration;
 import org.marionette.controlplane.domain.entities.ConfigRegistry;
 import org.marionette.controlplane.domain.entities.abntest.AbnTestResultsStorage;
 import org.marionette.controlplane.usecases.inbound.AbnTestAllSystemConfigurationsUseCase;
