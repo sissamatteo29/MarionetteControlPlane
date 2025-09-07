@@ -75,6 +75,10 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
                     SystemConfigurationSnapshot appliedSnapshot = applyConfigurationToSystem(config);
                     logger.logConfigurationApplied(configIndex, appliedSnapshot);
 
+                    System.out.println("Spleeping 6s to let configuration stabilise");
+                    Thread.sleep(6_000);
+
+                    System.out.println("Now sleeping for " + timeSlice.toSeconds() + " seconds to gather metrics");;
                     // Wait for time slice
                     Thread.sleep(timeSlice.toMillis());
 
@@ -88,6 +92,10 @@ public class UniformAbnTestExecutor implements AbnTestExecutor {
                     // Log completion
                     Duration actualDuration = Duration.between(configStart, Instant.now());
                     logger.logConfigurationComplete(configIndex, actualDuration, true);
+
+                    System.out.println("=".repeat(30));
+                    System.out.println("Sleeping 6s before applying new configuration");
+                    Thread.sleep(6_000);
 
                 } catch (Exception e) {
                     logger.logConfigurationFailure(configIndex, config, e);
